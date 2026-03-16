@@ -35,6 +35,34 @@ export async function getDriverInfo(driverId: string) {
   return fetchErgast(`/drivers/${driverId}`);
 }
 
+export async function getSeasonSchedule(season: number) {
+  return fetchErgast(`/${season}`);
+}
+
+export async function getRoundResults(season: number, round: number) {
+  return fetchErgast(`/${season}/${round}/results`);
+}
+
+export async function getRoundQualifying(season: number, round: number) {
+  return fetchErgast(`/${season}/${round}/qualifying`);
+}
+
+export async function getDriverSeasonResults(season: number, driverId: string) {
+  return fetchErgast(`/${season}/drivers/${driverId}/results`);
+}
+
+export async function getDriverQualifying(season: number, driverId: string) {
+  return fetchErgast(`/${season}/drivers/${driverId}/qualifying`);
+}
+
+export async function getConstructorSeasonResults(season: number, constructorId: string) {
+  return fetchErgast(`/${season}/constructors/${constructorId}/results`);
+}
+
+export async function getCircuitWinners(circuitId: string) {
+  return fetchErgast(`/circuits/${circuitId}/results/1`);
+}
+
 // Connectivity test
 export async function testConnection(): Promise<boolean> {
   try {

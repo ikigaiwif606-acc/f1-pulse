@@ -1,0 +1,94 @@
+{
+  "common": {
+    "appName": "F1 Pulse",
+    "tagline": "F1 Analytics & Betting Intelligence",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "viewAll": "View All",
+    "learnMore": "Learn More"
+  },
+  "nav": {
+    "home": "Home",
+    "races": "Races",
+    "drivers": "Drivers",
+    "teams": "Teams",
+    "markets": "Markets",
+    "analytics": "Analytics"
+  },
+  "home": {
+    "nextRace": "Next Race",
+    "countdown": "Race starts in",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "min",
+    "seconds": "sec",
+    "liveOdds": "Live Polymarket Odds",
+    "recentResults": "Recent Results",
+    "topMovers": "Top Movers",
+    "championshipStandings": "Championship Standings"
+  },
+  "race": {
+    "circuit": "Circuit",
+    "date": "Date",
+    "sessions": "Sessions",
+    "fp1": "Free Practice 1",
+    "fp2": "Free Practice 2",
+    "fp3": "Free Practice 3",
+    "qualifying": "Qualifying",
+    "sprint": "Sprint",
+    "race": "Race",
+    "sprintWeekend": "Sprint Weekend",
+    "weather": "Weather Forecast",
+    "history": "Circuit History",
+    "results": "Results",
+    "polymarketOdds": "Polymarket Odds",
+    "safetyCarRate": "Safety Car Rate",
+    "overtakes": "Avg. Overtakes"
+  },
+  "driver": {
+    "profile": "Driver Profile",
+    "team": "Team",
+    "nationality": "Nationality",
+    "number": "Number",
+    "wins": "Wins",
+    "podiums": "Podiums",
+    "poles": "Poles",
+    "points": "Points",
+    "championship": "Championship Position",
+    "dnfRate": "DNF Rate",
+    "qualifyingPace": "Qualifying Pace",
+    "h2h": "Head-to-Head vs. Teammate"
+  },
+  "team": {
+    "profile": "Team Profile",
+    "drivers": "Drivers",
+    "constructorChampionship": "Constructors' Championship",
+    "wins": "Wins",
+    "points": "Points",
+    "podiums": "Podiums"
+  },
+  "markets": {
+    "title": "Polymarket F1 Markets",
+    "championship": "Championship",
+    "raceWinner": "Race Winner",
+    "headToHead": "Head-to-Head",
+    "props": "Props",
+    "volume": "Volume",
+    "liquidity": "Liquidity",
+    "betOn": "Bet on Polymarket",
+    "odds": "Odds",
+    "lastUpdated": "Last updated"
+  },
+  "analytics": {
+    "title": "Analytics Lab",
+    "qualifyingPace": "Qualifying Pace Analysis",
+    "racePace": "Race Pace Analysis",
+    "circuitComparison": "Circuit Comparison",
+    "safetyCarProbability": "Safety Car Probability",
+    "preRegulationData": "Pre-2026 regulation data"
+  },
+  "footer": {
+    "disclaimer": "F1 Pulse displays prediction market data for informational purposes only. This is not financial advice. Always do your own research.",
+    "poweredBy": "Powered by OpenF1 & Polymarket"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "common": {
+    "appName": "F1 Pulse",
+    "tagline": "F1 赛事分析与博彩情报平台",
+    "loading": "加载中...",
+    "error": "出了点问题",
+    "viewAll": "查看全部",
+    "learnMore": "了解更多"
+  },
+  "nav": {
+    "home": "首页",
+    "races": "赛事",
+    "drivers": "车手",
+    "teams": "车队",
+    "markets": "预测市场",
+    "analytics": "数据分析"
+  },
+  "home": {
+    "nextRace": "下一场比赛",
+    "countdown": "距离比赛开始",
+    "days": "天",
+    "hours": "时",
+    "minutes": "分",
+    "seconds": "秒",
+    "liveOdds": "Polymarket 实时赔率",
+    "recentResults": "最新赛果",
+    "topMovers": "赔率变动",
+    "championshipStandings": "积分榜"
+  },
+  "race": {
+    "circuit": "赛道",
+    "date": "日期",
+    "sessions": "赛程",
+    "fp1": "自由练习赛 1",
+    "fp2": "自由练习赛 2",
+    "fp3": "自由练习赛 3",
+    "qualifying": "排位赛",
+    "sprint": "冲刺赛",
+    "race": "正赛",
+    "sprintWeekend": "冲刺赛周末",
+    "weather": "天气预报",
+    "history": "赛道历史",
+    "results": "比赛结果",
+    "polymarketOdds": "Polymarket 赔率",
+    "safetyCarRate": "安全车出动率",
+    "overtakes": "平均超车次数"
+  },
+  "driver": {
+    "profile": "车手资料",
+    "team": "车队",
+    "nationality": "国籍",
+    "number": "车号",
+    "wins": "胜场",
+    "podiums": "领奖台",
+    "poles": "杆位",
+    "points": "积分",
+    "championship": "积分榜排名",
+    "dnfRate": "退赛率",
+    "qualifyingPace": "排位赛速度",
+    "h2h": "队友对比"
+  },
+  "team": {
+    "profile": "车队资料",
+    "drivers": "车手",
+    "constructorChampionship": "制造商锦标赛",
+    "wins": "胜场",
+    "points": "积分",
+    "podiums": "领奖台"
+  },
+  "markets": {
+    "title": "Polymarket F1 预测市场",
+    "championship": "年度冠军",
+    "raceWinner": "分站冠军",
+    "headToHead": "车手对决",
+    "props": "特殊投注",
+    "volume": "交易量",
+    "liquidity": "流动性",
+    "betOn": "在 Polymarket 下注",
+    "odds": "赔率",
+    "lastUpdated": "最后更新"
+  },
+  "analytics": {
+    "title": "数据分析实验室",
+    "qualifyingPace": "排位赛速度分析",
+    "racePace": "正赛速度分析",
+    "circuitComparison": "赛道对比",
+    "safetyCarProbability": "安全车出动概率",
+    "preRegulationData": "2026 规则变更前数据"
+  },
+  "footer": {
+    "disclaimer": "F1 Pulse 仅展示预测市场数据，不构成投资建议。请自行研究后做出决策。",
+    "poweredBy": "数据来源：OpenF1 & Polymarket"
+  }
+}

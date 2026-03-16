@@ -1,17 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-
-const CHAMPIONSHIP_ODDS = [
-  { name: "George Russell", code: "RUS", odds: 0.57, volume: "$18.2M", change: +0.05, color: "#27F4D2" },
-  { name: "Kimi Antonelli", code: "ANT", odds: 0.15, volume: "$8.4M", change: +0.03, color: "#27F4D2" },
-  { name: "Charles Leclerc", code: "LEC", odds: 0.10, volume: "$6.1M", change: -0.02, color: "#E80020" },
-  { name: "Lando Norris", code: "NOR", odds: 0.08, volume: "$5.7M", change: +0.01, color: "#FF8000" },
-  { name: "Max Verstappen", code: "VER", odds: 0.05, volume: "$4.9M", change: -0.04, color: "#3671C6" },
-];
+import { useChampionshipOdds } from "@/lib/hooks/use-markets";
 
 export function OddsSummary() {
   const t = useTranslations("markets");
+  const { odds, isLoading } = useChampionshipOdds();
 
   return (
     <div>
@@ -26,7 +20,7 @@ export function OddsSummary() {
       </div>
 
       <div className="space-y-1">
-        {CHAMPIONSHIP_ODDS.map((entry, i) => (
+        {odds.map((entry, i) => (
           <div
             key={entry.name}
             className="f1-transition group flex items-center gap-3 rounded bg-[#0f0f0f] p-2.5 hover:bg-[#131313]"
@@ -52,7 +46,7 @@ export function OddsSummary() {
               </div>
             </div>
 
-            <span className={`f1-data text-xs ${entry.change > 0 ? "text-emerald-400" : "text-[#E10600]"}`}>
+            <span className={`f1-data text-xs ${entry.change > 0 ? "text-emerald-400" : entry.change < 0 ? "text-[#E10600]" : "text-[#666]"}`}>
               {entry.change > 0 ? "+" : ""}{(entry.change * 100).toFixed(0)}%
             </span>
 
@@ -66,7 +60,7 @@ export function OddsSummary() {
 
       <div className="mt-3 flex items-center justify-between">
         <span className="f1-label-xs" style={{ color: "#2a2a2a" }}>
-          {t("lastUpdated")}: 2 min ago
+          {t("lastUpdated")}: {isLoading ? "refreshing..." : "just now"}
         </span>
         <a
           href="https://polymarket.com"

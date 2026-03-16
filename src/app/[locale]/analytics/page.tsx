@@ -1,6 +1,9 @@
 import { useTranslations } from "next-intl";
+import { getQualifyingResults } from "@/lib/api/ergast";
+import { getTeamColor } from "@/lib/data/transformers";
 
-const QUALIFYING = [
+// ── Fallback data ──────────────────────────────────────────────
+const FALLBACK_QUALIFYING = [
   { name: "Russell", code: "RUS", gap: "+0.000s", color: "#27F4D2", pct: 100 },
   { name: "Antonelli", code: "ANT", gap: "+0.187s", color: "#27F4D2", pct: 82 },
   { name: "Leclerc", code: "LEC", gap: "+0.342s", color: "#E80020", pct: 65 },
@@ -10,12 +13,12 @@ const QUALIFYING = [
 ];
 
 const SAFETY_CAR = [
-  { circuit: "Monaco", rate: 55, icon: "🇲🇨" },
-  { circuit: "Spa", rate: 45, icon: "🇧🇪" },
-  { circuit: "Suzuka", rate: 35, icon: "🇯🇵" },
-  { circuit: "Monza", rate: 30, icon: "🇮🇹" },
-  { circuit: "Silverstone", rate: 25, icon: "🇬🇧" },
-  { circuit: "Barcelona", rate: 20, icon: "🇪🇸" },
+  { circuit: "Monaco", rate: 55, icon: "\u{1F1F2}\u{1F1E8}" },
+  { circuit: "Spa", rate: 45, icon: "\u{1F1E7}\u{1F1EA}" },
+  { circuit: "Suzuka", rate: 35, icon: "\u{1F1EF}\u{1F1F5}" },
+  { circuit: "Monza", rate: 30, icon: "\u{1F1EE}\u{1F1F9}" },
+  { circuit: "Silverstone", rate: 25, icon: "\u{1F1EC}\u{1F1E7}" },
+  { circuit: "Barcelona", rate: 20, icon: "\u{1F1EA}\u{1F1F8}" },
 ];
 
 const DNF = [
@@ -27,7 +30,74 @@ const DNF = [
   { team: "Mercedes", rate: 0, color: "#27F4D2" },
 ];
 
-export default function AnalyticsPage() {
+type QualifyingEntry = { name: string; code: string; gap: string; color: string; pct: number };
+
+function parseQualifyingTime(time: string): number | null {
+  if (!time) return null;
+  const parts = time.split(":");
+  if (parts.length === 2) {
+    return parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+  }
+  const val = parseFloat(time);
+  return isNaN(val) ? null : val;
+}
+
+async function getQualifyingData(): Promise<QualifyingEntry[]> {
+  try {
+    for (const season of [2025, 2024]) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = (await getQualifyingResults(season)) as any;
+      const races = data?.MRData?.RaceTable?.Races || [];
+      if (races.length === 0) continue;
+
+      const latestRace = races[races.length - 1];
+      const results = latestRace?.QualifyingResults || [];
+      if (results.length === 0) continue;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const parsed = results.slice(0, 6).map((r: any) => {
+        const time = r.Q3 || r.Q2 || r.Q1 || "";
+        const driver = r.Driver;
+        const team = r.Constructor?.name || "";
+        return {
+          name: driver.familyName,
+          code: driver.code || driver.familyName.slice(0, 3).toUpperCase(),
+          time,
+          color: getTeamColor(team),
+        };
+      });
+
+      const poleTime = parseQualifyingTime(parsed[0]?.time);
+      if (!poleTime) continue;
+
+      return parsed.map(
+        (p: { name: string; code: string; time: string; color: string }, i: number) => {
+          const t = parseQualifyingTime(p.time);
+          const gap = t ? t - poleTime : 0;
+          const maxGap = 1.0;
+          const pct = Math.max(0, 100 - (gap / maxGap) * 100);
+          return {
+            name: p.name,
+            code: p.code,
+            gap: i === 0 ? "+0.000s" : `+${gap.toFixed(3)}s`,
+            color: p.color,
+            pct: Math.round(pct),
+          };
+        }
+      );
+    }
+    return FALLBACK_QUALIFYING;
+  } catch {
+    return FALLBACK_QUALIFYING;
+  }
+}
+
+export default async function AnalyticsPage() {
+  const qualifying = await getQualifyingData();
+  return <AnalyticsPageContent qualifying={qualifying} />;
+}
+
+function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] }) {
   const t = useTranslations("analytics");
 
   return (
@@ -49,7 +119,7 @@ export default function AnalyticsPage() {
             <p className="f1-label mb-4">Average gap to pole — 2026</p>
 
             <div className="space-y-2">
-              {QUALIFYING.map((d, i) => (
+              {qualifying.map((d, i) => (
                 <div key={d.code} className="flex items-center gap-3">
                   <span className="f1-data w-4 text-center text-[0.625rem]" style={{ color: "#444" }}>{i + 1}</span>
                   <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />

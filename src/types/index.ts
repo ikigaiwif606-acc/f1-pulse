@@ -129,6 +129,84 @@ export interface WeatherSummary {
   rainProbability: number;
 }
 
+// ── List Item Types (used by data-layer functions) ─────────────
+export interface RaceListItem {
+  slug: string;
+  round: number;
+  name: string;
+  circuit: string;
+  date: string; // display date e.g. "MAR 06"
+  isoDate?: string; // full ISO date for countdown
+  winner?: string;
+  code?: string;
+  color?: string;
+  completed: boolean;
+  next?: boolean;
+  sprint?: boolean;
+}
+
+export interface DriverListItem {
+  id: string;
+  name: string;
+  code: string;
+  team: string;
+  number: number;
+  pts: number;
+  wins: number;
+  podiums: number;
+  poles: number;
+  pos: number;
+  color: string;
+}
+
+export interface TeamListItem {
+  id: string;
+  name: string;
+  drivers: string[];
+  pts: number;
+  wins: number;
+  podiums: number;
+  pos: number;
+  color: string;
+}
+
+export interface ChampionshipOddsItem {
+  name: string;
+  code: string;
+  odds: number;
+  volume: string;
+  change: number;
+  color: string;
+}
+
+export interface MarketListItem {
+  question: string;
+  volume: string;
+  endDate: string;
+  outcomes: { name: string; code: string; price: number; color: string }[];
+}
+
+export interface MarketsData {
+  championship: MarketListItem[];
+  raceWinner: MarketListItem[];
+  props: MarketListItem[];
+}
+
+export interface HomepageData {
+  nextRace: {
+    name: string;
+    nameZh: string;
+    circuit: string;
+    circuitZh: string;
+    date: string;
+    round: number;
+    isSprint: boolean;
+  };
+  standings: { pos: number; id: string; name: string; code: string; pts: number; color: string }[];
+  recent: { round: number; slug: string; name: string; code: string; color: string }[];
+  maxPts: number;
+}
+
 // ── API Response Wrapper ─────────────────────────────────────────
 export interface ApiResponse<T> {
   data: T;

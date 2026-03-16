@@ -2,35 +2,27 @@ import { useTranslations } from "next-intl";
 import { RaceCountdown } from "@/components/races/race-countdown";
 import { OddsSummary } from "@/components/markets/odds-summary";
 import { Link } from "@/lib/i18n/navigation";
+import { getHomepageData } from "@/lib/data/home";
+import type { HomepageData } from "@/types";
 
-const NEXT_RACE = {
-  name: "Japanese Grand Prix",
-  nameZh: "日本大奖赛",
-  circuit: "Suzuka International Racing Course",
-  circuitZh: "铃鹿国际赛车场",
-  date: "2026-03-29T06:00:00Z",
-  round: 3,
-  isSprint: false,
-};
+export default async function HomePage() {
+  const data = await getHomepageData();
+  return <HomePageContent data={data} />;
+}
 
-const STANDINGS = [
-  { pos: 1, id: "russell", name: "George Russell", code: "RUS", pts: 51, color: "#27F4D2" },
-  { pos: 2, id: "antonelli", name: "Kimi Antonelli", code: "ANT", pts: 37, color: "#27F4D2" },
-  { pos: 3, id: "leclerc", name: "Charles Leclerc", code: "LEC", pts: 31, color: "#E80020" },
-  { pos: 4, id: "norris", name: "Lando Norris", code: "NOR", pts: 28, color: "#FF8000" },
-  { pos: 5, id: "verstappen", name: "Max Verstappen", code: "VER", pts: 25, color: "#3671C6" },
-];
-
-const RECENT = [
-  { round: 1, slug: "australian-gp", name: "Australian GP", code: "RUS", color: "#27F4D2" },
-  { round: 2, slug: "chinese-gp", name: "Chinese GP", code: "ANT", color: "#27F4D2" },
-];
-
-const maxPts = 51;
-
-export default function HomePage() {
+function HomePageContent({ data }: { data: HomepageData }) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
+
+  const { nextRace, standings, recent, maxPts } = data;
+  const completedCount = recent.length;
+  const totalRounds = 22;
+
+  const nextRaceSlug = nextRace.name
+    .replace(/Grand Prix$/i, "GP")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-");
 
   return (
     <div className="min-h-screen bg-[#080808]">
@@ -54,17 +46,17 @@ export default function HomePage() {
             <div className="hidden text-right sm:block">
               <p className="f1-label-xs">2026 Season</p>
               <p className="f1-data-lg text-[#666] mt-0.5">
-                R2<span style={{ color: "#2a2a2a" }}>/</span>22
+                R{completedCount}<span style={{ color: "#2a2a2a" }}>/</span>{totalRounds}
               </p>
             </div>
           </div>
 
-          <Link href={"/races/japanese-gp" as "/"} className="f1-surface block p-5 sm:p-6 f1-transition hover:!border-[#2a2a2a]">
+          <Link href={`/races/${nextRaceSlug}` as "/"} className="f1-surface block p-5 sm:p-6 f1-transition hover:!border-[#2a2a2a]">
             <div className="mb-4 flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#E10600] animate-live" />
               <span className="f1-label !text-[#E10600]">{t("nextRace")}</span>
             </div>
-            <RaceCountdown race={NEXT_RACE} />
+            <RaceCountdown race={nextRace} />
           </Link>
         </div>
       </section>
@@ -101,7 +93,7 @@ export default function HomePage() {
               </div>
 
               <div className="space-y-1.5">
-                {STANDINGS.map((d) => (
+                {standings.map((d) => (
                   <Link key={d.pos} href={`/drivers/${d.id}` as "/"} className="f1-transition flex items-center gap-2.5 f1-surface-inner p-2 hover:bg-[#0d0d0d]">
                     <span className={`flex h-5 w-5 items-center justify-center rounded f1-data text-[0.625rem] ${
                       d.pos === 1 ? "bg-[#E10600] text-white" : "text-[#444]"
@@ -131,7 +123,7 @@ export default function HomePage() {
               </div>
 
               <div className="space-y-1.5">
-                {RECENT.map((r) => (
+                {recent.map((r) => (
                   <Link key={r.round} href={`/races/${r.slug}` as "/"} className="f1-transition flex items-center gap-3 f1-surface-inner p-2.5 hover:bg-[#0d0d0d]">
                     <span className="flex h-6 w-6 items-center justify-center rounded bg-[#131313] f1-data text-[0.625rem]" style={{ color: "#444" }}>
                       R{r.round}

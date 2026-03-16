@@ -1,30 +1,26 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
-
-const RACES_2026 = [
-  { slug: "australian-gp", round: 1, name: "Australian Grand Prix", circuit: "Melbourne", date: "MAR 06", winner: "Russell", code: "RUS", color: "#27F4D2", completed: true },
-  { slug: "chinese-gp", round: 2, name: "Chinese Grand Prix", circuit: "Shanghai", date: "MAR 13", winner: "Antonelli", code: "ANT", color: "#27F4D2", completed: true },
-  { slug: "japanese-gp", round: 3, name: "Japanese Grand Prix", circuit: "Suzuka", date: "MAR 29", next: true, completed: false },
-  { slug: "emilia-romagna-gp", round: 4, name: "Emilia Romagna Grand Prix", circuit: "Imola", date: "APR 12", completed: false },
-  { slug: "miami-gp", round: 5, name: "Miami Grand Prix", circuit: "Miami", date: "MAY 03", sprint: true, completed: false },
-  { slug: "spanish-gp", round: 6, name: "Spanish Grand Prix", circuit: "Barcelona", date: "MAY 17", completed: false },
-  { slug: "monaco-gp", round: 7, name: "Monaco Grand Prix", circuit: "Monte Carlo", date: "MAY 24", completed: false },
-  { slug: "canadian-gp", round: 8, name: "Canadian Grand Prix", circuit: "Montreal", date: "JUN 07", completed: false },
-  { slug: "austrian-gp", round: 9, name: "Austrian Grand Prix", circuit: "Spielberg", date: "JUN 21", sprint: true, completed: false },
-  { slug: "british-gp", round: 10, name: "British Grand Prix", circuit: "Silverstone", date: "JUL 05", completed: false },
-  { slug: "belgian-gp", round: 11, name: "Belgian Grand Prix", circuit: "Spa", date: "JUL 19", completed: false },
-  { slug: "hungarian-gp", round: 12, name: "Hungarian Grand Prix", circuit: "Budapest", date: "AUG 02", completed: false },
-];
+import { getRacesList } from "@/lib/data/races";
+import type { RaceListItem } from "@/types";
 
 const FLAGS: Record<string, string> = {
-  Australian: "🇦🇺", Chinese: "🇨🇳", Japanese: "🇯🇵", "Emilia Romagna": "🇮🇹",
-  Miami: "🇺🇸", Spanish: "🇪🇸", Monaco: "🇲🇨", Canadian: "🇨🇦",
-  Austrian: "🇦🇹", British: "🇬🇧", Belgian: "🇧🇪", Hungarian: "🇭🇺",
+  Australian: "\u{1F1E6}\u{1F1FA}", Chinese: "\u{1F1E8}\u{1F1F3}", Japanese: "\u{1F1EF}\u{1F1F5}", "Emilia Romagna": "\u{1F1EE}\u{1F1F9}",
+  Miami: "\u{1F1FA}\u{1F1F8}", Spanish: "\u{1F1EA}\u{1F1F8}", Monaco: "\u{1F1F2}\u{1F1E8}", Canadian: "\u{1F1E8}\u{1F1E6}",
+  Austrian: "\u{1F1E6}\u{1F1F9}", British: "\u{1F1EC}\u{1F1E7}", Belgian: "\u{1F1E7}\u{1F1EA}", Hungarian: "\u{1F1ED}\u{1F1FA}",
+  Bahrain: "\u{1F1E7}\u{1F1ED}", Saudi: "\u{1F1F8}\u{1F1E6}", Azerbaijan: "\u{1F1E6}\u{1F1FF}", Singapore: "\u{1F1F8}\u{1F1EC}",
+  Dutch: "\u{1F1F3}\u{1F1F1}", Italian: "\u{1F1EE}\u{1F1F9}", Mexico: "\u{1F1F2}\u{1F1FD}", Brazilian: "\u{1F1E7}\u{1F1F7}",
+  Qatar: "\u{1F1F6}\u{1F1E6}", "Abu Dhabi": "\u{1F1E6}\u{1F1EA}", "Las Vegas": "\u{1F1FA}\u{1F1F8}",
 };
-function flag(n: string) { for (const [k, f] of Object.entries(FLAGS)) if (n.includes(k)) return f; return "🏁"; }
+function flag(n: string) { for (const [k, f] of Object.entries(FLAGS)) if (n.includes(k)) return f; return "\u{1F3C1}"; }
 
-export default function RacesPage() {
+export default async function RacesPage() {
+  const races = await getRacesList();
+  return <RacesPageContent races={races} />;
+}
+
+function RacesPageContent({ races }: { races: RaceListItem[] }) {
   const tNav = useTranslations("nav");
+  const completedCount = races.filter((r) => r.completed).length;
 
   return (
     <div className="min-h-screen bg-[#080808]">
@@ -35,14 +31,14 @@ export default function RacesPage() {
             <h1 className="f1-display-lg text-white mt-0.5">{tNav("races")} 2026</h1>
           </div>
           <div className="flex items-center gap-2">
-            <span className="f1-label">22 Rounds</span>
+            <span className="f1-label">{races.length} Rounds</span>
             <span style={{ color: "#1c1c1c" }}>&middot;</span>
-            <span className="f1-label">2 Completed</span>
+            <span className="f1-label">{completedCount} Completed</span>
           </div>
         </div>
 
         <div className="space-y-1">
-          {RACES_2026.map((race) => (
+          {races.map((race) => (
             <Link
               key={race.round}
               href={`/races/${race.slug}` as "/"}

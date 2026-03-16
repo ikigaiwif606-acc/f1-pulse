@@ -1,23 +1,16 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
+import { getDriversList } from "@/lib/data/drivers";
+import type { DriverListItem } from "@/types";
 
-const DRIVERS = [
-  { id: "russell", name: "George Russell", code: "RUS", team: "Mercedes", number: 63, pts: 51, wins: 2, podiums: 2, poles: 2, pos: 1, color: "#27F4D2" },
-  { id: "antonelli", name: "Kimi Antonelli", code: "ANT", team: "Mercedes", number: 12, pts: 37, wins: 1, podiums: 2, poles: 0, pos: 2, color: "#27F4D2" },
-  { id: "leclerc", name: "Charles Leclerc", code: "LEC", team: "Ferrari", number: 16, pts: 31, wins: 0, podiums: 2, poles: 0, pos: 3, color: "#E80020" },
-  { id: "norris", name: "Lando Norris", code: "NOR", team: "McLaren", number: 4, pts: 28, wins: 0, podiums: 1, poles: 0, pos: 4, color: "#FF8000" },
-  { id: "verstappen", name: "Max Verstappen", code: "VER", team: "Red Bull", number: 1, pts: 25, wins: 0, podiums: 1, poles: 0, pos: 5, color: "#3671C6" },
-  { id: "hamilton", name: "Lewis Hamilton", code: "HAM", team: "Ferrari", number: 44, pts: 22, wins: 0, podiums: 1, poles: 0, pos: 6, color: "#E80020" },
-  { id: "piastri", name: "Oscar Piastri", code: "PIA", team: "McLaren", number: 81, pts: 20, wins: 0, podiums: 0, poles: 0, pos: 7, color: "#FF8000" },
-  { id: "hulkenberg", name: "Nico Hülkenberg", code: "HUL", team: "Audi", number: 27, pts: 12, wins: 0, podiums: 0, poles: 0, pos: 8, color: "#00594F" },
-  { id: "alonso", name: "Fernando Alonso", code: "ALO", team: "Aston Martin", number: 14, pts: 10, wins: 0, podiums: 0, poles: 0, pos: 9, color: "#229971" },
-  { id: "tsunoda", name: "Yuki Tsunoda", code: "TSU", team: "Red Bull", number: 22, pts: 8, wins: 0, podiums: 0, poles: 0, pos: 10, color: "#3671C6" },
-];
+export default async function DriversPage() {
+  const drivers = await getDriversList();
+  return <DriversPageContent drivers={drivers} />;
+}
 
-const maxPts = 51;
-
-export default function DriversPage() {
+function DriversPageContent({ drivers }: { drivers: DriverListItem[] }) {
   const t = useTranslations("driver");
+  const maxPts = drivers[0]?.pts || 1;
 
   return (
     <div className="min-h-screen bg-[#080808]">
@@ -28,7 +21,7 @@ export default function DriversPage() {
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          {DRIVERS.map((d) => (
+          {drivers.map((d) => (
             <Link key={d.id} href={`/drivers/${d.id}` as "/"} className="f1-hover group relative overflow-hidden rounded border border-[#1c1c1c] bg-[#0f0f0f]">
               <div className="h-px w-full" style={{ backgroundColor: d.color }} />
 

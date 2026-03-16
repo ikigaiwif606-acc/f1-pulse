@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { searchMarkets } from "@/lib/api/polymarket";
+import { getMarkets } from "@/lib/data/markets";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const markets = await searchMarkets("f1", 50);
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get("category") || undefined;
+    const markets = await getMarkets(category);
     return NextResponse.json({ data: markets, timestamp: new Date().toISOString(), cached: false });
   } catch (error) {
     return NextResponse.json(

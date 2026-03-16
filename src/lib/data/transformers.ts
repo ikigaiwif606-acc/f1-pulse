@@ -27,6 +27,7 @@ export const TEAM_COLORS: Record<string, string> = {
   RB: "#6692FF",
   "Racing Bulls": "#6692FF",
   "Visa Cash App RB": "#6692FF",
+  "RB F1 Team": "#6692FF",
 };
 
 const DRIVER_CODES: Record<string, string> = {
@@ -48,6 +49,40 @@ const DRIVER_CODES: Record<string, string> = {
   bearman: "BEA",
   doohan: "DOO",
   bortoleto: "BOR",
+  lawson: "LAW",
+  colapinto: "COL",
+  hadjar: "HAD",
+  lindblad: "LIN",
+  bottas: "BOT",
+  perez: "PER",
+};
+
+// Map OpenF1 circuit_short_name → official Grand Prix name
+const CIRCUIT_TO_GP: Record<string, string> = {
+  Melbourne: "Australian Grand Prix",
+  Shanghai: "Chinese Grand Prix",
+  Suzuka: "Japanese Grand Prix",
+  Sakhir: "Bahrain Grand Prix",
+  Jeddah: "Saudi Arabian Grand Prix",
+  Miami: "Miami Grand Prix",
+  Montreal: "Canadian Grand Prix",
+  "Monte Carlo": "Monaco Grand Prix",
+  Catalunya: "Spanish Grand Prix",
+  Spielberg: "Austrian Grand Prix",
+  Silverstone: "British Grand Prix",
+  "Spa-Francorchamps": "Belgian Grand Prix",
+  Hungaroring: "Hungarian Grand Prix",
+  Zandvoort: "Dutch Grand Prix",
+  Monza: "Italian Grand Prix",
+  Madring: "Madrid Grand Prix",
+  Baku: "Azerbaijan Grand Prix",
+  Singapore: "Singapore Grand Prix",
+  Austin: "United States Grand Prix",
+  "Mexico City": "Mexico City Grand Prix",
+  Interlagos: "Brazilian Grand Prix",
+  "Las Vegas": "Las Vegas Grand Prix",
+  Lusail: "Qatar Grand Prix",
+  "Yas Marina Circuit": "Abu Dhabi Grand Prix",
 };
 
 /** "Japanese Grand Prix" → "japanese-gp" */
@@ -83,6 +118,7 @@ export function formatDisplayDate(isoDate: string): string {
 /**
  * Transform OpenF1 session data into RaceListItem[].
  * OpenF1 sessions are individual session objects; we group by meeting/round.
+ * Filters out pre-season testing meetings (those without a Race session).
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function transformOpenF1Sessions(sessions: any[]): import("@/types").RaceListItem[] {
@@ -102,26 +138,38 @@ export function transformOpenF1Sessions(sessions: any[]): import("@/types").Race
   const races: any[] = [];
   let round = 0;
 
-  for (const [, meetingSessions] of byMeeting) {
+  // Sort meetings by earliest session date
+  const sortedMeetings = [...byMeeting.entries()].sort((a, b) => {
+    const dateA = a[1][0]?.date_start || "";
+    const dateB = b[1][0]?.date_start || "";
+    return dateA.localeCompare(dateB);
+  });
+
+  for (const [, meetingSessions] of sortedMeetings) {
+    // Filter out pre-season testing: only include meetings with a Race session
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hasRace = meetingSessions.some((s: any) => s.session_name === "Race");
+    if (!hasRace) continue;
+
     round++;
     const raceSess = meetingSessions.find(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (s: any) => s.session_type === "Race"
+      (s: any) => s.session_name === "Race" && s.session_type === "Race"
     ) || meetingSessions[0];
 
-    const name = raceSess.meeting_name || raceSess.circuit_short_name || `Round ${round}`;
     const circuit = raceSess.circuit_short_name || raceSess.location || "";
+    const gpName = CIRCUIT_TO_GP[circuit] || `${circuit} Grand Prix`;
     const isSprint = meetingSessions.some(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (s: any) => s.session_type === "Sprint"
+      (s: any) => s.session_name === "Sprint"
     );
     const dateStr = raceSess.date_start || raceSess.date_end || "";
     const completed = dateStr ? new Date(dateStr) < now : false;
 
     races.push({
-      slug: deriveSlug(name.includes("Grand Prix") ? name : `${name} Grand Prix`),
+      slug: deriveSlug(gpName),
       round,
-      name: name.includes("Grand Prix") ? name : `${name} Grand Prix`,
+      name: gpName,
       circuit,
       date: dateStr ? formatDisplayDate(dateStr) : "",
       isoDate: dateStr,
@@ -131,7 +179,7 @@ export function transformOpenF1Sessions(sessions: any[]): import("@/types").Race
   }
 
   // Mark the next upcoming race
-  const nextIdx = races.findIndex((r) => !r.completed);
+  const nextIdx = races.findIndex((r: { completed: boolean }) => !r.completed);
   if (nextIdx >= 0) races[nextIdx].next = true;
 
   return races;

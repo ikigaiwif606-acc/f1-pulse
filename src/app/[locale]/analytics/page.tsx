@@ -4,12 +4,12 @@ import { getTeamColor } from "@/lib/data/transformers";
 
 // ── Fallback data ──────────────────────────────────────────────
 const FALLBACK_QUALIFYING = [
-  { name: "Russell", code: "RUS", gap: "+0.000s", color: "#27F4D2", pct: 100 },
-  { name: "Antonelli", code: "ANT", gap: "+0.187s", color: "#27F4D2", pct: 82 },
-  { name: "Leclerc", code: "LEC", gap: "+0.342s", color: "#E80020", pct: 65 },
-  { name: "Norris", code: "NOR", gap: "+0.455s", color: "#FF8000", pct: 53 },
-  { name: "Verstappen", code: "VER", gap: "+0.521s", color: "#3671C6", pct: 45 },
-  { name: "Hamilton", code: "HAM", gap: "+0.589s", color: "#E80020", pct: 38 },
+  { name: "Antonelli", code: "ANT", gap: "+0.000s", color: "#27F4D2", pct: 100 },
+  { name: "Russell", code: "RUS", gap: "+0.222s", color: "#27F4D2", pct: 78 },
+  { name: "Hamilton", code: "HAM", gap: "+0.351s", color: "#E80020", pct: 65 },
+  { name: "Leclerc", code: "LEC", gap: "+0.456s", color: "#E80020", pct: 54 },
+  { name: "Hadjar", code: "HAD", gap: "+0.785s", color: "#3671C6", pct: 22 },
+  { name: "Bearman", code: "BEA", gap: "+0.812s", color: "#B6BABD", pct: 19 },
 ];
 
 const SAFETY_CAR = [
@@ -44,49 +44,47 @@ function parseQualifyingTime(time: string): number | null {
 
 async function getQualifyingData(): Promise<QualifyingEntry[]> {
   try {
-    for (const season of [2025, 2024]) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const data = (await getQualifyingResults(season)) as any;
-      const races = data?.MRData?.RaceTable?.Races || [];
-      if (races.length === 0) continue;
+    // Try 2026 season — if the API has real data, use it; otherwise fallback
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = (await getQualifyingResults(2026)) as any;
+    const races = data?.MRData?.RaceTable?.Races || [];
+    if (races.length === 0) return FALLBACK_QUALIFYING;
 
-      const latestRace = races[races.length - 1];
-      const results = latestRace?.QualifyingResults || [];
-      if (results.length === 0) continue;
+    const latestRace = races[races.length - 1];
+    const results = latestRace?.QualifyingResults || [];
+    if (results.length === 0) return FALLBACK_QUALIFYING;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const parsed = results.slice(0, 6).map((r: any) => {
-        const time = r.Q3 || r.Q2 || r.Q1 || "";
-        const driver = r.Driver;
-        const team = r.Constructor?.name || "";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parsed = results.slice(0, 6).map((r: any) => {
+      const time = r.Q3 || r.Q2 || r.Q1 || "";
+      const driver = r.Driver;
+      const team = r.Constructor?.name || "";
+      return {
+        name: driver.familyName,
+        code: driver.code || driver.familyName.slice(0, 3).toUpperCase(),
+        time,
+        color: getTeamColor(team),
+      };
+    });
+
+    const poleTime = parseQualifyingTime(parsed[0]?.time);
+    if (!poleTime) return FALLBACK_QUALIFYING;
+
+    return parsed.map(
+      (p: { name: string; code: string; time: string; color: string }, i: number) => {
+        const t = parseQualifyingTime(p.time);
+        const gap = t ? t - poleTime : 0;
+        const maxGap = 1.0;
+        const pct = Math.max(0, 100 - (gap / maxGap) * 100);
         return {
-          name: driver.familyName,
-          code: driver.code || driver.familyName.slice(0, 3).toUpperCase(),
-          time,
-          color: getTeamColor(team),
+          name: p.name,
+          code: p.code,
+          gap: i === 0 ? "+0.000s" : `+${gap.toFixed(3)}s`,
+          color: p.color,
+          pct: Math.round(pct),
         };
-      });
-
-      const poleTime = parseQualifyingTime(parsed[0]?.time);
-      if (!poleTime) continue;
-
-      return parsed.map(
-        (p: { name: string; code: string; time: string; color: string }, i: number) => {
-          const t = parseQualifyingTime(p.time);
-          const gap = t ? t - poleTime : 0;
-          const maxGap = 1.0;
-          const pct = Math.max(0, 100 - (gap / maxGap) * 100);
-          return {
-            name: p.name,
-            code: p.code,
-            gap: i === 0 ? "+0.000s" : `+${gap.toFixed(3)}s`,
-            color: p.color,
-            pct: Math.round(pct),
-          };
-        }
-      );
-    }
-    return FALLBACK_QUALIFYING;
+      }
+    );
   } catch {
     return FALLBACK_QUALIFYING;
   }

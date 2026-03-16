@@ -4,12 +4,14 @@ import { getRacesList } from "@/lib/data/races";
 import type { RaceListItem } from "@/types";
 
 const FLAGS: Record<string, string> = {
-  Australian: "\u{1F1E6}\u{1F1FA}", Chinese: "\u{1F1E8}\u{1F1F3}", Japanese: "\u{1F1EF}\u{1F1F5}", "Emilia Romagna": "\u{1F1EE}\u{1F1F9}",
-  Miami: "\u{1F1FA}\u{1F1F8}", Spanish: "\u{1F1EA}\u{1F1F8}", Monaco: "\u{1F1F2}\u{1F1E8}", Canadian: "\u{1F1E8}\u{1F1E6}",
-  Austrian: "\u{1F1E6}\u{1F1F9}", British: "\u{1F1EC}\u{1F1E7}", Belgian: "\u{1F1E7}\u{1F1EA}", Hungarian: "\u{1F1ED}\u{1F1FA}",
-  Bahrain: "\u{1F1E7}\u{1F1ED}", Saudi: "\u{1F1F8}\u{1F1E6}", Azerbaijan: "\u{1F1E6}\u{1F1FF}", Singapore: "\u{1F1F8}\u{1F1EC}",
-  Dutch: "\u{1F1F3}\u{1F1F1}", Italian: "\u{1F1EE}\u{1F1F9}", Mexico: "\u{1F1F2}\u{1F1FD}", Brazilian: "\u{1F1E7}\u{1F1F7}",
-  Qatar: "\u{1F1F6}\u{1F1E6}", "Abu Dhabi": "\u{1F1E6}\u{1F1EA}", "Las Vegas": "\u{1F1FA}\u{1F1F8}",
+  Australian: "\u{1F1E6}\u{1F1FA}", Chinese: "\u{1F1E8}\u{1F1F3}", Japanese: "\u{1F1EF}\u{1F1F5}",
+  Bahrain: "\u{1F1E7}\u{1F1ED}", Saudi: "\u{1F1F8}\u{1F1E6}", Miami: "\u{1F1FA}\u{1F1F8}",
+  Canadian: "\u{1F1E8}\u{1F1E6}", Monaco: "\u{1F1F2}\u{1F1E8}", Spanish: "\u{1F1EA}\u{1F1F8}",
+  Austrian: "\u{1F1E6}\u{1F1F9}", British: "\u{1F1EC}\u{1F1E7}", Belgian: "\u{1F1E7}\u{1F1EA}",
+  Hungarian: "\u{1F1ED}\u{1F1FA}", Dutch: "\u{1F1F3}\u{1F1F1}", Italian: "\u{1F1EE}\u{1F1F9}",
+  Madrid: "\u{1F1EA}\u{1F1F8}", Azerbaijan: "\u{1F1E6}\u{1F1FF}", Singapore: "\u{1F1F8}\u{1F1EC}",
+  "United States": "\u{1F1FA}\u{1F1F8}", Mexico: "\u{1F1F2}\u{1F1FD}", Brazilian: "\u{1F1E7}\u{1F1F7}",
+  "Las Vegas": "\u{1F1FA}\u{1F1F8}", Qatar: "\u{1F1F6}\u{1F1E6}", "Abu Dhabi": "\u{1F1E6}\u{1F1EA}",
 };
 function flag(n: string) { for (const [k, f] of Object.entries(FLAGS)) if (n.includes(k)) return f; return "\u{1F3C1}"; }
 

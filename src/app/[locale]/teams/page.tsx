@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 
 const TEAMS = [
   { id: "mercedes", name: "Mercedes-AMG Petronas", drivers: ["Russell", "Antonelli"], pts: 88, wins: 2, podiums: 4, pos: 1, color: "#27F4D2" },
@@ -28,7 +29,7 @@ export default function TeamsPage() {
 
         <div className="space-y-1.5">
           {TEAMS.map((team) => (
-            <div key={team.id} className="f1-hover flex items-center gap-3 rounded border border-[#1c1c1c] bg-[#0f0f0f] p-3.5 sm:gap-4 sm:p-4">
+            <Link key={team.id} href={`/teams/${team.id}` as "/"} className="f1-hover flex items-center gap-3 rounded border border-[#1c1c1c] bg-[#0f0f0f] p-3.5 sm:gap-4 sm:p-4">
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded ${
                 team.pos <= 3 ? "bg-[#E10600]" : "bg-[#131313]"
               }`}>
@@ -66,7 +67,7 @@ export default function TeamsPage() {
                 <span className="f1-data text-2xl font-bold" style={{ color: team.color }}>{team.pts}</span>
                 <p className="f1-label-xs mt-0.5">PTS</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

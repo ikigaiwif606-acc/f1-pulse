@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 
 const DRIVERS = [
   { id: "russell", name: "George Russell", code: "RUS", team: "Mercedes", number: 63, pts: 51, wins: 2, podiums: 2, poles: 2, pos: 1, color: "#27F4D2" },
@@ -28,7 +29,7 @@ export default function DriversPage() {
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {DRIVERS.map((d) => (
-            <div key={d.id} className="f1-hover group relative overflow-hidden rounded border border-[#1c1c1c] bg-[#0f0f0f]">
+            <Link key={d.id} href={`/drivers/${d.id}` as "/"} className="f1-hover group relative overflow-hidden rounded border border-[#1c1c1c] bg-[#0f0f0f]">
               <div className="h-px w-full" style={{ backgroundColor: d.color }} />
 
               {/* Watermark number */}
@@ -71,7 +72,7 @@ export default function DriversPage() {
                   ))}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

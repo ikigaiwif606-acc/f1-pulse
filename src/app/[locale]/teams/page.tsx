@@ -19,78 +19,52 @@ export default function TeamsPage() {
   const t = useTranslations("team");
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
-        {/* Header */}
+    <div className="min-h-screen bg-[#080808]">
+      <div className="mx-auto max-w-7xl px-5 py-8">
         <div className="mb-6">
-          <span className="font-display text-[10px] font-bold uppercase tracking-[0.3em] text-[#E10600]">
-            Constructors
-          </span>
-          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl">
-            {t("constructorChampionship")}
-          </h1>
+          <span className="f1-label !text-[#E10600]">Constructors</span>
+          <h1 className="f1-display-lg text-white mt-0.5">{t("constructorChampionship")}</h1>
         </div>
 
-        {/* Team list */}
         <div className="space-y-1.5">
           {TEAMS.map((team) => (
-            <div
-              key={team.id}
-              className="group flex items-center gap-3 rounded-lg border border-[#1f1f1f] bg-[#111] p-3 transition-all hover:border-[#2a2a2a] sm:gap-4 sm:p-4"
-            >
-              {/* Position */}
+            <div key={team.id} className="f1-hover flex items-center gap-3 rounded border border-[#1c1c1c] bg-[#0f0f0f] p-3.5 sm:gap-4 sm:p-4">
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded ${
-                team.pos <= 3 ? "bg-[#E10600]" : "bg-[#1a1a1a]"
+                team.pos <= 3 ? "bg-[#E10600]" : "bg-[#131313]"
               }`}>
-                <span className={`timing-number text-sm font-bold ${
-                  team.pos <= 3 ? "text-white" : "text-[#4a4a4a]"
-                }`}>
+                <span className={`f1-data text-sm ${team.pos <= 3 ? "text-white" : "text-[#444]"}`}>
                   {team.pos}
                 </span>
               </div>
 
-              {/* Team color bar */}
-              <div className="h-10 w-1 shrink-0 rounded-full" style={{ backgroundColor: team.color }} />
+              <div className="f1-team-bar h-10" style={{ backgroundColor: team.color }} />
 
-              {/* Team info */}
               <div className="flex-1 min-w-0">
-                <p className="font-display text-sm font-bold uppercase tracking-wide text-white truncate sm:text-base">
-                  {team.name}
-                </p>
-                <div className="mt-0.5 flex items-center gap-2">
-                  <span className="text-[10px] text-[#4a4a4a]">{team.drivers.join(" / ")}</span>
-                </div>
-                {/* Points bar */}
-                <div className="mt-2 h-[3px] w-full rounded-full bg-[#1a1a1a]">
+                <p className="f1-display-md text-white truncate">{team.name}</p>
+                <p className="f1-label-xs mt-0.5" style={{ color: "#444" }}>{team.drivers.join("  /  ")}</p>
+                <div className="mt-2 h-[2px] w-full rounded-full bg-[#161616]">
                   <div
-                    className="h-[3px] rounded-full transition-all duration-700"
-                    style={{
-                      width: maxPts > 0 ? `${(team.pts / maxPts) * 100}%` : "0%",
-                      backgroundColor: team.color,
-                    }}
+                    className="h-[2px] rounded-full f1-transition"
+                    style={{ width: maxPts > 0 ? `${(team.pts / maxPts) * 100}%` : "0%", backgroundColor: team.color }}
                   />
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="hidden gap-3 sm:flex">
+              <div className="hidden gap-2 sm:flex">
                 {[
                   { label: "WIN", value: team.wins },
                   { label: "POD", value: team.podiums },
-                ].map((stat) => (
-                  <div key={stat.label} className="w-10 rounded bg-[#0a0a0a] p-1.5 text-center">
-                    <p className="text-[8px] font-bold uppercase tracking-widest text-[#3a3a3a]">{stat.label}</p>
-                    <p className="timing-number text-sm font-bold text-white">{stat.value}</p>
+                ].map((s) => (
+                  <div key={s.label} className="f1-surface-inner w-11 p-1.5 text-center">
+                    <p className="f1-label-xs">{s.label}</p>
+                    <p className="f1-data text-sm text-white">{s.value}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Points */}
               <div className="shrink-0 text-right">
-                <span className="timing-number text-2xl font-bold" style={{ color: team.color }}>
-                  {team.pts}
-                </span>
-                <p className="text-[8px] font-bold uppercase tracking-widest text-[#3a3a3a]">PTS</p>
+                <span className="f1-data text-2xl font-bold" style={{ color: team.color }}>{team.pts}</span>
+                <p className="f1-label-xs mt-0.5">PTS</p>
               </div>
             </div>
           ))}

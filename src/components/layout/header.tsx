@@ -29,83 +29,76 @@ export function Header() {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-xl">
-      {/* Red accent line at top */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#E10600] to-transparent" />
+    <header className="sticky top-0 z-50 bg-[#080808]/95 backdrop-blur-xl">
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#E10600] to-transparent" />
 
-      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="relative flex h-6 items-center">
-            <span className="font-display text-xl font-bold tracking-wide text-[#E10600]">
-              F1
-            </span>
-            <span className="font-display ml-1 text-xl font-bold tracking-wide text-white">
-              PULSE
-            </span>
-          </div>
+      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-5">
+        <Link href="/" className="flex items-baseline gap-1">
+          <span className="f1-display" style={{ fontSize: "1.25rem", letterSpacing: "-0.03em", color: "#E10600" }}>
+            F1
+          </span>
+          <span className="f1-display" style={{ fontSize: "1.25rem", letterSpacing: "-0.03em", color: "#ededed" }}>
+            PULSE
+          </span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden items-center gap-0.5 md:flex">
           {navItems.map((item) => (
             <Link
               key={item.key}
               href={item.href}
-              className={`relative px-3 py-1.5 text-xs font-semibold uppercase tracking-widest transition-colors ${
-                isActive(item.href)
-                  ? "text-white"
-                  : "text-[#737373] hover:text-white"
+              className={`f1-transition relative px-3 py-1.5 f1-label ${
+                isActive(item.href) ? "!text-white" : "!text-[#555] hover:!text-white"
               }`}
+              style={{ fontSize: "0.6875rem" }}
             >
               {t(item.key)}
               {isActive(item.href) && (
-                <span className="absolute bottom-0 left-1/2 h-[2px] w-4 -translate-x-1/2 rounded-full bg-[#E10600]" />
+                <span className="absolute bottom-0 left-1/2 h-px w-4 -translate-x-1/2 bg-[#E10600]" />
               )}
             </Link>
           ))}
         </nav>
 
-        {/* Right side */}
         <div className="flex items-center gap-2">
           <button
             onClick={switchLocale}
-            className="rounded border border-[#2a2a2a] bg-[#161616] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#737373] transition-all hover:border-[#E10600]/30 hover:text-white"
+            className="f1-transition f1-label rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2.5 py-1 hover:border-[#E10600]/30 hover:!text-white"
+            style={{ fontSize: "0.5625rem" }}
           >
             {locale === "en" ? "中文" : "ENG"}
           </button>
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex h-8 w-8 items-center justify-center rounded hover:bg-[#1a1a1a] md:hidden"
+            className="f1-transition flex h-8 w-8 items-center justify-center rounded hover:bg-[#161616] md:hidden"
             aria-label="Toggle menu"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               {mobileOpen ? (
                 <path d="M4 4L12 12M12 4L4 12" stroke="#E10600" strokeWidth="1.5" strokeLinecap="round" />
               ) : (
-                <path d="M2 4H14M2 8H14M2 12H14" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M2 4H14M2 8H14M2 12H14" stroke="#ededed" strokeWidth="1.5" strokeLinecap="round" />
               )}
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Mobile nav */}
       {mobileOpen && (
-        <nav className="border-t border-[#1f1f1f] bg-[#0a0a0a] px-4 py-3 md:hidden">
+        <nav className="border-t border-[#1c1c1c] bg-[#080808] px-5 py-3 md:hidden">
           <div className="flex flex-col gap-0.5">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`rounded px-3 py-2.5 text-xs font-semibold uppercase tracking-widest transition-colors ${
+                className={`f1-transition rounded px-3 py-2.5 f1-label ${
                   isActive(item.href)
-                    ? "bg-[#E10600]/10 text-[#E10600]"
-                    : "text-[#737373] hover:text-white"
+                    ? "bg-[#E10600]/10 !text-[#E10600]"
+                    : "!text-[#555] hover:!text-white"
                 }`}
+                style={{ fontSize: "0.6875rem" }}
               >
                 {t(item.key)}
               </Link>
@@ -114,8 +107,7 @@ export function Header() {
         </nav>
       )}
 
-      {/* Bottom border */}
-      <div className="h-px w-full bg-[#1f1f1f]" />
+      <div className="h-px w-full bg-[#1c1c1c]" />
     </header>
   );
 }

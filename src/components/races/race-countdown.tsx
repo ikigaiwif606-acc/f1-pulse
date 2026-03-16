@@ -49,42 +49,41 @@ export function RaceCountdown({ race }: RaceCountdownProps) {
 
   return (
     <div>
-      {/* Race info */}
-      <div className="mb-1 flex items-center gap-2">
-        <span className="rounded bg-[#E10600] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">
+      {/* Tags */}
+      <div className="mb-2 flex items-center gap-2">
+        <span className="f1-label rounded bg-[#E10600] px-1.5 py-0.5 !text-white">
           Round {race.round}
         </span>
         {race.isSprint && (
-          <span className="rounded border border-[#E10600]/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#E10600]">
+          <span className="f1-label rounded border border-[#E10600]/30 px-1.5 py-0.5 !text-[#E10600]">
             Sprint
           </span>
         )}
       </div>
 
-      <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl">
-        {name}
-      </h2>
-      <p className="mt-0.5 text-xs text-[#737373]">{circuit}</p>
+      {/* Race name */}
+      <h2 className="f1-display-lg text-white">{name}</h2>
+      <p className="f1-body-sm mt-0.5" style={{ color: "#555" }}>{circuit}</p>
 
-      {/* Session schedule */}
-      <div className="mt-4 flex flex-wrap gap-3">
+      {/* Sessions */}
+      <div className="mt-5 flex flex-wrap gap-2">
         {[
-          { label: tRace("fp1"), time: "FRI 03:30", dim: true },
-          { label: tRace("qualifying"), time: "SAT 07:00", dim: true },
-          { label: tRace("race"), time: "SUN 06:00", dim: false },
+          { label: tRace("fp1"), time: "FRI 03:30", active: false },
+          { label: tRace("qualifying"), time: "SAT 07:00", active: false },
+          { label: tRace("race"), time: "SUN 06:00", active: true },
         ].map((s) => (
           <div
             key={s.label}
-            className={`rounded border px-2.5 py-1.5 ${
-              s.dim
-                ? "border-[#1f1f1f] bg-[#111]"
-                : "border-[#E10600]/30 bg-[#E10600]/5"
+            className={`f1-transition rounded border px-3 py-2 ${
+              s.active
+                ? "border-[#E10600]/20 bg-[#E10600]/5"
+                : "border-[#1c1c1c] bg-[#0f0f0f]"
             }`}
           >
-            <p className={`text-[9px] font-bold uppercase tracking-widest ${s.dim ? "text-[#4a4a4a]" : "text-[#E10600]"}`}>
+            <p className={`f1-label-xs ${s.active ? "!text-[#E10600]" : ""}`}>
               {s.label}
             </p>
-            <p className={`timing-number text-xs font-bold ${s.dim ? "text-[#737373]" : "text-white"}`}>
+            <p className={`f1-data mt-0.5 text-xs ${s.active ? "text-white" : "text-[#666]"}`}>
               {s.time} UTC
             </p>
           </div>
@@ -93,21 +92,17 @@ export function RaceCountdown({ race }: RaceCountdownProps) {
 
       {/* Countdown */}
       <div className="mt-6">
-        <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#4a4a4a]">
-          {t("countdown")}
-        </p>
+        <p className="f1-label-xs mb-2.5">{t("countdown")}</p>
         <div className="flex gap-2 sm:gap-3">
           {units.map((unit) => (
             <div key={unit.label} className="text-center">
-              <div className="relative overflow-hidden rounded-md border border-[#1f1f1f] bg-[#111] px-3 py-2.5 sm:px-4 sm:py-3">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent" />
-                <span className="timing-number relative text-2xl font-bold text-white sm:text-4xl">
+              <div className="relative overflow-hidden rounded border border-[#1c1c1c] bg-[#0f0f0f] px-3 py-2.5 sm:px-4 sm:py-3">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.015] to-transparent" />
+                <span className="f1-data-xl relative text-white">
                   {String(unit.value).padStart(2, "0")}
                 </span>
               </div>
-              <p className="mt-1.5 text-[9px] font-bold uppercase tracking-widest text-[#4a4a4a]">
-                {unit.label}
-              </p>
+              <p className="f1-label-xs mt-1.5">{unit.label}</p>
             </div>
           ))}
         </div>

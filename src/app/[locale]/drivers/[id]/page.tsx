@@ -3,7 +3,77 @@ import { Link } from "@/lib/i18n/navigation";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const DRIVER_DATA = {
+type DriverData = {
+  id: string;
+  name: string;
+  firstName: string;
+  lastName: string;
+  code: string;
+  number: number;
+  team: string;
+  teamColor: string;
+  nationality: string;
+  flag: string;
+  age: number;
+  championshipPos: number;
+  stats: {
+    points: number;
+    wins: number;
+    podiums: number;
+    poles: number;
+    dnfs: number;
+    bestFinish: number;
+    pointsTarget: number;
+  };
+  polymarket: {
+    championshipPct: number;
+    championshipChange: number;
+    nextRaceWinPct: number;
+    nextRaceWinChange: number;
+    volume: string;
+    url: string;
+  };
+  races: {
+    round: number;
+    name: string;
+    circuit: string;
+    grid: number;
+    finish: number;
+    points: number;
+    gap: string;
+    fl: boolean;
+  }[];
+  qualifying: {
+    avgGapToPole: string;
+    sessions: { round: number; name: string; pos: number; gap: string }[];
+  };
+  h2h: {
+    teammate: string;
+    teammateCode: string;
+    teammateColor: string;
+    qualiWins: number;
+    qualiLosses: number;
+    raceWins: number;
+    raceLosses: number;
+    points: number;
+    teammatePoints: number;
+  };
+  circuits: {
+    name: string;
+    flag: string;
+    note: string;
+    isNext: boolean;
+    bestFinish: number;
+    avgFinish: number;
+    entries: number;
+    wins: number;
+    podiums: number;
+    poles: number;
+    safetyCarRate: number;
+  }[];
+};
+
+const DRIVERS_DATA: Record<string, DriverData> = {
   russell: {
     id: "russell",
     name: "George Russell",
@@ -98,9 +168,862 @@ const DRIVER_DATA = {
       },
     ],
   },
-};
 
-type DriverId = keyof typeof DRIVER_DATA;
+  antonelli: {
+    id: "antonelli",
+    name: "Kimi Antonelli",
+    firstName: "Kimi",
+    lastName: "Antonelli",
+    code: "ANT",
+    number: 12,
+    team: "Mercedes",
+    teamColor: "#27F4D2",
+    nationality: "Italian",
+    flag: "🇮🇹",
+    age: 19,
+    championshipPos: 2,
+    stats: {
+      points: 37,
+      wins: 1,
+      podiums: 2,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 1,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 15,
+      championshipChange: +3.1,
+      nextRaceWinPct: 18,
+      nextRaceWinChange: +1.4,
+      volume: "$6.4M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 3, finish: 3, points: 15, gap: "+18.204s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 1, finish: 1, points: 25, gap: "WINNER", fl: true },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.081s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 3, gap: "+0.162" },
+        { round: 2, name: "CHN", pos: 1, gap: "+0.000" },
+      ],
+    },
+    h2h: {
+      teammate: "George Russell",
+      teammateCode: "RUS",
+      teammateColor: "#27F4D2",
+      qualiWins: 0,
+      qualiLosses: 2,
+      raceWins: 0,
+      raceLosses: 2,
+      points: 37,
+      teammatePoints: 51,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 4,
+        avgFinish: 4.0,
+        entries: 1,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P3",
+        isNext: false,
+        bestFinish: 3,
+        avgFinish: 3.0,
+        entries: 1,
+        wins: 0,
+        podiums: 1,
+        poles: 0,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — 2026 Winner",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 1.0,
+        entries: 1,
+        wins: 1,
+        podiums: 1,
+        poles: 1,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  leclerc: {
+    id: "leclerc",
+    name: "Charles Leclerc",
+    firstName: "Charles",
+    lastName: "Leclerc",
+    code: "LEC",
+    number: 16,
+    team: "Ferrari",
+    teamColor: "#E80020",
+    nationality: "Monégasque",
+    flag: "🇲🇨",
+    age: 28,
+    championshipPos: 3,
+    stats: {
+      points: 31,
+      wins: 0,
+      podiums: 2,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 2,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 10,
+      championshipChange: -1.2,
+      nextRaceWinPct: 12,
+      nextRaceWinChange: -0.8,
+      volume: "$4.1M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 4, finish: 2, points: 18, gap: "+8.812s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 5, finish: 3, points: 15, gap: "+22.576s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.243s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 4, gap: "+0.312" },
+        { round: 2, name: "CHN", pos: 5, gap: "+0.174" },
+      ],
+    },
+    h2h: {
+      teammate: "Lewis Hamilton",
+      teammateCode: "HAM",
+      teammateColor: "#E80020",
+      qualiWins: 2,
+      qualiLosses: 0,
+      raceWins: 2,
+      raceLosses: 0,
+      points: 31,
+      teammatePoints: 22,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 2,
+        avgFinish: 4.5,
+        entries: 6,
+        wins: 0,
+        podiums: 2,
+        poles: 1,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P2",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 4.1,
+        entries: 7,
+        wins: 2,
+        podiums: 4,
+        poles: 3,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P3",
+        isNext: false,
+        bestFinish: 2,
+        avgFinish: 5.2,
+        entries: 5,
+        wins: 0,
+        podiums: 2,
+        poles: 0,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  norris: {
+    id: "norris",
+    name: "Lando Norris",
+    firstName: "Lando",
+    lastName: "Norris",
+    code: "NOR",
+    number: 4,
+    team: "McLaren",
+    teamColor: "#FF8000",
+    nationality: "British",
+    flag: "🇬🇧",
+    age: 25,
+    championshipPos: 4,
+    stats: {
+      points: 28,
+      wins: 0,
+      podiums: 1,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 3,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 8,
+      championshipChange: -2.4,
+      nextRaceWinPct: 10,
+      nextRaceWinChange: -1.0,
+      volume: "$3.2M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 5, finish: 4, points: 12, gap: "+31.005s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 4, finish: 3, points: 15, gap: "WINNER", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.298s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 5, gap: "+0.421" },
+        { round: 2, name: "CHN", pos: 4, gap: "+0.175" },
+      ],
+    },
+    h2h: {
+      teammate: "Oscar Piastri",
+      teammateCode: "PIA",
+      teammateColor: "#FF8000",
+      qualiWins: 1,
+      qualiLosses: 1,
+      raceWins: 1,
+      raceLosses: 1,
+      points: 28,
+      teammatePoints: 20,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 3,
+        avgFinish: 5.5,
+        entries: 5,
+        wins: 0,
+        podiums: 1,
+        poles: 0,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P4",
+        isNext: false,
+        bestFinish: 2,
+        avgFinish: 5.0,
+        entries: 5,
+        wins: 0,
+        podiums: 2,
+        poles: 1,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P3",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 4.6,
+        entries: 4,
+        wins: 1,
+        podiums: 2,
+        poles: 0,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  verstappen: {
+    id: "verstappen",
+    name: "Max Verstappen",
+    firstName: "Max",
+    lastName: "Verstappen",
+    code: "VER",
+    number: 1,
+    team: "Red Bull",
+    teamColor: "#3671C6",
+    nationality: "Dutch",
+    flag: "🇳🇱",
+    age: 27,
+    championshipPos: 5,
+    stats: {
+      points: 25,
+      wins: 0,
+      podiums: 1,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 2,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 5,
+      championshipChange: -6.1,
+      nextRaceWinPct: 8,
+      nextRaceWinChange: -2.3,
+      volume: "$2.8M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 2, finish: 5, points: 10, gap: "+38.441s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 3, finish: 2, points: 18, gap: "+5.821s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.189s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 2, gap: "+0.088" },
+        { round: 2, name: "CHN", pos: 3, gap: "+0.290" },
+      ],
+    },
+    h2h: {
+      teammate: "Yuki Tsunoda",
+      teammateCode: "TSU",
+      teammateColor: "#3671C6",
+      qualiWins: 2,
+      qualiLosses: 0,
+      raceWins: 2,
+      raceLosses: 0,
+      points: 25,
+      teammatePoints: 8,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 1,
+        avgFinish: 2.3,
+        entries: 7,
+        wins: 4,
+        podiums: 6,
+        poles: 3,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P5",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 3.1,
+        entries: 8,
+        wins: 2,
+        podiums: 5,
+        poles: 2,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P2",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 2.8,
+        entries: 6,
+        wins: 3,
+        podiums: 5,
+        poles: 2,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  hamilton: {
+    id: "hamilton",
+    name: "Lewis Hamilton",
+    firstName: "Lewis",
+    lastName: "Hamilton",
+    code: "HAM",
+    number: 44,
+    team: "Ferrari",
+    teamColor: "#E80020",
+    nationality: "British",
+    flag: "🇬🇧",
+    age: 41,
+    championshipPos: 6,
+    stats: {
+      points: 22,
+      wins: 0,
+      podiums: 1,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 3,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 3,
+      championshipChange: -0.5,
+      nextRaceWinPct: 5,
+      nextRaceWinChange: +0.2,
+      volume: "$1.9M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 6, finish: 3, points: 15, gap: "+14.992s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 8, finish: 6, points: 8, gap: "+44.331s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.387s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 6, gap: "+0.489" },
+        { round: 2, name: "CHN", pos: 8, gap: "+0.285" },
+      ],
+    },
+    h2h: {
+      teammate: "Charles Leclerc",
+      teammateCode: "LEC",
+      teammateColor: "#E80020",
+      qualiWins: 0,
+      qualiLosses: 2,
+      raceWins: 0,
+      raceLosses: 2,
+      points: 22,
+      teammatePoints: 31,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 1,
+        avgFinish: 3.8,
+        entries: 18,
+        wins: 3,
+        podiums: 9,
+        poles: 5,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P3",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 3.5,
+        entries: 19,
+        wins: 4,
+        podiums: 10,
+        poles: 6,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P6",
+        isNext: false,
+        bestFinish: 1,
+        avgFinish: 4.2,
+        entries: 16,
+        wins: 6,
+        podiums: 10,
+        poles: 5,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  piastri: {
+    id: "piastri",
+    name: "Oscar Piastri",
+    firstName: "Oscar",
+    lastName: "Piastri",
+    code: "PIA",
+    number: 81,
+    team: "McLaren",
+    teamColor: "#FF8000",
+    nationality: "Australian",
+    flag: "🇦🇺",
+    age: 24,
+    championshipPos: 7,
+    stats: {
+      points: 20,
+      wins: 0,
+      podiums: 0,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 4,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 1,
+      championshipChange: -0.8,
+      nextRaceWinPct: 6,
+      nextRaceWinChange: +0.4,
+      volume: "$0.9M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 7, finish: 4, points: 12, gap: "+29.113s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 6, finish: 5, points: 10, gap: "+36.780s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.343s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 7, gap: "+0.511" },
+        { round: 2, name: "CHN", pos: 6, gap: "+0.175" },
+      ],
+    },
+    h2h: {
+      teammate: "Lando Norris",
+      teammateCode: "NOR",
+      teammateColor: "#FF8000",
+      qualiWins: 1,
+      qualiLosses: 1,
+      raceWins: 1,
+      raceLosses: 1,
+      points: 20,
+      teammatePoints: 28,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 4,
+        avgFinish: 5.5,
+        entries: 2,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P4",
+        isNext: false,
+        bestFinish: 3,
+        avgFinish: 4.5,
+        entries: 2,
+        wins: 0,
+        podiums: 1,
+        poles: 0,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P5",
+        isNext: false,
+        bestFinish: 4,
+        avgFinish: 5.0,
+        entries: 2,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  hulkenberg: {
+    id: "hulkenberg",
+    name: "Nico Hulkenberg",
+    firstName: "Nico",
+    lastName: "Hulkenberg",
+    code: "HUL",
+    number: 27,
+    team: "Audi",
+    teamColor: "#00594F",
+    nationality: "German",
+    flag: "🇩🇪",
+    age: 37,
+    championshipPos: 8,
+    stats: {
+      points: 12,
+      wins: 0,
+      podiums: 0,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 6,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 0.5,
+      championshipChange: +0.1,
+      nextRaceWinPct: 2,
+      nextRaceWinChange: +0.1,
+      volume: "$0.4M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 9, finish: 7, points: 6, gap: "+52.334s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 10, finish: 6, points: 8, gap: "+41.229s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.621s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 9, gap: "+0.734" },
+        { round: 2, name: "CHN", pos: 10, gap: "+0.508" },
+      ],
+    },
+    h2h: {
+      teammate: "Gabriel Bortoleto",
+      teammateCode: "BOR",
+      teammateColor: "#00594F",
+      qualiWins: 2,
+      qualiLosses: 0,
+      raceWins: 2,
+      raceLosses: 0,
+      points: 12,
+      teammatePoints: 4,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 6,
+        avgFinish: 8.2,
+        entries: 9,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P7",
+        isNext: false,
+        bestFinish: 5,
+        avgFinish: 9.1,
+        entries: 10,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P6",
+        isNext: false,
+        bestFinish: 6,
+        avgFinish: 8.5,
+        entries: 7,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  alonso: {
+    id: "alonso",
+    name: "Fernando Alonso",
+    firstName: "Fernando",
+    lastName: "Alonso",
+    code: "ALO",
+    number: 14,
+    team: "Aston Martin",
+    teamColor: "#229971",
+    nationality: "Spanish",
+    flag: "🇪🇸",
+    age: 44,
+    championshipPos: 9,
+    stats: {
+      points: 10,
+      wins: 0,
+      podiums: 0,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 7,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 0.3,
+      championshipChange: -0.1,
+      nextRaceWinPct: 1,
+      nextRaceWinChange: -0.1,
+      volume: "$0.3M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 11, finish: 8, points: 4, gap: "+61.112s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 9, finish: 7, points: 6, gap: "+55.004s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.714s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 11, gap: "+0.881" },
+        { round: 2, name: "CHN", pos: 9, gap: "+0.547" },
+      ],
+    },
+    h2h: {
+      teammate: "Lance Stroll",
+      teammateCode: "STR",
+      teammateColor: "#229971",
+      qualiWins: 2,
+      qualiLosses: 0,
+      raceWins: 2,
+      raceLosses: 0,
+      points: 10,
+      teammatePoints: 2,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3",
+        isNext: true,
+        bestFinish: 3,
+        avgFinish: 6.8,
+        entries: 20,
+        wins: 1,
+        podiums: 5,
+        poles: 2,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P8",
+        isNext: false,
+        bestFinish: 2,
+        avgFinish: 7.1,
+        entries: 21,
+        wins: 2,
+        podiums: 6,
+        poles: 1,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P7",
+        isNext: false,
+        bestFinish: 3,
+        avgFinish: 7.4,
+        entries: 18,
+        wins: 0,
+        podiums: 3,
+        poles: 0,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+
+  tsunoda: {
+    id: "tsunoda",
+    name: "Yuki Tsunoda",
+    firstName: "Yuki",
+    lastName: "Tsunoda",
+    code: "TSU",
+    number: 22,
+    team: "Red Bull",
+    teamColor: "#3671C6",
+    nationality: "Japanese",
+    flag: "🇯🇵",
+    age: 25,
+    championshipPos: 10,
+    stats: {
+      points: 8,
+      wins: 0,
+      podiums: 0,
+      poles: 0,
+      dnfs: 0,
+      bestFinish: 5,
+      pointsTarget: 60,
+    },
+    polymarket: {
+      championshipPct: 0.2,
+      championshipChange: +0.1,
+      nextRaceWinPct: 3,
+      nextRaceWinChange: +0.5,
+      volume: "$0.2M",
+      url: "https://polymarket.com",
+    },
+    races: [
+      { round: 1, name: "Australian GP", circuit: "Melbourne", grid: 8, finish: 9, points: 2, gap: "+67.334s", fl: false },
+      { round: 2, name: "Chinese GP", circuit: "Shanghai", grid: 7, finish: 5, points: 10, gap: "+28.991s", fl: false },
+    ],
+    qualifying: {
+      avgGapToPole: "+0.552s",
+      sessions: [
+        { round: 1, name: "AUS", pos: 8, gap: "+0.644" },
+        { round: 2, name: "CHN", pos: 7, gap: "+0.460" },
+      ],
+    },
+    h2h: {
+      teammate: "Max Verstappen",
+      teammateCode: "VER",
+      teammateColor: "#3671C6",
+      qualiWins: 0,
+      qualiLosses: 2,
+      raceWins: 0,
+      raceLosses: 2,
+      points: 8,
+      teammatePoints: 25,
+    },
+    circuits: [
+      {
+        name: "Suzuka",
+        flag: "🇯🇵",
+        note: "Next Race — R3 (Home)",
+        isNext: true,
+        bestFinish: 5,
+        avgFinish: 7.2,
+        entries: 4,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 35,
+      },
+      {
+        name: "Melbourne",
+        flag: "🇦🇺",
+        note: "R1 — P9",
+        isNext: false,
+        bestFinish: 6,
+        avgFinish: 8.5,
+        entries: 4,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 40,
+      },
+      {
+        name: "Shanghai",
+        flag: "🇨🇳",
+        note: "R2 — P5",
+        isNext: false,
+        bestFinish: 5,
+        avgFinish: 7.8,
+        entries: 4,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        safetyCarRate: 25,
+      },
+    ],
+  },
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -133,7 +1056,20 @@ export default async function DriverDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const driver = DRIVER_DATA[id as DriverId] ?? DRIVER_DATA["russell"];
+  const driver = DRIVERS_DATA[id] ?? null;
+
+  if (!driver) {
+    return (
+      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
+        <div className="text-center">
+          <p className="f1-data-lg text-[#333] mb-2">Driver not found</p>
+          <Link href="/drivers" className="f1-label !text-[#E10600] hover:opacity-70">
+            &larr; All Drivers
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const totalRacePoints = driver.races.reduce((s, r) => s + r.points, 0);
   const h2hQualiTotal = driver.h2h.qualiWins + driver.h2h.qualiLosses;
@@ -161,7 +1097,7 @@ function DriverDetailContent({
   h2hRaceTotal,
   h2hMaxPts,
 }: {
-  driver: typeof DRIVER_DATA["russell"];
+  driver: DriverData;
   totalRacePoints: number;
   h2hQualiTotal: number;
   h2hRaceTotal: number;

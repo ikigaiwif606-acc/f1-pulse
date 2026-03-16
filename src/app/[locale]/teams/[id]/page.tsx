@@ -1,72 +1,706 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 
+// ── Types ───────────────────────────────────────────────────────────────────
+
+interface Driver {
+  id: string;
+  name: string;
+  code: string;
+  number: number;
+  nationality: string;
+  pts: number;
+  wins: number;
+  podiums: number;
+  poles: number;
+  dnfs: number;
+  qualifyingH2H: number;
+  raceH2H: number;
+  totalSessions: number;
+  totalRaces: number;
+}
+
+interface TeamData {
+  id: string;
+  name: string;
+  fullName: string;
+  color: string;
+  championship: { pos: number; pts: number; wins: number; podiums: number; poles: number; dnfs: number };
+  polymarket: { probability: number; volume: string; question: string; url: string };
+  drivers: [Driver, Driver];
+  raceResults: { round: number; race: string; d1: number; d2: number; teamPts: number }[];
+  technical: {
+    powerUnit: string;
+    chassis: string;
+    tyreSupplier: string;
+    base: string;
+    technicalDirector: string;
+    reg2026: string[];
+  };
+}
+
 // ── Static data ────────────────────────────────────────────────────────────────
 
-const MERCEDES = {
-  id: "mercedes",
-  name: "Mercedes",
-  fullName: "Mercedes-AMG Petronas F1 Team",
-  color: "#27F4D2",
-  championship: { pos: 1, pts: 88, wins: 2, podiums: 4, poles: 2, dnfs: 0 },
-  polymarket: {
-    probability: 0.65,
-    volume: "$12.1M",
-    question: "Who will win the 2026 Constructors' Championship?",
-    url: "https://polymarket.com",
-  },
-  drivers: [
-    {
-      id: "russell",
-      name: "George Russell",
-      code: "RUS",
-      number: 63,
-      nationality: "British",
-      pts: 51,
-      wins: 2,
-      podiums: 2,
-      poles: 2,
-      dnfs: 0,
-      qualifyingH2H: 5, // Russell ahead in 5 out of 7 sessions
-      raceH2H: 4,       // Russell ahead in 4 out of 7 races
-      totalSessions: 7,
-      totalRaces: 7,
+const TEAMS_DATA: Record<string, TeamData> = {
+  mercedes: {
+    id: "mercedes",
+    name: "Mercedes",
+    fullName: "Mercedes-AMG Petronas F1 Team",
+    color: "#27F4D2",
+    championship: { pos: 1, pts: 88, wins: 2, podiums: 4, poles: 2, dnfs: 0 },
+    polymarket: {
+      probability: 0.65,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
     },
-    {
-      id: "antonelli",
-      name: "Kimi Antonelli",
-      code: "ANT",
-      number: 12,
-      nationality: "Italian",
-      pts: 37,
-      wins: 1,
-      podiums: 2,
-      poles: 0,
-      dnfs: 0,
-      qualifyingH2H: 2,
-      raceH2H: 3,
-      totalSessions: 7,
-      totalRaces: 7,
-    },
-  ],
-  raceResults: [
-    { round: 1, race: "Australian GP", d1: 1, d2: 3, teamPts: 28 },
-    { round: 2, race: "Chinese GP",    d1: 2, d2: 1, teamPts: 28 },
-  ],
-  technical: {
-    powerUnit: "Mercedes-AMG F1 M17 E Performance",
-    chassis: "W17",
-    tyreSupplier: "Pirelli",
-    base: "Brackley, England",
-    technicalDirector: "James Allison",
-    reg2026: [
-      "First season under 2026 ground-effect + active aero regulations",
-      "New 1.6L V6 hybrid unit with enhanced MGU-K deployment (350 kW)",
-      "Narrower car concept (1,900 mm width) optimised for slower corners",
-      "Significantly revised front wing geometry per new aero framework",
+    drivers: [
+      {
+        id: "russell",
+        name: "George Russell",
+        code: "RUS",
+        number: 63,
+        nationality: "British",
+        pts: 51,
+        wins: 2,
+        podiums: 2,
+        poles: 2,
+        dnfs: 0,
+        qualifyingH2H: 5,
+        raceH2H: 4,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "antonelli",
+        name: "Kimi Antonelli",
+        code: "ANT",
+        number: 12,
+        nationality: "Italian",
+        pts: 37,
+        wins: 1,
+        podiums: 2,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 2,
+        raceH2H: 3,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
     ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 1, d2: 3, teamPts: 28 },
+      { round: 2, race: "Chinese GP",    d1: 2, d2: 1, teamPts: 28 },
+    ],
+    technical: {
+      powerUnit: "Mercedes-AMG F1 M17 E Performance",
+      chassis: "W17",
+      tyreSupplier: "Pirelli",
+      base: "Brackley, England",
+      technicalDirector: "James Allison",
+      reg2026: [
+        "First season under 2026 ground-effect + active aero regulations",
+        "New 1.6L V6 hybrid unit with enhanced MGU-K deployment (350 kW)",
+        "Narrower car concept (1,900 mm width) optimised for slower corners",
+        "Significantly revised front wing geometry per new aero framework",
+      ],
+    },
+  },
+
+  ferrari: {
+    id: "ferrari",
+    name: "Ferrari",
+    fullName: "Scuderia Ferrari HP",
+    color: "#E80020",
+    championship: { pos: 2, pts: 53, wins: 0, podiums: 3, poles: 0, dnfs: 0 },
+    polymarket: {
+      probability: 0.16,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "leclerc",
+        name: "Charles Leclerc",
+        code: "LEC",
+        number: 16,
+        nationality: "Monégasque",
+        pts: 31,
+        wins: 0,
+        podiums: 2,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 4,
+        raceH2H: 4,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "hamilton",
+        name: "Lewis Hamilton",
+        code: "HAM",
+        number: 44,
+        nationality: "British",
+        pts: 22,
+        wins: 0,
+        podiums: 1,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 3,
+        raceH2H: 3,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 3, d2: 4, teamPts: 27 },
+      { round: 2, race: "Chinese GP",    d1: 2, d2: 5, teamPts: 26 },
+    ],
+    technical: {
+      powerUnit: "Ferrari 066/10",
+      chassis: "SF-26",
+      tyreSupplier: "Pirelli",
+      base: "Maranello, Italy",
+      technicalDirector: "Loic Serra",
+      reg2026: [
+        "Heavily revised power unit architecture for 2026 hybrid regulations",
+        "New active aero system integrated into SF-26 front and rear wings",
+        "Redesigned sidepod concept following 2026 aerodynamic framework",
+        "Hamilton joining the team marks a new strategic direction for Scuderia",
+      ],
+    },
+  },
+
+  mclaren: {
+    id: "mclaren",
+    name: "McLaren",
+    fullName: "McLaren Formula 1 Team",
+    color: "#FF8000",
+    championship: { pos: 3, pts: 48, wins: 0, podiums: 1, poles: 0, dnfs: 0 },
+    polymarket: {
+      probability: 0.10,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "norris",
+        name: "Lando Norris",
+        code: "NOR",
+        number: 4,
+        nationality: "British",
+        pts: 28,
+        wins: 0,
+        podiums: 1,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 5,
+        raceH2H: 4,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "piastri",
+        name: "Oscar Piastri",
+        code: "PIA",
+        number: 81,
+        nationality: "Australian",
+        pts: 20,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 2,
+        raceH2H: 3,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 4, d2: 6, teamPts: 22 },
+      { round: 2, race: "Chinese GP",    d1: 3, d2: 7, teamPts: 26 },
+    ],
+    technical: {
+      powerUnit: "Mercedes-AMG F1 M17 E Performance",
+      chassis: "MCL39",
+      tyreSupplier: "Pirelli",
+      base: "Woking, England",
+      technicalDirector: "Peter Prodromou",
+      reg2026: [
+        "Customer Mercedes power unit transition to 2026 spec hybrid architecture",
+        "Aggressive MCL39 concept with revised sidepod geometry under new regs",
+        "Active aero system designed for high-speed stability under 2026 rules",
+        "Norris and Piastri retain strong driver lineup from championship-winning 2025",
+      ],
+    },
+  },
+
+  redbull: {
+    id: "redbull",
+    name: "Red Bull",
+    fullName: "Oracle Red Bull Racing",
+    color: "#3671C6",
+    championship: { pos: 4, pts: 33, wins: 0, podiums: 1, poles: 0, dnfs: 1 },
+    polymarket: {
+      probability: 0.05,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "verstappen",
+        name: "Max Verstappen",
+        code: "VER",
+        number: 1,
+        nationality: "Dutch",
+        pts: 25,
+        wins: 0,
+        podiums: 1,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 6,
+        raceH2H: 5,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "tsunoda",
+        name: "Yuki Tsunoda",
+        code: "TSU",
+        number: 22,
+        nationality: "Japanese",
+        pts: 8,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 1,
+        qualifyingH2H: 1,
+        raceH2H: 2,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 5, d2: 0, teamPts: 10 },
+      { round: 2, race: "Chinese GP",    d1: 3, d2: 8, teamPts: 23 },
+    ],
+    technical: {
+      powerUnit: "Honda RBPTH002",
+      chassis: "RB22",
+      tyreSupplier: "Pirelli",
+      base: "Milton Keynes, England",
+      technicalDirector: "Pierre Waché",
+      reg2026: [
+        "Honda power unit transition to full 2026 hybrid specification",
+        "RB22 developed under new aerodynamic framework with active aero",
+        "Team adapting to new regulations after dominant stretch under old rules",
+        "Tsunoda promoted to race seat following Pérez departure",
+      ],
+    },
+  },
+
+  aston_martin: {
+    id: "aston_martin",
+    name: "Aston Martin",
+    fullName: "Aston Martin Aramco F1 Team",
+    color: "#229971",
+    championship: { pos: 5, pts: 14, wins: 0, podiums: 0, poles: 0, dnfs: 0 },
+    polymarket: {
+      probability: 0.02,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "alonso",
+        name: "Fernando Alonso",
+        code: "ALO",
+        number: 14,
+        nationality: "Spanish",
+        pts: 10,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 5,
+        raceH2H: 5,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "stroll",
+        name: "Lance Stroll",
+        code: "STR",
+        number: 18,
+        nationality: "Canadian",
+        pts: 4,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 2,
+        raceH2H: 2,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 6, d2: 9, teamPts: 10 },
+      { round: 2, race: "Chinese GP",    d1: 7, d2: 10, teamPts: 4 },
+    ],
+    technical: {
+      powerUnit: "Honda RBPTH002",
+      chassis: "AMR26",
+      tyreSupplier: "Pirelli",
+      base: "Silverstone, England",
+      technicalDirector: "Enrico Cardile",
+      reg2026: [
+        "AMR26 designed from clean sheet for 2026 regulation overhaul",
+        "Honda power unit partnership continues into new hybrid era",
+        "New factory infrastructure at Silverstone supports 2026 development",
+        "Alonso aiming to challenge for podiums in first full season under new regs",
+      ],
+    },
+  },
+
+  audi: {
+    id: "audi",
+    name: "Audi",
+    fullName: "Audi F1 Team (formerly Sauber)",
+    color: "#00594F",
+    championship: { pos: 6, pts: 14, wins: 0, podiums: 0, poles: 0, dnfs: 1 },
+    polymarket: {
+      probability: 0.01,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "hulkenberg",
+        name: "Nico Hülkenberg",
+        code: "HUL",
+        number: 27,
+        nationality: "German",
+        pts: 12,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 5,
+        raceH2H: 5,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "bortoleto",
+        name: "Gabriel Bortoleto",
+        code: "BOR",
+        number: 5,
+        nationality: "Brazilian",
+        pts: 2,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 1,
+        qualifyingH2H: 2,
+        raceH2H: 2,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 7, d2: 0, teamPts: 6 },
+      { round: 2, race: "Chinese GP",    d1: 8, d2: 11, teamPts: 8 },
+    ],
+    technical: {
+      powerUnit: "Audi F1 Power Unit",
+      chassis: "C46",
+      tyreSupplier: "Pirelli",
+      base: "Hinwil, Switzerland",
+      technicalDirector: "Mattia Binotto",
+      reg2026: [
+        "First season as Audi F1 Team after full takeover of Sauber operations",
+        "Audi-branded power unit makes its Formula 1 debut in 2026",
+        "Significant infrastructure investment at Hinwil facility ahead of 2026",
+        "Hülkenberg and Bortoleto lead the team's ambitious multi-year project",
+      ],
+    },
+  },
+
+  alpine: {
+    id: "alpine",
+    name: "Alpine",
+    fullName: "BWT Alpine F1 Team",
+    color: "#0093CC",
+    championship: { pos: 7, pts: 8, wins: 0, podiums: 0, poles: 0, dnfs: 0 },
+    polymarket: {
+      probability: 0.005,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "gasly",
+        name: "Pierre Gasly",
+        code: "GAS",
+        number: 10,
+        nationality: "French",
+        pts: 5,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 5,
+        raceH2H: 5,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "doohan",
+        name: "Jack Doohan",
+        code: "DOO",
+        number: 7,
+        nationality: "Australian",
+        pts: 3,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 2,
+        raceH2H: 2,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 9, d2: 11, teamPts: 2 },
+      { round: 2, race: "Chinese GP",    d1: 8, d2: 9,  teamPts: 6 },
+    ],
+    technical: {
+      powerUnit: "Renault E-Tech RE26",
+      chassis: "A526",
+      tyreSupplier: "Pirelli",
+      base: "Enstone, England",
+      technicalDirector: "David Sanchez",
+      reg2026: [
+        "Renault power unit fully rebuilt for 2026 regulation requirements",
+        "A526 designed around revised 2026 aerodynamic and dimensional rules",
+        "Team consolidating after management restructure in late 2025",
+        "Doohan retains seat for second season alongside experienced Gasly",
+      ],
+    },
+  },
+
+  haas: {
+    id: "haas",
+    name: "Haas",
+    fullName: "MoneyGram Haas F1 Team",
+    color: "#B6BABD",
+    championship: { pos: 8, pts: 5, wins: 0, podiums: 0, poles: 0, dnfs: 1 },
+    polymarket: {
+      probability: 0.003,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "ocon",
+        name: "Esteban Ocon",
+        code: "OCO",
+        number: 31,
+        nationality: "French",
+        pts: 3,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 5,
+        raceH2H: 5,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "bearman",
+        name: "Oliver Bearman",
+        code: "BEA",
+        number: 87,
+        nationality: "British",
+        pts: 2,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 1,
+        qualifyingH2H: 2,
+        raceH2H: 2,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 10, d2: 0,  teamPts: 1 },
+      { round: 2, race: "Chinese GP",    d1: 10, d2: 12, teamPts: 4 },
+    ],
+    technical: {
+      powerUnit: "Ferrari 066/10",
+      chassis: "VF-26",
+      tyreSupplier: "Pirelli",
+      base: "Kannapolis, USA",
+      technicalDirector: "Simone Resta",
+      reg2026: [
+        "Customer Ferrari power unit upgraded to 2026 specification",
+        "VF-26 marks Haas's most ambitious technical development programme to date",
+        "Ocon joins from Alpine to bring experience to the American outfit",
+        "Bearman given full season after impressive substitute appearances in 2025",
+      ],
+    },
+  },
+
+  williams: {
+    id: "williams",
+    name: "Williams",
+    fullName: "Williams Racing",
+    color: "#1868DB",
+    championship: { pos: 9, pts: 4, wins: 0, podiums: 0, poles: 0, dnfs: 1 },
+    polymarket: {
+      probability: 0.002,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "sainz",
+        name: "Carlos Sainz",
+        code: "SAI",
+        number: 55,
+        nationality: "Spanish",
+        pts: 3,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 0,
+        qualifyingH2H: 6,
+        raceH2H: 5,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "albon",
+        name: "Alexander Albon",
+        code: "ALB",
+        number: 23,
+        nationality: "Thai",
+        pts: 1,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 1,
+        qualifyingH2H: 1,
+        raceH2H: 2,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 11, d2: 0,  teamPts: 0 },
+      { round: 2, race: "Chinese GP",    d1: 10, d2: 13, teamPts: 4 },
+    ],
+    technical: {
+      powerUnit: "Mercedes-AMG F1 M17 E Performance",
+      chassis: "FW47",
+      tyreSupplier: "Pirelli",
+      base: "Grove, England",
+      technicalDirector: "Pat Fry",
+      reg2026: [
+        "Customer Mercedes power unit in 2026 specification hybrid form",
+        "FW47 designed under James Vowles's ongoing Williams rebuild programme",
+        "Sainz recruited from Ferrari to spearhead on-track performance recovery",
+        "Continued investment in wind tunnel and simulator infrastructure",
+      ],
+    },
+  },
+
+  cadillac: {
+    id: "cadillac",
+    name: "Cadillac",
+    fullName: "Cadillac F1 Team",
+    color: "#C0C0C0",
+    championship: { pos: 10, pts: 0, wins: 0, podiums: 0, poles: 0, dnfs: 2 },
+    polymarket: {
+      probability: 0.001,
+      volume: "$12.1M",
+      question: "Who will win the 2026 Constructors' Championship?",
+      url: "https://polymarket.com",
+    },
+    drivers: [
+      {
+        id: "cadillac_d1",
+        name: "TBD",
+        code: "TBD",
+        number: 0,
+        nationality: "TBD",
+        pts: 0,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 1,
+        qualifyingH2H: 3,
+        raceH2H: 3,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+      {
+        id: "cadillac_d2",
+        name: "TBD",
+        code: "TBD",
+        number: 0,
+        nationality: "TBD",
+        pts: 0,
+        wins: 0,
+        podiums: 0,
+        poles: 0,
+        dnfs: 1,
+        qualifyingH2H: 4,
+        raceH2H: 4,
+        totalSessions: 7,
+        totalRaces: 7,
+      },
+    ],
+    raceResults: [
+      { round: 1, race: "Australian GP", d1: 0, d2: 0, teamPts: 0 },
+      { round: 2, race: "Chinese GP",    d1: 0, d2: 0, teamPts: 0 },
+    ],
+    technical: {
+      powerUnit: "Cadillac V6 Hybrid",
+      chassis: "CGR-01",
+      tyreSupplier: "Pirelli",
+      base: "Concord, USA",
+      technicalDirector: "TBD",
+      reg2026: [
+        "Cadillac enters Formula 1 as the 11th constructor from the 2026 season",
+        "Brand-new power unit developed in partnership with GM's performance division",
+        "CGR-01 chassis constructed at new facility in Concord, North Carolina",
+        "Drivers and full technical leadership lineup to be confirmed",
+      ],
+    },
   },
 };
+
+// ── Ordinal helper ─────────────────────────────────────────────────────────────
+
+function ordinal(n: number): string {
+  if (n === 1) return "1st";
+  if (n === 2) return "2nd";
+  if (n === 3) return "3rd";
+  return `${n}th`;
+}
 
 // ── Position badge helper ──────────────────────────────────────────────────────
 
@@ -84,6 +718,13 @@ function PosBadge({ pos }: { pos: number }) {
 // ── Finish cell helper ─────────────────────────────────────────────────────────
 
 function FinishCell({ pos }: { pos: number }) {
+  if (pos === 0) {
+    return (
+      <span className="f1-data text-sm" style={{ color: "#444" }}>
+        DNF
+      </span>
+    );
+  }
   const isPodium = pos <= 3;
   const isWin = pos === 1;
   return (
@@ -107,8 +748,7 @@ export default async function TeamDetailPage({
 }) {
   const { id } = await params;
 
-  // For now only Mercedes is implemented; show placeholder for other IDs
-  const team = id === "mercedes" ? MERCEDES : null;
+  const team = TEAMS_DATA[id] ?? null;
 
   if (!team) {
     return (
@@ -158,7 +798,9 @@ export default async function TeamDetailPage({
               <div className="flex items-center gap-2.5 mb-1.5">
                 <PosBadge pos={team.championship.pos} />
                 <span className="f1-label" style={{ color: team.color }}>
-                  Constructors&apos; Championship Leader
+                  {team.championship.pos === 1
+                    ? "Constructors\u2019 Championship Leader"
+                    : `${ordinal(team.championship.pos)} in Constructors\u2019 Championship`}
                 </span>
               </div>
               <h1 className="f1-display-xl text-white">{team.name}</h1>
@@ -300,15 +942,17 @@ export default async function TeamDetailPage({
                     <span className="f1-label">Points</span>
                     <span className="f1-data text-sm" style={{ color: "#666" }}>{d2.pts}</span>
                   </div>
-                  <div className="flex h-[4px] w-full overflow-hidden rounded-full bg-[#161616]">
-                    <div
-                      className="h-full f1-transition"
-                      style={{
-                        width: `${(d1.pts / (d1.pts + d2.pts)) * 100}%`,
-                        background: team.color,
-                      }}
-                    />
-                  </div>
+                  {(d1.pts + d2.pts) > 0 && (
+                    <div className="flex h-[4px] w-full overflow-hidden rounded-full bg-[#161616]">
+                      <div
+                        className="h-full f1-transition"
+                        style={{
+                          width: `${(d1.pts / (d1.pts + d2.pts)) * 100}%`,
+                          background: team.color,
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Wins */}
@@ -467,7 +1111,9 @@ export default async function TeamDetailPage({
 
               <div className="space-y-2">
                 {team.drivers.map((d, i) => {
-                  const ptsShare = Math.round((d.pts / team.championship.pts) * 100);
+                  const ptsShare = team.championship.pts > 0
+                    ? Math.round((d.pts / team.championship.pts) * 100)
+                    : 0;
                   return (
                     <div key={d.id} className="f1-hover f1-surface-inner p-3">
                       <div className="flex items-start justify-between mb-2">
@@ -513,7 +1159,7 @@ export default async function TeamDetailPage({
                         <div className="h-[2px] w-full rounded-full bg-[#161616]">
                           <div
                             className="h-[2px] rounded-full f1-transition"
-                            style={{ width: `${(d.pts / maxPts) * 100}%`, background: team.color, opacity: i === 0 ? 1 : 0.5 }}
+                            style={{ width: maxPts > 0 ? `${(d.pts / maxPts) * 100}%` : "0%", background: team.color, opacity: i === 0 ? 1 : 0.5 }}
                           />
                         </div>
                       </div>

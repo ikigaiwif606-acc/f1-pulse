@@ -1,7 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Card, CardContent } from "@/components/ui/card";
 
-// Placeholder driver data — will be fetched from API
 const DRIVERS = [
   { id: "russell", name: "George Russell", code: "RUS", team: "Mercedes", number: 63, pts: 51, wins: 2, podiums: 2, poles: 2, pos: 1, color: "#27F4D2" },
   { id: "antonelli", name: "Kimi Antonelli", code: "ANT", team: "Mercedes", number: 12, pts: 37, wins: 1, podiums: 2, poles: 0, pos: 2, color: "#27F4D2" },
@@ -15,68 +13,104 @@ const DRIVERS = [
   { id: "tsunoda", name: "Yuki Tsunoda", code: "TSU", team: "Red Bull Racing", number: 22, pts: 8, wins: 0, podiums: 0, poles: 0, pos: 10, color: "#3671C6" },
 ];
 
+const maxPts = 51;
+
 export default function DriversPage() {
   const t = useTranslations("driver");
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
-      <div className="mb-6 flex items-end justify-between">
-        <h1 className="text-2xl font-bold sm:text-3xl">{t("profile")}s</h1>
-        <p className="text-xs text-muted-foreground">2026 Season &middot; After Round 2</p>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {DRIVERS.map((driver) => (
-          <Card
-            key={driver.id}
-            className="group relative overflow-hidden transition-all hover:border-foreground/20 hover:shadow-lg"
-          >
-            {/* Team color top bar */}
+    <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-6">
+          <span className="font-display text-[10px] font-bold uppercase tracking-[0.3em] text-[#E10600]">
+            Championship
+          </span>
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl">
+            {t("profile")}s
+          </h1>
+        </div>
+
+        {/* Driver grid */}
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {DRIVERS.map((driver) => (
             <div
-              className="h-1 w-full"
-              style={{ backgroundColor: driver.color }}
-            />
-            <CardContent className="p-4">
-              {/* Header row */}
-              <div className="mb-3 flex items-start justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">{driver.team}</p>
-                  <p className="text-lg font-bold leading-tight">{driver.name}</p>
-                </div>
-                <div className="flex flex-col items-end">
+              key={driver.id}
+              className="group relative overflow-hidden rounded-lg border border-[#1f1f1f] bg-[#111] transition-all hover:border-[#2a2a2a]"
+            >
+              {/* Team color top stripe */}
+              <div className="h-[2px] w-full" style={{ backgroundColor: driver.color }} />
+
+              {/* Large background number */}
+              <div className="absolute -right-2 -top-2 select-none">
+                <span
+                  className="font-display text-[80px] font-bold leading-none"
+                  style={{ color: driver.color, opacity: 0.06 }}
+                >
+                  {driver.number}
+                </span>
+              </div>
+
+              <div className="relative p-4">
+                {/* Position + Number */}
+                <div className="mb-3 flex items-start justify-between">
+                  <div>
+                    <span className={`inline-flex h-5 items-center justify-center rounded px-1.5 text-[10px] font-bold ${
+                      driver.pos <= 3
+                        ? "bg-[#E10600] text-white"
+                        : "bg-[#1a1a1a] text-[#4a4a4a]"
+                    }`}>
+                      P{driver.pos}
+                    </span>
+                  </div>
                   <span
-                    className="text-2xl font-black leading-none"
+                    className="font-display text-3xl font-bold leading-none"
                     style={{ color: driver.color }}
                   >
                     {driver.number}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    P{driver.pos}
-                  </span>
                 </div>
-              </div>
 
-              {/* Stats grid */}
-              <div className="grid grid-cols-4 gap-1 rounded-md bg-accent/50 p-2">
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">{t("points")}</p>
-                  <p className="text-sm font-bold tabular-nums">{driver.pts}</p>
+                {/* Name */}
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#4a4a4a]">
+                  {driver.team}
+                </p>
+                <p className="font-display text-lg font-bold uppercase tracking-wide text-white">
+                  {driver.name}
+                </p>
+
+                {/* Points bar */}
+                <div className="mt-3 mb-3">
+                  <div className="h-[3px] w-full rounded-full bg-[#1a1a1a]">
+                    <div
+                      className="h-[3px] rounded-full"
+                      style={{ width: `${(driver.pts / maxPts) * 100}%`, backgroundColor: driver.color }}
+                    />
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">{t("wins")}</p>
-                  <p className="text-sm font-bold tabular-nums">{driver.wins}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">{t("podiums")}</p>
-                  <p className="text-sm font-bold tabular-nums">{driver.podiums}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">{t("poles")}</p>
-                  <p className="text-sm font-bold tabular-nums">{driver.poles}</p>
+
+                {/* Stats row */}
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { label: "PTS", value: driver.pts },
+                    { label: "WIN", value: driver.wins },
+                    { label: "POD", value: driver.podiums },
+                    { label: "POL", value: driver.poles },
+                  ].map((stat) => (
+                    <div key={stat.label} className="rounded bg-[#0a0a0a] p-1.5 text-center">
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#3a3a3a]">
+                        {stat.label}
+                      </p>
+                      <p className="timing-number text-sm font-bold text-white">
+                        {stat.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

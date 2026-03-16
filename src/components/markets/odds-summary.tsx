@@ -1,9 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Badge } from "@/components/ui/badge";
 
-// Placeholder data — will be fetched from Polymarket API in Phase 1b
 const CHAMPIONSHIP_ODDS = [
   { name: "George Russell", code: "RUS", odds: 0.57, volume: "$18.2M", change: +0.05, color: "#27F4D2" },
   { name: "Kimi Antonelli", code: "ANT", odds: 0.15, volume: "$8.4M", change: +0.03, color: "#27F4D2" },
@@ -17,65 +15,86 @@ export function OddsSummary() {
 
   return (
     <div>
+      {/* Header */}
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Drivers&apos; Champion 2026
-        </h3>
-        <Badge variant="outline" className="text-[10px]">
-          {t("volume")}: $63.8M+
-        </Badge>
+        <div className="flex items-center gap-2">
+          <span className="font-display text-xs font-semibold uppercase tracking-wider text-[#737373]">
+            Drivers&apos; Champion 2026
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 rounded border border-[#1f1f1f] bg-[#111] px-2 py-0.5">
+          <span className="text-[9px] font-bold uppercase tracking-widest text-[#4a4a4a]">
+            Vol
+          </span>
+          <span className="timing-number text-[10px] font-bold text-[#737373]">
+            $63.8M
+          </span>
+        </div>
       </div>
 
-      <div className="space-y-2.5">
-        {CHAMPIONSHIP_ODDS.map((entry) => (
-          <div key={entry.name} className="group">
-            <div className="mb-1 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground w-8">
+      {/* Odds rows */}
+      <div className="space-y-1.5">
+        {CHAMPIONSHIP_ODDS.map((entry, i) => (
+          <div
+            key={entry.name}
+            className="group flex items-center gap-3 rounded border border-transparent bg-[#111] p-2 transition-all hover:border-[#2a2a2a]"
+          >
+            {/* Position */}
+            <span className="w-4 text-center text-[10px] font-bold text-[#4a4a4a]">
+              {i + 1}
+            </span>
+
+            {/* Team color bar */}
+            <div className="h-6 w-0.5 rounded-full" style={{ backgroundColor: entry.color }} />
+
+            {/* Name */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="timing-number text-[10px] font-bold text-[#4a4a4a]">
                   {entry.code}
                 </span>
-                <span className="text-sm font-medium">{entry.name}</span>
+                <span className="text-sm font-medium text-white truncate">{entry.name}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-[11px] font-semibold tabular-nums ${
-                    entry.change > 0
-                      ? "text-emerald-400"
-                      : "text-red-400"
-                  }`}
-                >
-                  {entry.change > 0 ? "+" : ""}
-                  {(entry.change * 100).toFixed(0)}%
-                </span>
-                <span className="w-10 text-right text-sm font-bold tabular-nums">
-                  {(entry.odds * 100).toFixed(0)}%
-                </span>
+              {/* Odds bar */}
+              <div className="mt-1 h-[3px] w-full rounded-full bg-[#1a1a1a]">
+                <div
+                  className="h-[3px] rounded-full transition-all duration-700"
+                  style={{ width: `${entry.odds * 100}%`, backgroundColor: entry.color }}
+                />
               </div>
             </div>
-            {/* Probability bar */}
-            <div className="h-1.5 w-full rounded-full bg-accent/50">
-              <div
-                className="h-1.5 rounded-full transition-all duration-500"
-                style={{
-                  width: `${entry.odds * 100}%`,
-                  backgroundColor: entry.color,
-                  opacity: 0.7,
-                }}
-              />
+
+            {/* Change */}
+            <span
+              className={`timing-number text-[11px] font-bold ${
+                entry.change > 0 ? "text-emerald-400" : "text-[#E10600]"
+              }`}
+            >
+              {entry.change > 0 ? "+" : ""}
+              {(entry.change * 100).toFixed(0)}%
+            </span>
+
+            {/* Odds */}
+            <div className="w-14 rounded border border-[#1f1f1f] bg-[#0a0a0a] py-1 text-center">
+              <span className="timing-number text-sm font-bold text-white">
+                {(entry.odds * 100).toFixed(0)}
+              </span>
+              <span className="text-[9px] text-[#4a4a4a]">%</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-        <span className="text-[10px] text-muted-foreground">
+      {/* Footer */}
+      <div className="mt-3 flex items-center justify-between">
+        <span className="text-[9px] font-bold uppercase tracking-widest text-[#2a2a2a]">
           {t("lastUpdated")}: 2 min ago
         </span>
         <a
           href="https://polymarket.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-medium text-red-500 hover:text-red-400"
+          className="text-[10px] font-bold uppercase tracking-widest text-[#E10600] transition-opacity hover:opacity-70"
         >
           {t("betOn")} &rarr;
         </a>

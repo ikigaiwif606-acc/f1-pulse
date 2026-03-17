@@ -2,6 +2,16 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { getRaceDetailData, type RaceData } from "@/lib/data/race-detail";
 
+// ── Code → driver slug mapping ───────────────────────────────────────────────
+const DRIVER_SLUG: Record<string, string> = {
+  RUS: "russell", ANT: "antonelli", LEC: "leclerc", HAM: "hamilton",
+  BEA: "bearman", NOR: "norris", GAS: "gasly", VER: "verstappen",
+  LAW: "lawson", LIN: "lindblad", HAD: "hadjar", PIA: "piastri",
+  SAI: "sainz", BOR: "bortoleto", COL: "colapinto", OCO: "ocon",
+  HUL: "hulkenberg", ALB: "albon", BOT: "bottas", PER: "perez",
+  ALO: "alonso", STR: "stroll",
+};
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function WeatherIcon({ type }: { type: string }) {
@@ -272,7 +282,11 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                         <span className="f1-data w-7 shrink-0 text-[0.625rem]" style={{ color: "#444" }}>{o.code}</span>
                         <div className="min-w-0 flex-1">
-                          <a href={race.polymarket.market_url} target="_blank" rel="noopener noreferrer" className="f1-body-sm block truncate font-semibold text-white hover:text-[#E10600] f1-transition">{o.name}</a>
+                          {DRIVER_SLUG[o.code] ? (
+                            <Link href={`/drivers/${DRIVER_SLUG[o.code]}`} className="f1-body-sm block truncate font-semibold text-white hover:text-[#E10600] f1-transition">{o.name}</Link>
+                          ) : (
+                            <span className="f1-body-sm block truncate font-semibold text-white">{o.name}</span>
+                          )}
                           <span className="f1-label-xs block" style={{ color: "#333" }}>{o.team}</span>
                         </div>
                       </div>

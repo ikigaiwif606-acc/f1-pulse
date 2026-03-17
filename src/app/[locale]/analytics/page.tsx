@@ -1,17 +1,8 @@
 import { useTranslations } from "next-intl";
 import { getQualifyingResults } from "@/lib/api/ergast";
 import { getTeamColor } from "@/lib/data/transformers";
-import dynamic from "next/dynamic";
-
-const PointsProgressionChart = dynamic(
-  () => import("@/components/charts/points-chart").then(mod => ({ default: mod.PointsProgressionChart })),
-  { ssr: false }
-);
-
-const LapComparisonChart = dynamic(
-  () => import("@/components/charts/lap-comparison").then(mod => ({ default: mod.LapComparisonChart })),
-  { ssr: false }
-);
+import { PointsProgressionChart } from "@/components/charts/points-chart";
+import { LapComparisonChart } from "@/components/charts/lap-comparison";
 
 // ── Fallback qualifying data (top 10, R2 China 2026) ─────────────────────────
 const FALLBACK_QUALIFYING = [

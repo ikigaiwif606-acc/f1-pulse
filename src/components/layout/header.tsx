@@ -39,15 +39,25 @@ export function Header() {
 
   const isMoreActive = moreNav.some((item) => isActive(item.href));
 
-  // Close dropdown on click outside
+  // Close dropdown on click outside or Escape key
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
         setMoreOpen(false);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setMoreOpen(false);
+        setMobileOpen(false);
+      }
+    }
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   return (
@@ -85,6 +95,8 @@ export function Header() {
           <div ref={moreRef} className="relative">
             <button
               onClick={() => setMoreOpen(!moreOpen)}
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
               className={`f1-transition relative flex items-center gap-1 px-3 py-1.5 f1-label ${
                 isMoreActive ? "!text-white" : "!text-[#666] hover:!text-white"
               }`}

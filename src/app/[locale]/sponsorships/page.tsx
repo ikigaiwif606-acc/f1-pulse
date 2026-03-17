@@ -131,6 +131,7 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
 }
 
 function SponsorCard({ sponsor, teamColor }: { sponsor: Sponsor; teamColor: string }) {
+  const locale = useLocale();
   const badge = DEAL_BADGES[sponsor.dealType] ?? DEAL_BADGES.official;
 
   return (

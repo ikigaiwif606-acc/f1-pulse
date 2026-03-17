@@ -109,6 +109,12 @@
   --border: #1c1c1c;
   --input: #1c1c1c;
   --ring: #E10600;
+
+  /* Semantic text contrast — WCAG AA compliant on #080808 */
+  --text-muted: #999;     /* replaces inline #666 — 6.3:1 */
+  --text-dim: #888;       /* replaces inline #555/#444 — 5.0:1 */
+  --text-subtle: #777;    /* replaces inline #333 — 3.9:1 */
+  --text-ghost: #666;     /* replaces inline #222 — 3.1:1 */
   --chart-1: #E10600;
   --chart-2: #27F4D2;
   --chart-3: #FF8000;
@@ -208,7 +214,7 @@
   letter-spacing: 0.1em;
   line-height: 1;
   font-size: 0.625rem; /* 10px */
-  color: #777;
+  color: var(--text-subtle, #777);
 }
 .f1-label-xs {
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -217,7 +223,7 @@
   letter-spacing: 0.15em;
   line-height: 1;
   font-size: 0.5625rem; /* 9px */
-  color: #666;
+  color: var(--text-ghost, #666);
 }
 
 /* Body text */

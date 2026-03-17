@@ -29,7 +29,7 @@ export function Footer() {
         </div>
 
         <div className="mt-4 h-px w-full bg-[#131313]" />
-        <p className="f1-label-xs mt-3 text-center sm:text-left" style={{ color: "#333" }}>
+        <p className="f1-label-xs mt-3 text-center sm:text-left" style={{ color: "var(--text-subtle)" }}>
           {t("disclaimer")}
         </p>
       </div>

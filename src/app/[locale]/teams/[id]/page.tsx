@@ -21,10 +21,10 @@ function PosBadge({ pos }: { pos: number }) {
 }
 
 function FinishCell({ pos }: { pos: number }) {
-  if (pos === 0) return <span className="f1-data text-sm" style={{ color: "#444" }}>DNF</span>;
+  if (pos === 0) return <span className="f1-data text-sm" style={{ color: "var(--text-dim)" }}>DNF</span>;
   const isPodium = pos <= 3;
   const isWin = pos === 1;
-  return <span className="f1-data text-sm" style={{ color: isWin ? "#E10600" : isPodium ? "#27F4D2" : "#666" }}>P{pos}</span>;
+  return <span className="f1-data text-sm" style={{ color: isWin ? "#E10600" : isPodium ? "#27F4D2" : "var(--text-muted)" }}>P{pos}</span>;
 }
 
 // ── Page ───────────────────────────────────────────────────────────────────
@@ -88,12 +88,12 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                 </span>
               </div>
               <h1 className="f1-display-xl text-white">{team.name}</h1>
-              <p className="f1-body-sm mt-1" style={{ color: "#555" }}>{team.fullName}</p>
+              <p className="f1-body-sm mt-1" style={{ color: "var(--text-muted)" }}>{team.fullName}</p>
             </div>
           </div>
           <div className="hidden text-right sm:block">
             <p className="f1-label-xs">2026 Season</p>
-            <p className="f1-data-lg mt-0.5" style={{ color: "#444" }}>
+            <p className="f1-data-lg mt-0.5" style={{ color: "var(--text-dim)" }}>
               R{racesCompleted}<span style={{ color: "#2a2a2a" }}>/</span>24
             </p>
           </div>
@@ -190,7 +190,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                     <div className="mb-1.5 flex items-center justify-between">
                       <span className="f1-data text-sm text-white">{row.v1}</span>
                       <span className="f1-label">{row.label}</span>
-                      <span className="f1-data text-sm" style={{ color: "#666" }}>{row.v2}</span>
+                      <span className="f1-data text-sm" style={{ color: "var(--text-muted)" }}>{row.v2}</span>
                     </div>
                     {(row.v1 + row.v2) > 0 && (
                       <div className="flex h-[4px] w-full overflow-hidden rounded-full bg-[#161616]">
@@ -241,7 +241,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                 <div className="space-y-1">
                   {team.raceResults.map((r) => (
                     <div key={r.round} className="f1-transition grid grid-cols-[2rem_1fr_3rem_3rem_3.5rem] items-center gap-2 f1-surface-inner px-2 py-2.5 hover:bg-[#0d0d0d]">
-                      <span className="f1-data text-[0.625rem] text-center" style={{ color: "#444" }}>{String(r.round).padStart(2, "0")}</span>
+                      <span className="f1-data text-[0.625rem] text-center" style={{ color: "var(--text-dim)" }}>{String(r.round).padStart(2, "0")}</span>
                       <span className="f1-body-sm text-white truncate">{r.race}</span>
                       <div className="text-center"><FinishCell pos={r.d1} /></div>
                       <div className="text-center"><FinishCell pos={r.d2} /></div>
@@ -347,7 +347,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                   {team.technical.reg2026.map((note, i) => (
                     <li key={i} className="flex items-start gap-2 f1-surface-inner px-3 py-2">
                       <span className="f1-data text-[0.5625rem] mt-0.5 shrink-0" style={{ color: "#2a2a2a" }}>{String(i + 1).padStart(2, "0")}</span>
-                      <span className="f1-body-sm" style={{ color: "#777" }}>{note}</span>
+                      <span className="f1-body-sm" style={{ color: "var(--text-subtle)" }}>{note}</span>
                     </li>
                   ))}
                 </ul>
@@ -369,7 +369,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                 ].map((link) => (
                   <Link key={link.href} href={link.href as "/"} className="f1-transition f1-hover flex items-center justify-between f1-surface-inner px-3 py-2.5">
                     <span className="f1-body-sm text-white">{link.label}</span>
-                    <span className="f1-label" style={{ color: "#333" }}>&rarr;</span>
+                    <span className="f1-label" style={{ color: "var(--text-subtle)" }}>&rarr;</span>
                   </Link>
                 ))}
               </div>

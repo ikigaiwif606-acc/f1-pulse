@@ -14,6 +14,7 @@ const primaryNav = [
 ] as const;
 
 const moreNav = [
+  { key: "news", href: "/news" },
   { key: "sponsorships", href: "/sponsorships" },
   { key: "stocks", href: "/stocks" },
 ] as const;

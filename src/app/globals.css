@@ -335,6 +335,32 @@
   border-color: #333;
 }
 
+/* Corner accent — decorative red top-left corner for premium cards */
+.f1-corner-accent {
+  position: relative;
+  overflow: hidden;
+}
+.f1-corner-accent::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 2px;
+  background: #E10600;
+  border-radius: 0 0 1px 0;
+}
+.f1-corner-accent::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 24px;
+  background: #E10600;
+  border-radius: 0 0 1px 0;
+}
+
 /* Tertiary card — minimal, background-only */
 .f1-surface-tertiary {
   background: #0c0c0c;

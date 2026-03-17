@@ -16,6 +16,7 @@
     "sponsorships": "Sponsors",
     "stocks": "Stocks",
     "analytics": "Analytics",
+    "news": "News",
     "more": "More"
   },
   "home": {
@@ -256,6 +257,15 @@
     "partners": "partners",
     "globalPartnersDesc": "Official Formula 1 series-level partnerships",
     "footerNote": "F1 Pulse · Sponsorship data curated from official team websites and press releases · Values are reported estimates"
+  },
+  "news": {
+    "title": "F1 News Hub",
+    "intelligence": "News Feed",
+    "articles": "articles",
+    "sources": "sources",
+    "updatedEvery15m": "Updated every 15 min",
+    "latestHeadlines": "Latest Headlines",
+    "disclaimer": "F1 Pulse · News aggregated from public RSS feeds · Content belongs to original publishers · Links open in new tab"
   },
   "footer": {
     "disclaimer": "F1 Pulse displays prediction market data for informational purposes only. This is not financial advice. Always do your own research.",

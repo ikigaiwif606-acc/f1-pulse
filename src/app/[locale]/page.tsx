@@ -70,7 +70,7 @@ function HomePageContent({ data }: { data: HomepageData }) {
             </div>
           </div>
 
-          <Link href={`/races/${nextRaceSlug}` as "/"} className="f1-surface-primary glow-red block p-5 sm:p-6 f1-transition animate-fade-up">
+          <Link href={`/races/${nextRaceSlug}` as "/"} className="f1-surface-primary f1-corner-accent glow-red block p-5 sm:p-6 f1-transition animate-fade-up">
             <div className="mb-4 flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#E10600] animate-live" />
               <span className="f1-label !text-[#E10600]">{t("nextRace")}</span>

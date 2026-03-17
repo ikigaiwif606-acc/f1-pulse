@@ -29,6 +29,20 @@ function FinishCell({ pos }: { pos: number }) {
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
+function TeamNotFound() {
+  const t = useTranslations("team");
+  return (
+    <div className="min-h-screen bg-[#080808] flex items-center justify-center">
+      <div className="text-center">
+        <p className="f1-display-md text-white mb-3">{t("teamNotFound")}</p>
+        <Link href="/teams" className="f1-transition f1-label !text-[#E10600] hover:opacity-70">
+          &larr; {t("backToTeams")}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default async function TeamDetailPage({
   params,
 }: {
@@ -36,19 +50,9 @@ export default async function TeamDetailPage({
 }) {
   const { id } = await params;
   const team = await getTeamDetailData(id);
-  const t = useTranslations("team");
 
   if (!team) {
-    return (
-      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
-        <div className="text-center">
-          <p className="f1-display-md text-white mb-3">{t("teamNotFound")}</p>
-          <Link href="/teams" className="f1-transition f1-label !text-[#E10600] hover:opacity-70">
-            &larr; {t("backToTeams")}
-          </Link>
-        </div>
-      </div>
-    );
+    return <TeamNotFound />;
   }
 
   return <TeamDetailContent team={team} />;

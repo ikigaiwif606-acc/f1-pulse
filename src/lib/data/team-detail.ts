@@ -69,7 +69,7 @@ const ID_ALIASES: Record<string, string> = {
   redbull: "red_bull",
   "aston-martin": "aston_martin",
   "racing-bulls": "rb",
-  audi: "sauber",
+  sauber: "audi",
 };
 
 function normalizeId(id: string): string {
@@ -258,7 +258,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
     },
   },
 
-  sauber: {
+  audi: {
     fullName: "Audi F1 Team (formerly Sauber)",
     polymarket: {
       probability: 0.01,

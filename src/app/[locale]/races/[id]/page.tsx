@@ -272,7 +272,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                         <span className="f1-data w-7 shrink-0 text-[0.625rem]" style={{ color: "#444" }}>{o.code}</span>
                         <div className="min-w-0 flex-1">
-                          <span className="f1-body-sm block truncate font-semibold text-white">{o.name}</span>
+                          <a href={race.polymarket.market_url} target="_blank" rel="noopener noreferrer" className="f1-body-sm block truncate font-semibold text-white hover:text-[#E10600] f1-transition">{o.name}</a>
                           <span className="f1-label-xs block" style={{ color: "#333" }}>{o.team}</span>
                         </div>
                       </div>
@@ -292,13 +292,10 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                   ))}
                 </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-[#131313] pt-3">
+                <div className="mt-4 border-t border-[#131313] pt-3">
                   <span className="f1-label-xs" style={{ color: "#2a2a2a" }}>
                     {tMarkets("lastUpdated")}: {race.polymarket.updated}
                   </span>
-                  <a href={race.polymarket.market_url} target="_blank" rel="noopener noreferrer" className="f1-transition f1-label !text-[#E10600] hover:opacity-70">
-                    {tMarkets("betOn")} &rarr;
-                  </a>
                 </div>
               </div>
             )}

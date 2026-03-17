@@ -3,6 +3,17 @@ import { getQualifyingResults } from "@/lib/api/ergast";
 import { getTeamColor } from "@/lib/data/transformers";
 import { PointsProgressionChart } from "@/components/charts/points-chart";
 import { LapComparisonChart } from "@/components/charts/lap-comparison";
+import { Link } from "@/lib/i18n/navigation";
+
+// ── Driver code → slug mapping ───────────────────────────────────────────────
+const DRIVER_SLUG: Record<string, string> = {
+  RUS: "russell", ANT: "antonelli", LEC: "leclerc", HAM: "hamilton",
+  NOR: "norris", VER: "verstappen", PIA: "piastri", HAD: "hadjar",
+  BEA: "bearman", GAS: "gasly", LAW: "lawson", LIN: "lindblad",
+  SAI: "sainz", ALB: "albon", BOR: "bortoleto", HUL: "hulkenberg",
+  COL: "colapinto", OCO: "ocon", ALO: "alonso", STR: "stroll",
+  BOT: "bottas", PER: "perez",
+};
 
 // ── Fallback qualifying data (top 10, R2 China 2026) ─────────────────────────
 const FALLBACK_QUALIFYING = [
@@ -89,6 +100,27 @@ const BETTING_EDGE = [
   { name: "Verstappen", code: "VER", color: "#3671C6", odds: 3, pts: 8 },
 ];
 
+// ── Tire strategy data ──────────────────────────────────────────────────────
+const TIRE_STRATEGY = {
+  totalStints: 30,
+  compounds: [
+    { compound: "Hard", abbr: "H", color: "#ededed", textColor: "#000", count: 14, pct: 47 },
+    { compound: "Medium", abbr: "M", color: "#f59e0b", textColor: "#000", count: 10, pct: 33 },
+    { compound: "Soft", abbr: "S", color: "#E10600", textColor: "#fff", count: 6, pct: 20 },
+  ],
+  avgStints: 3.0,
+  mostPopularStrategy: "M \u2192 H \u2192 H",
+};
+
+// ── Tab categories for sticky pill bar ──────────────────────────────────────
+const TAB_CATEGORIES = [
+  { label: "Pace", href: "#pace" },
+  { label: "Reliability", href: "#reliability" },
+  { label: "Strategy", href: "#strategy" },
+  { label: "Betting", href: "#betting" },
+  { label: "Head-to-Head", href: "#head-to-head" },
+];
+
 // ── Types ────────────────────────────────────────────────────────────────────
 type QualifyingEntry = { name: string; code: string; gap: string; color: string; pct: number };
 
@@ -161,6 +193,15 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
     ? TEAMMATE_BATTLES[0].qualiH2H[0] + TEAMMATE_BATTLES[0].qualiH2H[1]
     : 0;
 
+  // Sort betting edge by absolute gap (biggest mispricing first)
+  const sortedBettingEdge = [...BETTING_EDGE]
+    .map((d) => {
+      const ptsShare = parseFloat(((d.pts / TOTAL_POINTS) * 100).toFixed(1));
+      const gap = ptsShare - d.odds;
+      return { ...d, ptsShare, gap };
+    })
+    .sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
+
   return (
     <div className="min-h-screen bg-[#080808]">
       <div className="mx-auto max-w-7xl px-5 py-8">
@@ -171,38 +212,245 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
           <p className="f1-label mt-1">{t("dataFromRounds", { count: roundsCompleted })} &middot; {t("season2026")}</p>
         </div>
 
+        {/* ── Sticky Tab / Pill Bar ──────────────────────────────────────── */}
+        <nav className="sticky top-12 z-40 bg-[#080808]/95 backdrop-blur-xl border-b border-[#1c1c1c] mb-6">
+          <div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide">
+            {TAB_CATEGORIES.map((tab) => (
+              <a
+                key={tab.href}
+                href={tab.href}
+                className="shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#999] border border-[#1c1c1c] bg-[#0c0c0c] transition-colors hover:text-white hover:border-[#333] hover:bg-[#161616]"
+              >
+                {tab.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+
         <div className="grid gap-4 md:grid-cols-2">
           {/* ── 1. QUALIFYING PACE ──────────────────────────────────────── */}
-          <div className="f1-surface p-5">
+          <div id="pace" className="f1-surface p-5" style={{ scrollMarginTop: "4rem" }}>
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
               <span className="f1-heading text-white">{t("qualifyingPace")}</span>
+              <span className="cursor-help text-[#666] text-xs" title="Average gap to pole position across all qualifying sessions this season">&#9432;</span>
             </div>
-            <p className="f1-label mb-4">{t("qualifyingPaceDesc")}</p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="f1-label">{t("qualifyingPaceDesc")}</p>
+              <span className="f1-label text-[0.6rem] rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">Top 10 shown</span>
+            </div>
 
             <div className="space-y-2">
               {qualifying.map((d, i) => (
-                <div key={d.code} className="flex items-center gap-3">
-                  <span className="f1-data w-4 text-center text-[0.625rem]" style={{ color: "#444" }}>{i + 1}</span>
+                <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="flex items-center gap-3 cursor-pointer hover:bg-[#111] rounded transition-colors -mx-1 px-1">
+                  <span className="f1-data w-4 text-center text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{i + 1}</span>
                   <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                  <span className="f1-data w-8 text-[0.625rem]" style={{ color: "#444" }}>{d.code}</span>
+                  <span className="f1-data w-8 text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
                   <div className="flex-1">
                     <div className="h-[3px] w-full rounded-full bg-[#161616]">
                       <div className="h-[3px] rounded-full" style={{ width: `${d.pct}%`, backgroundColor: d.color }} />
                     </div>
                   </div>
-                  <span className={`f1-data text-xs ${i === 0 ? "text-[#E10600]" : "text-[#666]"}`}>{d.gap}</span>
+                  <span className={`f1-data text-xs ${i === 0 ? "text-[#E10600]" : "text-[var(--text-muted)]"}`}>{d.gap}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 2. GRID vs FINISH ───────────────────────────────────────── */}
+          <div id="grid-vs-finish" className="f1-surface p-5" style={{ scrollMarginTop: "4rem" }}>
+            <div className="mb-1 flex items-center gap-2">
+              <div className="f1-accent-bar" />
+              <span className="f1-heading text-white">{t("gridVsFinish")}</span>
+              <span className="cursor-help text-[#666] text-xs" title="Compares average starting position to average finishing position — positive delta means gaining places">&#9432;</span>
+            </div>
+            <p className="f1-label mb-4">{t("gridVsFinishDesc")}</p>
+
+            <div className="space-y-2">
+              {GRID_VS_FINISH.map((d) => {
+                const isGain = d.delta > 0;
+                const isLoss = d.delta < 0;
+                return (
+                  <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="flex items-center gap-3 cursor-pointer hover:bg-[#111] rounded transition-colors -mx-1 px-1">
+                    <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
+                    <span className="f1-data w-8 text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
+                    <div className="flex items-center gap-2 flex-1">
+                      <span className="f1-body-sm w-8 text-center" style={{ color: "var(--text-muted)" }}>P{d.avgGrid.toFixed(1)}</span>
+                      <div className="flex-1 flex items-center justify-center">
+                        <svg width="16" height="10" viewBox="0 0 16 10" className="mx-1">
+                          <path d="M0 5 L12 5 M9 2 L12 5 L9 8" stroke={isGain ? "#22c55e" : isLoss ? "#ef4444" : "var(--text-dim)"} strokeWidth="1.5" fill="none" />
+                        </svg>
+                      </div>
+                      <span className="f1-body-sm w-8 text-center" style={{ color: "var(--text-muted)" }}>P{d.avgFinish.toFixed(1)}</span>
+                    </div>
+                    <span
+                      className="f1-data w-12 text-right text-xs font-semibold"
+                      style={{ color: isGain ? "#22c55e" : isLoss ? "#ef4444" : "var(--text-dim)" }}
+                    >
+                      {isGain && "+"}{d.delta.toFixed(1)}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── 3. BETTING EDGE FINDER (full width) ─────────────────────── */}
+          <div id="betting" className="f1-surface p-5 md:col-span-2" style={{ scrollMarginTop: "4rem" }}>
+            <div className="mb-1 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="f1-accent-bar" />
+                <span className="f1-heading text-white">{t("bettingEdge")}</span>
+                <span className="cursor-help text-[#666] text-xs" title="Compares Polymarket championship odds to actual points share — positive gap suggests the market undervalues this driver">&#9432;</span>
+              </div>
+              <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+                Polymarket
+              </span>
+            </div>
+            <p className="f1-label mb-4">{t("bettingEdgeDesc")}</p>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {sortedBettingEdge.map((d) => {
+                const isValue = d.gap > 0;
+                const label = isValue ? t("valueBet") : t("overvalued");
+                return (
+                  <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
+                    <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
+                        <span className="f1-heading text-sm text-white">{d.name}</span>
+                        <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
+                      </div>
+
+                      <div className="space-y-2 mb-3">
+                        <div className="flex items-center justify-between">
+                          <span className="f1-label text-[0.625rem]">{t("marketOdds")}</span>
+                          <span className="f1-data text-sm text-white">{d.odds}%</span>
+                        </div>
+                        <div className="h-[3px] w-full rounded-full bg-[#161616]">
+                          <div className="h-[3px] rounded-full bg-[var(--text-muted)]" style={{ width: `${d.odds}%` }} />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="f1-label text-[0.625rem]">{t("actualPtsShare")}</span>
+                          <span className="f1-data text-sm text-white">{d.ptsShare}%</span>
+                        </div>
+                        <div className="h-[3px] w-full rounded-full bg-[#161616]">
+                          <div className="h-[3px] rounded-full" style={{ width: `${d.ptsShare}%`, backgroundColor: d.color }} />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-2">
+                        <span
+                          className="f1-data text-xs font-bold"
+                          style={{ color: isValue ? "#22c55e" : "#ef4444" }}
+                        >
+                          {isValue ? "+" : ""}{d.gap.toFixed(1)}%
+                        </span>
+                        <span
+                          className="rounded px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider"
+                          style={{
+                            backgroundColor: isValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                            color: isValue ? "#22c55e" : "#ef4444",
+                          }}
+                        >
+                          {label}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── 4. TIRE STRATEGY TRENDS (full width) ────────────────────── */}
+          <div id="strategy" className="f1-surface p-5 md:col-span-2" style={{ scrollMarginTop: "4rem" }}>
+            <div className="mb-1 flex items-center gap-2">
+              <div className="f1-accent-bar" />
+              <span className="f1-heading text-white">Tire Strategy Trends</span>
+            </div>
+            <p className="f1-label mb-4">Compound distribution across {roundsCompleted} rounds</p>
+
+            {/* Stacked bar */}
+            <div className="flex h-6 w-full overflow-hidden rounded-full mb-4">
+              {TIRE_STRATEGY.compounds.map((c) => (
+                <div
+                  key={c.abbr}
+                  className="flex items-center justify-center text-[0.625rem] font-bold"
+                  style={{
+                    width: `${c.pct}%`,
+                    backgroundColor: c.color,
+                    color: c.textColor,
+                  }}
+                >
+                  {c.abbr} {c.pct}%
+                </div>
+              ))}
+            </div>
+
+            {/* Stat cards */}
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+                <p className="f1-label text-[0.625rem] mb-1">Most Used</p>
+                <p className="f1-heading text-white text-lg">Hard (47%)</p>
+              </div>
+              <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+                <p className="f1-label text-[0.625rem] mb-1">Avg Stints</p>
+                <p className="f1-heading text-white text-lg">{TIRE_STRATEGY.avgStints.toFixed(1)}</p>
+              </div>
+              <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+                <p className="f1-label text-[0.625rem] mb-1">Popular Strategy</p>
+                <p className="f1-heading text-white text-lg">{TIRE_STRATEGY.mostPopularStrategy}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Points Progression Chart ────────────────────────────────── */}
+        <div className="mt-4">
+          <PointsProgressionChart />
+        </div>
+
+        {/* ── Lap Time Comparison ─────────────────────────────────────── */}
+        <div className="mt-4">
+          <LapComparisonChart />
+        </div>
+
+        {/* ── DNF + Safety Car (2-column grid) ───────────────────────── */}
+        <div id="reliability" className="grid gap-4 md:grid-cols-2 mt-4" style={{ scrollMarginTop: "4rem" }}>
+          {/* ── DNF RATE BY TEAM ─────────────────────────────────────── */}
+          <div className="f1-surface p-5">
+            <div className="mb-1 flex items-center gap-2">
+              <div className="f1-accent-bar" />
+              <span className="f1-heading text-white">{t("dnfRate")}</span>
+              <span className="cursor-help text-[#666] text-xs" title="Percentage of race starts that ended in retirement per team">&#9432;</span>
+            </div>
+            <p className="f1-label mb-4">{t("dnfRateDesc")}</p>
+
+            <div className="space-y-2">
+              {DNF.map((d) => (
+                <div key={d.team} className="flex items-center gap-3">
+                  <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
+                  <span className="f1-body-sm w-24" style={{ color: "#999" }}>{d.team}</span>
+                  <div className="flex-1">
+                    <div className="h-[3px] w-full rounded-full bg-[#161616]">
+                      <div className="h-[3px] rounded-full" style={{ width: `${Math.max(d.rate, 1)}%`, backgroundColor: d.color }} />
+                    </div>
+                  </div>
+                  <span className="f1-data w-8 text-right text-xs text-[var(--text-muted)]">{d.rate}%</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* ── 2. SAFETY CAR PROBABILITY ───────────────────────────────── */}
+          {/* ── SAFETY CAR PROBABILITY ───────────────────────────────── */}
           <div className="f1-surface p-5">
             <div className="mb-1 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="f1-accent-bar" />
                 <span className="f1-heading text-white">{t("safetyCarProbability")}</span>
+                <span className="cursor-help text-[#666] text-xs" title="Historical safety car deployment rate at each circuit (pre-2026 data)">&#9432;</span>
               </div>
               <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
                 {t("preRegulationData")}
@@ -225,153 +473,15 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               ))}
             </div>
           </div>
-
-          {/* ── 3. DNF RATE BY TEAM ─────────────────────────────────────── */}
-          <div className="f1-surface p-5">
-            <div className="mb-1 flex items-center gap-2">
-              <div className="f1-accent-bar" />
-              <span className="f1-heading text-white">{t("dnfRate")}</span>
-            </div>
-            <p className="f1-label mb-4">{t("dnfRateDesc")}</p>
-
-            <div className="space-y-2">
-              {DNF.map((d) => (
-                <div key={d.team} className="flex items-center gap-3">
-                  <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                  <span className="f1-body-sm w-24" style={{ color: "#999" }}>{d.team}</span>
-                  <div className="flex-1">
-                    <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                      <div className="h-[3px] rounded-full" style={{ width: `${Math.max(d.rate, 1)}%`, backgroundColor: d.color }} />
-                    </div>
-                  </div>
-                  <span className="f1-data w-8 text-right text-xs text-[#666]">{d.rate}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ── 5. GRID vs FINISH ───────────────────────────────────────── */}
-          <div className="f1-surface p-5">
-            <div className="mb-1 flex items-center gap-2">
-              <div className="f1-accent-bar" />
-              <span className="f1-heading text-white">{t("gridVsFinish")}</span>
-            </div>
-            <p className="f1-label mb-4">{t("gridVsFinishDesc")}</p>
-
-            <div className="space-y-2">
-              {GRID_VS_FINISH.map((d) => {
-                const isGain = d.delta > 0;
-                const isLoss = d.delta < 0;
-                return (
-                  <div key={d.code} className="flex items-center gap-3">
-                    <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                    <span className="f1-data w-8 text-[0.625rem]" style={{ color: "#444" }}>{d.code}</span>
-                    <div className="flex items-center gap-2 flex-1">
-                      <span className="f1-body-sm w-8 text-center" style={{ color: "#666" }}>P{d.avgGrid.toFixed(1)}</span>
-                      <div className="flex-1 flex items-center justify-center">
-                        <svg width="16" height="10" viewBox="0 0 16 10" className="mx-1">
-                          <path d="M0 5 L12 5 M9 2 L12 5 L9 8" stroke={isGain ? "#22c55e" : isLoss ? "#ef4444" : "#444"} strokeWidth="1.5" fill="none" />
-                        </svg>
-                      </div>
-                      <span className="f1-body-sm w-8 text-center" style={{ color: "#666" }}>P{d.avgFinish.toFixed(1)}</span>
-                    </div>
-                    <span
-                      className="f1-data w-12 text-right text-xs font-semibold"
-                      style={{ color: isGain ? "#22c55e" : isLoss ? "#ef4444" : "#444" }}
-                    >
-                      {isGain && "+"}{d.delta.toFixed(1)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ── 6. BETTING EDGE FINDER (full width) ─────────────────────── */}
-          <div className="f1-surface p-5 md:col-span-2">
-            <div className="mb-1 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">{t("bettingEdge")}</span>
-              </div>
-              <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
-                Polymarket
-              </span>
-            </div>
-            <p className="f1-label mb-4">{t("bettingEdgeDesc")}</p>
-
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {BETTING_EDGE.map((d) => {
-                const ptsShare = parseFloat(((d.pts / TOTAL_POINTS) * 100).toFixed(1));
-                const gap = ptsShare - d.odds;
-                const isValue = gap > 0;
-                const label = isValue ? t("valueBet") : t("overvalued");
-                return (
-                  <div key={d.code} className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                      <span className="f1-heading text-sm text-white">{d.name}</span>
-                      <span className="f1-data text-[0.625rem]" style={{ color: "#444" }}>{d.code}</span>
-                    </div>
-
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center justify-between">
-                        <span className="f1-label text-[0.625rem]">{t("marketOdds")}</span>
-                        <span className="f1-data text-sm text-white">{d.odds}%</span>
-                      </div>
-                      <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                        <div className="h-[3px] rounded-full bg-[#666]" style={{ width: `${d.odds}%` }} />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="f1-label text-[0.625rem]">{t("actualPtsShare")}</span>
-                        <span className="f1-data text-sm text-white">{ptsShare}%</span>
-                      </div>
-                      <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                        <div className="h-[3px] rounded-full" style={{ width: `${ptsShare}%`, backgroundColor: d.color }} />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-2">
-                      <span
-                        className="f1-data text-xs font-bold"
-                        style={{ color: isValue ? "#22c55e" : "#ef4444" }}
-                      >
-                        {isValue ? "+" : ""}{gap.toFixed(1)}%
-                      </span>
-                      <span
-                        className="rounded px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider"
-                        style={{
-                          backgroundColor: isValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-                          color: isValue ? "#22c55e" : "#ef4444",
-                        }}
-                      >
-                        {label}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
 
-        {/* ── Points Progression Chart ────────────────────────────────── */}
-        <div className="mt-4">
-          <PointsProgressionChart />
-        </div>
-
-        {/* ── Lap Time Comparison ─────────────────────────────────────── */}
-        <div className="mt-4">
-          <LapComparisonChart />
-        </div>
-
-        {/* ── 4. TEAMMATE BATTLES (full width below grid) ──────────────── */}
-        <div className="mt-4">
+        {/* ── TEAMMATE BATTLES (full width) ──────────────────────────── */}
+        <div id="head-to-head" className="mt-4" style={{ scrollMarginTop: "4rem" }}>
           <div className="f1-surface p-5">
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
               <span className="f1-heading text-white">{t("teammateBattles")}</span>
+              <span className="cursor-help text-[#666] text-xs" title="Head-to-head qualifying and race finishing position comparison between teammates">&#9432;</span>
             </div>
             <p className="f1-label mb-4">{t("teammateBattlesDesc")}</p>
 
@@ -394,12 +504,12 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-left">
                         <span className="f1-heading text-sm text-white">{b.c1}</span>
-                        <p className="f1-data text-[0.625rem] text-[#666]">{b.pts[0]} pts</p>
+                        <p className="f1-data text-[0.625rem] text-[var(--text-muted)]">{b.pts[0]} pts</p>
                       </div>
-                      <span className="f1-label text-[0.5rem] text-[#333]">vs</span>
+                      <span className="f1-label text-[0.5rem] text-[var(--text-subtle)]">vs</span>
                       <div className="text-right">
                         <span className="f1-heading text-sm text-white">{b.c2}</span>
-                        <p className="f1-data text-[0.625rem] text-[#666]">{b.pts[1]} pts</p>
+                        <p className="f1-data text-[0.625rem] text-[var(--text-muted)]">{b.pts[1]} pts</p>
                       </div>
                     </div>
 
@@ -407,7 +517,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="f1-label text-[0.5rem]">{t("qualifying")}</span>
-                        <span className="f1-data text-[0.5rem] text-[#444]">{b.qualiH2H[0]}-{b.qualiH2H[1]}</span>
+                        <span className="f1-data text-[0.5rem] text-[var(--text-dim)]">{b.qualiH2H[0]}-{b.qualiH2H[1]}</span>
                       </div>
                       <div className="flex h-[4px] w-full overflow-hidden rounded-full">
                         <div className="h-full" style={{ width: `${qualiPct1}%`, backgroundColor: b.color }} />
@@ -419,7 +529,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     <div>
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="f1-label text-[0.5rem]">{t("raceH2H")}</span>
-                        <span className="f1-data text-[0.5rem] text-[#444]">{b.raceH2H[0]}-{b.raceH2H[1]}</span>
+                        <span className="f1-data text-[0.5rem] text-[var(--text-dim)]">{b.raceH2H[0]}-{b.raceH2H[1]}</span>
                       </div>
                       <div className="flex h-[4px] w-full overflow-hidden rounded-full">
                         <div className="h-full" style={{ width: `${racePct1}%`, backgroundColor: b.color }} />

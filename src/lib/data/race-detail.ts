@@ -10,6 +10,19 @@ type Winner = { year: number; driver: string; code: string; team: string; color:
 type WeatherDay = { day: string; date: string; condition: string; temp_hi: number; temp_lo: number; rain: number; wind: string; icon: string };
 type ResultEntry = { pos: number; driver: string; code: string; team: string; color: string; time?: string };
 
+type TireStint = { compound: "soft" | "medium" | "hard" | "intermediate" | "wet"; laps: number };
+type DriverStrategy = { driver: string; code: string; color: string; stints: TireStint[] };
+
+type CircuitRecord = {
+  driver: string;
+  code: string;
+  color: string;
+  wins: number;
+  podiums: number;
+  poles: number;
+  bestFinish: number;
+};
+
 type CircuitInfo = {
   length: string; turns: number; lap_record: string; lap_record_holder: string;
   lap_record_year: number; drs_zones: number; overtake_mode_zones: number;
@@ -38,6 +51,8 @@ export type RaceData = {
   history: { safety_car_rate: number; avg_overtakes: number; last_winners: Winner[] };
   weather: WeatherDay[];
   results?: ResultEntry[];
+  tireStrategy: DriverStrategy[];
+  circuitRecords: CircuitRecord[];
 };
 
 // ── Country → Flag ───────────────────────────────────────────────────────────
@@ -62,6 +77,8 @@ type StaticEnrichment = {
   weather: WeatherDay[];
   safety_car_rate: number;
   avg_overtakes: number;
+  tireStrategy: DriverStrategy[];
+  circuitRecords: CircuitRecord[];
 };
 
 const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
@@ -81,6 +98,18 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "06 Mar", condition: "Sunny", temp_hi: 28, temp_lo: 18, rain: 0, wind: "8 km/h SE", icon: "sunny" },
     ],
     safety_car_rate: 60, avg_overtakes: 22,
+    tireStrategy: [
+      { driver: "George Russell", code: "RUS", color: "#27F4D2", stints: [{ compound: "medium", laps: 18 }, { compound: "hard", laps: 20 }, { compound: "hard", laps: 20 }] },
+      { driver: "Kimi Antonelli", code: "ANT", color: "#27F4D2", stints: [{ compound: "medium", laps: 18 }, { compound: "hard", laps: 22 }, { compound: "hard", laps: 18 }] },
+      { driver: "Charles Leclerc", code: "LEC", color: "#E80020", stints: [{ compound: "soft", laps: 14 }, { compound: "hard", laps: 22 }, { compound: "medium", laps: 22 }] },
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", stints: [{ compound: "medium", laps: 20 }, { compound: "hard", laps: 20 }, { compound: "hard", laps: 18 }] },
+      { driver: "Lando Norris", code: "NOR", color: "#FF8000", stints: [{ compound: "soft", laps: 12 }, { compound: "medium", laps: 20 }, { compound: "hard", laps: 26 }] },
+    ],
+    circuitRecords: [
+      { driver: "Max Verstappen", code: "VER", color: "#3671C6", wins: 3, podiums: 4, poles: 2, bestFinish: 1 },
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", wins: 2, podiums: 7, poles: 8, bestFinish: 1 },
+      { driver: "Sebastian Vettel", code: "VET", color: "#006F62", wins: 3, podiums: 5, poles: 4, bestFinish: 1 },
+    ],
   },
   "chinese-gp": {
     circuit_info: { length: "5.451 km", turns: 16, lap_record: "1:32.238", lap_record_holder: "Michael Schumacher", lap_record_year: 2004, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
@@ -98,6 +127,18 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "13 Mar", condition: "Mostly Sunny", temp_hi: 17, temp_lo: 9, rain: 10, wind: "10 km/h NW", icon: "sunny" },
     ],
     safety_car_rate: 42, avg_overtakes: 34,
+    tireStrategy: [
+      { driver: "Kimi Antonelli", code: "ANT", color: "#27F4D2", stints: [{ compound: "medium", laps: 16 }, { compound: "hard", laps: 24 }, { compound: "hard", laps: 16 }] },
+      { driver: "George Russell", code: "RUS", color: "#27F4D2", stints: [{ compound: "medium", laps: 16 }, { compound: "hard", laps: 22 }, { compound: "hard", laps: 18 }] },
+      { driver: "Charles Leclerc", code: "LEC", color: "#E80020", stints: [{ compound: "medium", laps: 18 }, { compound: "hard", laps: 20 }, { compound: "hard", laps: 18 }] },
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", stints: [{ compound: "soft", laps: 12 }, { compound: "hard", laps: 24 }, { compound: "medium", laps: 20 }] },
+      { driver: "Max Verstappen", code: "VER", color: "#3671C6", stints: [{ compound: "medium", laps: 20 }, { compound: "hard", laps: 18 }, { compound: "hard", laps: 18 }] },
+    ],
+    circuitRecords: [
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", wins: 6, podiums: 9, poles: 7, bestFinish: 1 },
+      { driver: "Sebastian Vettel", code: "VET", color: "#006F62", wins: 3, podiums: 5, poles: 3, bestFinish: 1 },
+      { driver: "Fernando Alonso", code: "ALO", color: "#006F62", wins: 2, podiums: 4, poles: 2, bestFinish: 1 },
+    ],
   },
   "japanese-gp": {
     circuit_info: { length: "5.807 km", turns: 18, lap_record: "1:30.983", lap_record_holder: "Lewis Hamilton", lap_record_year: 2019, drs_zones: 2, overtake_mode_zones: 3, layout: "Figure-8", direction: "Clockwise" },
@@ -116,6 +157,12 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "29 Mar", condition: "Mostly Sunny", temp_hi: 17, temp_lo: 11, rain: 5, wind: "10 km/h SW", icon: "sunny" },
     ],
     safety_car_rate: 35, avg_overtakes: 28,
+    tireStrategy: [],
+    circuitRecords: [
+      { driver: "Max Verstappen", code: "VER", color: "#3671C6", wins: 3, podiums: 3, poles: 3, bestFinish: 1 },
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", wins: 1, podiums: 5, poles: 3, bestFinish: 1 },
+      { driver: "Sebastian Vettel", code: "VET", color: "#006F62", wins: 4, podiums: 7, poles: 4, bestFinish: 1 },
+    ],
   },
   "bahrain-gp": {
     circuit_info: { length: "5.412 km", turns: 15, lap_record: "1:31.447", lap_record_holder: "Pedro de la Rosa", lap_record_year: 2005, drs_zones: 3, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
@@ -133,6 +180,13 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "12 Apr", condition: "Sunny", temp_hi: 34, temp_lo: 24, rain: 0, wind: "10 km/h N", icon: "sunny" },
     ],
     safety_car_rate: 50, avg_overtakes: 35,
+    tireStrategy: [],
+    circuitRecords: [
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", wins: 3, podiums: 6, poles: 4, bestFinish: 1 },
+      { driver: "Max Verstappen", code: "VER", color: "#3671C6", wins: 3, podiums: 5, poles: 3, bestFinish: 1 },
+      { driver: "Sebastian Vettel", code: "VET", color: "#006F62", wins: 2, podiums: 6, poles: 3, bestFinish: 1 },
+      { driver: "Charles Leclerc", code: "LEC", color: "#E80020", wins: 1, podiums: 3, poles: 2, bestFinish: 1 },
+    ],
   },
   "saudi-arabian-gp": {
     circuit_info: { length: "6.174 km", turns: 27, lap_record: "1:30.734", lap_record_holder: "Lewis Hamilton", lap_record_year: 2021, drs_zones: 3, overtake_mode_zones: 3, layout: "Street", direction: "Anti-clockwise" },
@@ -150,6 +204,12 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "19 Apr", condition: "Partly Cloudy", temp_hi: 34, temp_lo: 25, rain: 5, wind: "14 km/h W", icon: "partly-cloudy" },
     ],
     safety_car_rate: 70, avg_overtakes: 20,
+    tireStrategy: [],
+    circuitRecords: [
+      { driver: "Max Verstappen", code: "VER", color: "#3671C6", wins: 2, podiums: 3, poles: 2, bestFinish: 1 },
+      { driver: "Lewis Hamilton", code: "HAM", color: "#E80020", wins: 1, podiums: 2, poles: 1, bestFinish: 1 },
+      { driver: "Sergio Perez", code: "PER", color: "#3671C6", wins: 1, podiums: 2, poles: 1, bestFinish: 1 },
+    ],
   },
   "miami-gp": {
     circuit_info: { length: "5.412 km", turns: 19, lap_record: "1:29.708", lap_record_holder: "Max Verstappen", lap_record_year: 2023, drs_zones: 3, overtake_mode_zones: 4, layout: "Street/Temporary", direction: "Clockwise" },
@@ -167,6 +227,12 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "03 May", condition: "Partly Cloudy", temp_hi: 31, temp_lo: 23, rain: 30, wind: "14 km/h SW", icon: "partly-cloudy" },
     ],
     safety_car_rate: 55, avg_overtakes: 27,
+    tireStrategy: [],
+    circuitRecords: [
+      { driver: "Max Verstappen", code: "VER", color: "#3671C6", wins: 2, podiums: 3, poles: 2, bestFinish: 1 },
+      { driver: "Lando Norris", code: "NOR", color: "#FF8000", wins: 1, podiums: 2, poles: 1, bestFinish: 1 },
+      { driver: "Charles Leclerc", code: "LEC", color: "#E80020", wins: 0, podiums: 2, poles: 1, bestFinish: 2 },
+    ],
   },
   "canadian-gp": {
     circuit_info: { length: "4.361 km", turns: 14, lap_record: "1:13.078", lap_record_holder: "Valtteri Bottas", lap_record_year: 2019, drs_zones: 2, overtake_mode_zones: 3, layout: "Semi-Street", direction: "Clockwise" },
@@ -184,6 +250,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "24 May", condition: "Partly Cloudy", temp_hi: 23, temp_lo: 14, rain: 20, wind: "12 km/h NW", icon: "partly-cloudy" },
     ],
     safety_car_rate: 65, avg_overtakes: 31,
+    tireStrategy: [],
+    circuitRecords: [],
   },
   "monaco-gp": {
     circuit_info: { length: "3.337 km", turns: 19, lap_record: "1:12.909", lap_record_holder: "Rubens Barrichello", lap_record_year: 2004, drs_zones: 1, overtake_mode_zones: 1, layout: "Street", direction: "Clockwise" },
@@ -201,6 +269,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "07 Jun", condition: "Sunny", temp_hi: 24, temp_lo: 16, rain: 5, wind: "7 km/h S", icon: "sunny" },
     ],
     safety_car_rate: 75, avg_overtakes: 8,
+    tireStrategy: [],
+    circuitRecords: [],
   },
   "spanish-gp": {
     circuit_info: { length: "4.657 km", turns: 14, lap_record: "1:16.330", lap_record_holder: "Max Verstappen", lap_record_year: 2023, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
@@ -218,6 +288,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "14 Jun", condition: "Partly Cloudy", temp_hi: 25, temp_lo: 15, rain: 10, wind: "10 km/h SW", icon: "partly-cloudy" },
     ],
     safety_car_rate: 30, avg_overtakes: 24,
+    tireStrategy: [],
+    circuitRecords: [],
   },
   "austrian-gp": {
     circuit_info: { length: "4.318 km", turns: 10, lap_record: "1:05.619", lap_record_holder: "Carlos Sainz", lap_record_year: 2020, drs_zones: 3, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
@@ -235,6 +307,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "28 Jun", condition: "Thunderstorms", temp_hi: 22, temp_lo: 13, rain: 65, wind: "22 km/h SW", icon: "cloudy" },
     ],
     safety_car_rate: 40, avg_overtakes: 38,
+    tireStrategy: [],
+    circuitRecords: [],
   },
   "british-gp": {
     circuit_info: { length: "5.891 km", turns: 18, lap_record: "1:27.097", lap_record_holder: "Max Verstappen", lap_record_year: 2020, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
@@ -252,6 +326,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "05 Jul", condition: "Mostly Sunny", temp_hi: 23, temp_lo: 14, rain: 10, wind: "12 km/h NW", icon: "sunny" },
     ],
     safety_car_rate: 38, avg_overtakes: 33,
+    tireStrategy: [],
+    circuitRecords: [],
   },
   "belgian-gp": {
     circuit_info: { length: "7.004 km", turns: 19, lap_record: "1:46.286", lap_record_holder: "Valtteri Bottas", lap_record_year: 2018, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
@@ -269,6 +345,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "19 Jul", condition: "Partly Cloudy", temp_hi: 22, temp_lo: 13, rain: 20, wind: "13 km/h NW", icon: "partly-cloudy" },
     ],
     safety_car_rate: 45, avg_overtakes: 41,
+    tireStrategy: [],
+    circuitRecords: [],
   },
   "hungarian-gp": {
     circuit_info: { length: "4.381 km", turns: 14, lap_record: "1:16.627", lap_record_holder: "Lewis Hamilton", lap_record_year: 2020, drs_zones: 2, overtake_mode_zones: 2, layout: "Permanent", direction: "Clockwise" },
@@ -286,6 +364,8 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
       { day: "Sunday", date: "26 Jul", condition: "Partly Cloudy", temp_hi: 32, temp_lo: 21, rain: 10, wind: "10 km/h S", icon: "partly-cloudy" },
     ],
     safety_car_rate: 35, avg_overtakes: 16,
+    tireStrategy: [],
+    circuitRecords: [],
   },
 };
 
@@ -553,6 +633,8 @@ export async function getRaceDetailData(slug: string): Promise<RaceData | null> 
       },
       weather: staticData?.weather ?? [],
       results,
+      tireStrategy: staticData?.tireStrategy ?? [],
+      circuitRecords: staticData?.circuitRecords ?? [],
     };
 
     return raceData;

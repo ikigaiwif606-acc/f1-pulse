@@ -211,6 +211,69 @@ function RaceDetailInner({ race }: { race: RaceData }) {
               </div>
             )}
 
+            {/* Tire Strategy (completed races only) */}
+            {race.tireStrategy && race.tireStrategy.length > 0 && (
+              <div className="f1-surface p-5">
+                <div className="mb-5 flex items-center gap-2">
+                  <div className="f1-accent-bar" />
+                  <span className="f1-heading text-white">Tire Strategy</span>
+                </div>
+                <div className="space-y-2">
+                  {race.tireStrategy.map((ds) => {
+                    const totalLaps = ds.stints.reduce((sum, s) => sum + s.laps, 0);
+                    return (
+                      <div key={ds.code} className="f1-surface-inner p-2.5">
+                        <div className="mb-1.5 flex items-center gap-2">
+                          <div className="f1-team-bar h-4" style={{ backgroundColor: ds.color }} />
+                          <span className="f1-data w-8 text-xs font-bold" style={{ color: ds.color }}>{ds.code}</span>
+                          <span className="f1-label-xs" style={{ color: "#444" }}>{totalLaps} laps</span>
+                        </div>
+                        <div className="flex h-7 w-full overflow-hidden rounded">
+                          {ds.stints.map((stint, i) => {
+                            const widthPct = (stint.laps / totalLaps) * 100;
+                            const compoundColors: Record<string, string> = {
+                              soft: "#E10600",
+                              medium: "#f59e0b",
+                              hard: "#ededed",
+                              intermediate: "#22c55e",
+                              wet: "#3671C6",
+                            };
+                            const bg = compoundColors[stint.compound] || "#444";
+                            const textColor = stint.compound === "hard" || stint.compound === "medium" ? "#000" : "#fff";
+                            return (
+                              <div
+                                key={i}
+                                className="flex items-center justify-center gap-0.5 border-r border-[#0a0a0a] last:border-r-0"
+                                style={{
+                                  width: `${widthPct}%`,
+                                  backgroundColor: bg,
+                                  minWidth: "2rem",
+                                }}
+                                title={`${stint.compound.charAt(0).toUpperCase() + stint.compound.slice(1)} - ${stint.laps} laps`}
+                              >
+                                <span
+                                  className="f1-label-xs !text-[8px] font-bold uppercase"
+                                  style={{ color: textColor, letterSpacing: "0.05em" }}
+                                >
+                                  {stint.compound.charAt(0).toUpperCase()}
+                                </span>
+                                <span
+                                  className="f1-data text-[9px]"
+                                  style={{ color: textColor }}
+                                >
+                                  {stint.laps}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Session Schedule */}
             {race.sessions.length > 0 && (
               <div className="f1-surface p-5">
@@ -343,6 +406,50 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                     </div>
                   )}
                 </div>
+
+                {/* Circuit Kings */}
+                {race.circuitRecords && race.circuitRecords.length > 0 && (() => {
+                  const maxWins = Math.max(...race.circuitRecords.map((r) => r.wins));
+                  return (
+                    <div className="mb-5">
+                      <p className="f1-label mb-3" style={{ color: "#555" }}>
+                        Circuit Kings
+                      </p>
+                      <div className="space-y-1">
+                        {race.circuitRecords.map((record) => {
+                          const isKing = record.wins === maxWins && record.wins > 0;
+                          return (
+                            <div
+                              key={record.code}
+                              className={`flex items-center gap-3 f1-surface-inner p-2.5 ${isKing ? "ring-1 ring-[#f59e0b]/30" : ""}`}
+                            >
+                              <div className="f1-team-bar h-5" style={{ backgroundColor: record.color }} />
+                              <span className="f1-data w-8 shrink-0 text-xs font-bold" style={{ color: record.color }}>{record.code}</span>
+                              <span className="f1-body-sm flex-1 font-semibold text-white">
+                                {record.driver}
+                                {isKing && <span className="ml-1.5 f1-label-xs !text-[#f59e0b]">KING</span>}
+                              </span>
+                              <div className="flex items-center gap-3">
+                                <div className="text-center">
+                                  <p className="f1-data text-xs text-white">{record.wins}</p>
+                                  <p className="f1-label-xs !text-[7px]">WIN{record.wins !== 1 ? "S" : ""}</p>
+                                </div>
+                                <div className="text-center">
+                                  <p className="f1-data text-xs text-[#666]">{record.podiums}</p>
+                                  <p className="f1-label-xs !text-[7px]">POD</p>
+                                </div>
+                                <div className="text-center">
+                                  <p className="f1-data text-xs text-[#555]">{record.poles}</p>
+                                  <p className="f1-label-xs !text-[7px]">POLE</p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div>
                   <p className="f1-label mb-3" style={{ color: "#555" }}>

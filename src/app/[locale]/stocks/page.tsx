@@ -2,7 +2,13 @@
 
 import { useTranslations } from "next-intl";
 import { F1_STOCKS, CORRELATION_INSIGHTS, type F1Stock } from "@/lib/data/stocks";
-import { StockSparkline, generateSparklineData } from "@/components/charts/stock-sparkline";
+import dynamic from "next/dynamic";
+import { generateSparklineData } from "@/components/charts/stock-sparkline";
+
+const StockSparkline = dynamic(
+  () => import("@/components/charts/stock-sparkline").then(mod => ({ default: mod.StockSparkline })),
+  { ssr: false }
+);
 
 function changeColor(n: number): string {
   return n > 0 ? "text-[#22c55e]" : n < 0 ? "text-[#E10600]" : "text-[#555]";
@@ -32,6 +38,8 @@ function StocksContent() {
 
   // Sort by market cap proxy (price * implied scale) — just show in order
   const avgChange1d = F1_STOCKS.reduce((s, st) => s + st.change1d, 0) / F1_STOCKS.length;
+  const bestStock = F1_STOCKS.reduce((best, s) => s.changeYtd > best.changeYtd ? s : best, F1_STOCKS[0]);
+  const worstStock = F1_STOCKS.reduce((worst, s) => s.changeYtd < worst.changeYtd ? s : worst, F1_STOCKS[0]);
 
   return (
     <div className="min-h-screen bg-[#080808]">
@@ -57,13 +65,13 @@ function StocksContent() {
           </div>
           <div className="f1-surface p-4 text-center">
             <p className="f1-label-xs mb-2">{t("bestPerformer")}</p>
-            <p className="f1-data-lg text-[#22c55e]">GM</p>
-            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>+12.3% YTD</p>
+            <p className="f1-data-lg text-[#22c55e]">{bestStock.ticker}</p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>{formatChange(bestStock.changeYtd)} {t("ytd")}</p>
           </div>
           <div className="f1-surface p-4 text-center">
             <p className="f1-label-xs mb-2">{t("worstPerformer")}</p>
-            <p className="f1-data-lg text-[#E10600]">AML</p>
-            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>-22.4% YTD</p>
+            <p className="f1-data-lg text-[#E10600]">{worstStock.ticker}</p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>{formatChange(worstStock.changeYtd)} {t("ytd")}</p>
           </div>
         </div>
 

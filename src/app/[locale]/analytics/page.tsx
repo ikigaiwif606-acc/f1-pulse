@@ -1,8 +1,17 @@
 import { useTranslations } from "next-intl";
 import { getQualifyingResults } from "@/lib/api/ergast";
 import { getTeamColor } from "@/lib/data/transformers";
-import { PointsProgressionChart } from "@/components/charts/points-chart";
-import { LapComparisonChart } from "@/components/charts/lap-comparison";
+import dynamic from "next/dynamic";
+
+const PointsProgressionChart = dynamic(
+  () => import("@/components/charts/points-chart").then(mod => ({ default: mod.PointsProgressionChart })),
+  { ssr: false }
+);
+
+const LapComparisonChart = dynamic(
+  () => import("@/components/charts/lap-comparison").then(mod => ({ default: mod.LapComparisonChart })),
+  { ssr: false }
+);
 
 // ── Fallback qualifying data (top 10, R2 China 2026) ─────────────────────────
 const FALLBACK_QUALIFYING = [
@@ -157,6 +166,10 @@ export default async function AnalyticsPage() {
 function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] }) {
   const t = useTranslations("analytics");
 
+  const roundsCompleted = TEAMMATE_BATTLES.length > 0
+    ? TEAMMATE_BATTLES[0].qualiH2H[0] + TEAMMATE_BATTLES[0].qualiH2H[1]
+    : 0;
+
   return (
     <div className="min-h-screen bg-[#080808]">
       <div className="mx-auto max-w-7xl px-5 py-8">
@@ -164,7 +177,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
         <div className="mb-6">
           <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
           <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
-          <p className="f1-label mt-1">{t("dataFromRounds", { count: 2 })} &middot; {t("season2026")}</p>
+          <p className="f1-label mt-1">{t("dataFromRounds", { count: roundsCompleted })} &middot; {t("season2026")}</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

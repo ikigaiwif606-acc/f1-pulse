@@ -16,6 +16,7 @@
     "sponsorships": "Sponsors",
     "stocks": "Stocks",
     "analytics": "Analytics",
+    "replay": "Replay",
     "news": "News",
     "more": "More"
   },
@@ -266,6 +267,22 @@
     "updatedEvery15m": "Updated every 15 min",
     "latestHeadlines": "Latest Headlines",
     "disclaimer": "F1 Pulse · News aggregated from public RSS feeds · Content belongs to original publishers · Links open in new tab"
+  },
+  "replay": {
+    "title": "Race Replay",
+    "intelligence": "Race Visualization",
+    "description": "Watch the 2026 Australian GP unfold lap by lap — simulated from race data",
+    "lap": "Lap",
+    "leaderboard": "Live Standings",
+    "playPause": "Play / Pause",
+    "seek": "Seek",
+    "speed": "Speed",
+    "labels": "Labels",
+    "position": "POS",
+    "gap": "GAP",
+    "tire": "TIRE",
+    "lastLap": "LAST LAP",
+    "disclaimer": "F1 Pulse · Race replay uses simulated data based on actual race results · Visualization is approximate"
   },
   "footer": {
     "disclaimer": "F1 Pulse displays prediction market data for informational purposes only. This is not financial advice. Always do your own research.",

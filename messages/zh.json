@@ -16,6 +16,7 @@
     "sponsorships": "赞助商",
     "stocks": "股票",
     "analytics": "数据分析",
+    "replay": "回放",
     "news": "新闻",
     "more": "更多"
   },
@@ -266,6 +267,22 @@
     "updatedEvery15m": "每15分钟更新",
     "latestHeadlines": "最新头条",
     "disclaimer": "F1 Pulse · 新闻来自公开RSS源 · 内容归原发布者所有 · 链接在新标签页打开"
+  },
+  "replay": {
+    "title": "比赛回放",
+    "intelligence": "比赛可视化",
+    "description": "逐圈回放2026澳大利亚大奖赛 — 基于比赛数据模拟",
+    "lap": "圈数",
+    "leaderboard": "实时排名",
+    "playPause": "播放/暂停",
+    "seek": "快进/快退",
+    "speed": "速度",
+    "labels": "标签",
+    "position": "位置",
+    "gap": "差距",
+    "tire": "轮胎",
+    "lastLap": "上圈",
+    "disclaimer": "F1 Pulse · 比赛回放使用基于实际赛果的模拟数据 · 可视化为近似效果"
   },
   "footer": {
     "disclaimer": "F1 Pulse 仅展示预测市场数据，不构成投资建议。请自行研究后做出决策。",

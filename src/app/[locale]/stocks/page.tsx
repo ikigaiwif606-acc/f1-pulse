@@ -1,5 +1,8 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { F1_STOCKS, CORRELATION_INSIGHTS, type F1Stock } from "@/lib/data/stocks";
+import { StockSparkline, generateSparklineData } from "@/components/charts/stock-sparkline";
 
 function changeColor(n: number): string {
   return n > 0 ? "text-[#22c55e]" : n < 0 ? "text-[#E10600]" : "text-[#555]";
@@ -228,6 +231,16 @@ function StockCard({ stock }: { stock: F1Stock }) {
             {c.label} {formatChange(c.val)}
           </span>
         ))}
+      </div>
+
+      {/* Sparkline */}
+      <div className="mb-3 flex items-center justify-between">
+        <span className="f1-label-xs">30D Trend</span>
+        <StockSparkline
+          data={generateSparklineData(stock.price, stock.changeYtd)}
+          color={stock.teamColor}
+          isPositive={stock.changeYtd > 0}
+        />
       </div>
 
       {/* 52-week range */}

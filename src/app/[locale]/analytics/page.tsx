@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { getQualifyingResults } from "@/lib/api/ergast";
 import { getTeamColor } from "@/lib/data/transformers";
+import { PointsProgressionChart } from "@/components/charts/points-chart";
 
 // ── Fallback qualifying data (top 10, R2 China 2026) ─────────────────────────
 const FALLBACK_QUALIFYING = [
@@ -348,6 +349,11 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               })}
             </div>
           </div>
+        </div>
+
+        {/* ── Points Progression Chart ────────────────────────────────── */}
+        <div className="mt-4">
+          <PointsProgressionChart />
         </div>
 
         {/* ── 4. TEAMMATE BATTLES (full width below grid) ──────────────── */}

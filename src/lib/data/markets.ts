@@ -2,70 +2,134 @@ import { searchMarkets } from "@/lib/api/polymarket";
 import { transformPolymarketResults } from "./transformers";
 import type { MarketsData, ChampionshipOddsItem } from "@/types";
 
-// ── Fallback data ──────────────────────────────────────────────
+// ── Fallback data (synced with polymarket.com/sports/f1/props) ──
 const FALLBACK_MARKETS: MarketsData = {
   championship: [
     {
-      question: "Who will win the 2026 F1 Drivers' Championship?",
-      volume: "$18.2M", endDate: "Dec 6, 2026",
+      question: "F1 Drivers' Champion 2026",
+      volume: "$31M", endDate: "Dec 6, 2026",
       outcomes: [
-        { name: "George Russell", code: "RUS", price: 0.57, color: "#27F4D2" },
-        { name: "Kimi Antonelli", code: "ANT", price: 0.15, color: "#27F4D2" },
+        { name: "George Russell", code: "RUS", price: 0.60, color: "#27F4D2" },
+        { name: "Kimi Antonelli", code: "ANT", price: 0.18, color: "#27F4D2" },
         { name: "Charles Leclerc", code: "LEC", price: 0.10, color: "#E80020" },
-        { name: "Lando Norris", code: "NOR", price: 0.08, color: "#FF8000" },
-        { name: "Max Verstappen", code: "VER", price: 0.05, color: "#3671C6" },
+        { name: "Lando Norris", code: "NOR", price: 0.05, color: "#FF8000" },
+        { name: "Max Verstappen", code: "VER", price: 0.03, color: "#3671C6" },
       ],
     },
     {
-      question: "Who will win the 2026 Constructors' Championship?",
-      volume: "$12.1M", endDate: "Dec 6, 2026",
+      question: "F1 Constructors' Champion 2026",
+      volume: "$4M", endDate: "Dec 6, 2026",
       outcomes: [
-        { name: "Mercedes", code: "MER", price: 0.65, color: "#27F4D2" },
-        { name: "Ferrari", code: "FER", price: 0.18, color: "#E80020" },
-        { name: "McLaren", code: "MCL", price: 0.10, color: "#FF8000" },
+        { name: "Mercedes", code: "MER", price: 0.80, color: "#27F4D2" },
+        { name: "Ferrari", code: "FER", price: 0.16, color: "#E80020" },
+        { name: "McLaren", code: "MCL", price: 0.03, color: "#FF8000" },
       ],
     },
   ],
   raceWinner: [
     {
-      question: "Who will win the 2026 Japanese Grand Prix?",
-      volume: "$2.4M", endDate: "Mar 29, 2026",
+      question: "Japanese Grand Prix: Driver Winner",
+      volume: "$202K", endDate: "Mar 29, 2026",
       outcomes: [
-        { name: "George Russell", code: "RUS", price: 0.28, color: "#27F4D2" },
+        { name: "George Russell", code: "RUS", price: 0.55, color: "#27F4D2" },
+        { name: "Kimi Antonelli", code: "ANT", price: 0.21, color: "#27F4D2" },
+        { name: "Charles Leclerc", code: "LEC", price: 0.08, color: "#E80020" },
+        { name: "Max Verstappen", code: "VER", price: 0.06, color: "#3671C6" },
+        { name: "Lando Norris", code: "NOR", price: 0.04, color: "#FF8000" },
+      ],
+    },
+    {
+      question: "Japanese Grand Prix: Driver Pole Position",
+      volume: "$50K", endDate: "Mar 28, 2026",
+      outcomes: [
+        { name: "George Russell", code: "RUS", price: 0.57, color: "#27F4D2" },
         { name: "Kimi Antonelli", code: "ANT", price: 0.22, color: "#27F4D2" },
-        { name: "Charles Leclerc", code: "LEC", price: 0.15, color: "#E80020" },
-        { name: "Max Verstappen", code: "VER", price: 0.12, color: "#3671C6" },
-        { name: "Lando Norris", code: "NOR", price: 0.10, color: "#FF8000" },
+        { name: "Charles Leclerc", code: "LEC", price: 0.08, color: "#E80020" },
+        { name: "Max Verstappen", code: "VER", price: 0.05, color: "#3671C6" },
+      ],
+    },
+    {
+      question: "Japanese Grand Prix: Constructor Scores 1st",
+      volume: "$30K", endDate: "Mar 29, 2026",
+      outcomes: [
+        { name: "Red Bull", code: "RBR", price: 0.83, color: "#3671C6" },
+        { name: "Mercedes", code: "MER", price: 0.73, color: "#27F4D2" },
+        { name: "Ferrari", code: "FER", price: 0.50, color: "#E80020" },
+        { name: "McLaren", code: "MCL", price: 0.30, color: "#FF8000" },
       ],
     },
   ],
   props: [
     {
-      question: "Will there be a safety car at the Japanese GP?",
-      volume: "$340K", endDate: "Mar 29, 2026",
+      question: "Safety Car During Japanese Grand Prix 2026?",
+      volume: "$40K", endDate: "Mar 29, 2026",
       outcomes: [
-        { name: "Yes", code: "YES", price: 0.35, color: "#f59e0b" },
-        { name: "No", code: "NO", price: 0.65, color: "#666" },
+        { name: "Yes", code: "YES", price: 0.67, color: "#f59e0b" },
+        { name: "No", code: "NO", price: 0.33, color: "#666" },
       ],
     },
     {
-      question: "F1 Action of the Year 2026 Award Winner?",
+      question: "Red Flag During Japanese Grand Prix 2026?",
+      volume: "$25K", endDate: "Mar 29, 2026",
+      outcomes: [
+        { name: "Yes", code: "YES", price: 0.33, color: "#E10600" },
+        { name: "No", code: "NO", price: 0.67, color: "#666" },
+      ],
+    },
+    {
+      question: "Japanese Grand Prix: Driver Fastest Lap",
+      volume: "$20K", endDate: "Mar 29, 2026",
+      outcomes: [
+        { name: "Kimi Antonelli", code: "ANT", price: 0.65, color: "#27F4D2" },
+        { name: "George Russell", code: "RUS", price: 0.44, color: "#27F4D2" },
+        { name: "Charles Leclerc", code: "LEC", price: 0.15, color: "#E80020" },
+      ],
+    },
+    {
+      question: "Japanese Grand Prix: Constructor Fastest Lap",
+      volume: "$15K", endDate: "Mar 29, 2026",
+      outcomes: [
+        { name: "Williams", code: "WIL", price: 0.49, color: "#1868DB" },
+        { name: "Racing Bulls", code: "RBU", price: 0.49, color: "#6692FF" },
+        { name: "Mercedes", code: "MER", price: 0.80, color: "#27F4D2" },
+      ],
+    },
+    {
+      question: "Japanese Grand Prix: Practice 1 Fastest Lap",
+      volume: "$10K", endDate: "Mar 26, 2026",
+      outcomes: [
+        { name: "Charles Leclerc", code: "LEC", price: 0.44, color: "#E80020" },
+        { name: "Lando Norris", code: "NOR", price: 0.44, color: "#FF8000" },
+        { name: "George Russell", code: "RUS", price: 0.30, color: "#27F4D2" },
+      ],
+    },
+    {
+      question: "F1: Action of the Year 2026",
       volume: "$180K", endDate: "Dec 31, 2026",
       outcomes: [
-        { name: "Max Verstappen", code: "VER", price: 0.20, color: "#3671C6" },
-        { name: "Lewis Hamilton", code: "HAM", price: 0.18, color: "#E80020" },
-        { name: "Fernando Alonso", code: "ALO", price: 0.12, color: "#229971" },
+        { name: "George Russell", code: "RUS", price: 0.21, color: "#27F4D2" },
+        { name: "Charles Leclerc", code: "LEC", price: 0.05, color: "#E80020" },
+        { name: "Max Verstappen", code: "VER", price: 0.05, color: "#3671C6" },
+      ],
+    },
+    {
+      question: "Japanese Grand Prix: Constructor Pole Position",
+      volume: "$20K", endDate: "Mar 28, 2026",
+      outcomes: [
+        { name: "Mercedes", code: "MER", price: 0.88, color: "#27F4D2" },
+        { name: "Red Bull", code: "RBR", price: 0.34, color: "#3671C6" },
+        { name: "Ferrari", code: "FER", price: 0.25, color: "#E80020" },
       ],
     },
   ],
 };
 
 const FALLBACK_CHAMPIONSHIP_ODDS: ChampionshipOddsItem[] = [
-  { name: "George Russell", code: "RUS", odds: 0.57, volume: "$18.2M", change: +0.05, color: "#27F4D2" },
-  { name: "Kimi Antonelli", code: "ANT", odds: 0.15, volume: "$8.4M", change: +0.03, color: "#27F4D2" },
-  { name: "Charles Leclerc", code: "LEC", odds: 0.10, volume: "$6.1M", change: -0.02, color: "#E80020" },
-  { name: "Lando Norris", code: "NOR", odds: 0.08, volume: "$5.7M", change: +0.01, color: "#FF8000" },
-  { name: "Max Verstappen", code: "VER", odds: 0.05, volume: "$4.9M", change: -0.04, color: "#3671C6" },
+  { name: "George Russell", code: "RUS", odds: 0.60, volume: "$31M", change: +0.03, color: "#27F4D2" },
+  { name: "Kimi Antonelli", code: "ANT", odds: 0.18, volume: "$31M", change: +0.02, color: "#27F4D2" },
+  { name: "Charles Leclerc", code: "LEC", odds: 0.10, volume: "$31M", change: -0.01, color: "#E80020" },
+  { name: "Lando Norris", code: "NOR", odds: 0.05, volume: "$31M", change: -0.02, color: "#FF8000" },
+  { name: "Max Verstappen", code: "VER", odds: 0.03, volume: "$31M", change: -0.03, color: "#3671C6" },
 ];
 
 export async function getMarkets(category?: string): Promise<MarketsData> {

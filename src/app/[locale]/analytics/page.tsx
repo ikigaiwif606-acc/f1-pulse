@@ -4,8 +4,20 @@ import { getTeamColor } from "@/lib/data/transformers";
 import { PointsProgressionChart } from "@/components/charts/points-chart";
 import { LapComparisonChart } from "@/components/charts/lap-comparison";
 import { Link } from "@/lib/i18n/navigation";
+import {
+  getF1Markets,
+  filterMarketsForRace,
+  findChampionshipMarkets,
+  parseMarketOutcomes,
+  formatVolume,
+  type GammaMarket,
+} from "@/lib/api/polymarket";
+import { OddsMovementChart } from "@/components/analytics/odds-movement-chart";
+import { MarketCard } from "@/components/analytics/market-card";
+import { LiquidityBadge } from "@/components/analytics/liquidity-badge";
+import { TabSwitcher } from "@/components/analytics/tab-switcher";
 
-// ── Driver code → slug mapping ───────────────────────────────────────────────
+// ── Driver code -> slug mapping ───────────────────────────────────────────────
 const DRIVER_SLUG: Record<string, string> = {
   RUS: "russell", ANT: "antonelli", LEC: "leclerc", HAM: "hamilton",
   NOR: "norris", VER: "verstappen", PIA: "piastri", HAD: "hadjar",
@@ -112,7 +124,7 @@ const TIRE_STRATEGY = {
   mostPopularStrategy: "M \u2192 H \u2192 H",
 };
 
-// ── Tab categories for sticky pill bar ──────────────────────────────────────
+// ── Tab categories for deep analytics ───────────────────────────────────────
 const TAB_CATEGORIES = [
   { label: "Pace", href: "#pace" },
   { label: "Reliability", href: "#reliability" },
@@ -120,6 +132,44 @@ const TAB_CATEGORIES = [
   { label: "Betting", href: "#betting" },
   { label: "Head-to-Head", href: "#head-to-head" },
 ];
+
+// ── Driver name -> team color mapping (for Polymarket outcomes) ─────────────
+const DRIVER_COLORS: Record<string, string> = {
+  "George Russell": "#27F4D2", "Andrea Kimi Antonelli": "#27F4D2",
+  "Kimi Antonelli": "#27F4D2", "Russell": "#27F4D2", "Antonelli": "#27F4D2",
+  "Charles Leclerc": "#E80020", "Lewis Hamilton": "#E80020",
+  "Leclerc": "#E80020", "Hamilton": "#E80020",
+  "Lando Norris": "#FF8000", "Oscar Piastri": "#FF8000",
+  "Norris": "#FF8000", "Piastri": "#FF8000",
+  "Max Verstappen": "#3671C6", "Isack Hadjar": "#3671C6",
+  "Verstappen": "#3671C6", "Hadjar": "#3671C6",
+  "Oliver Bearman": "#B6BABD", "Esteban Ocon": "#B6BABD",
+  "Bearman": "#B6BABD", "Ocon": "#B6BABD",
+  "Pierre Gasly": "#0093CC", "Franco Colapinto": "#0093CC",
+  "Gasly": "#0093CC", "Colapinto": "#0093CC",
+  "Liam Lawson": "#6692FF", "Arvid Lindblad": "#6692FF",
+  "Lawson": "#6692FF", "Lindblad": "#6692FF",
+  "Carlos Sainz": "#1868DB", "Alexander Albon": "#1868DB",
+  "Sainz": "#1868DB", "Albon": "#1868DB",
+  "Gabriel Bortoleto": "#00594F", "Nico Hulkenberg": "#00594F",
+  "Bortoleto": "#00594F", "Hulkenberg": "#00594F",
+  "Fernando Alonso": "#229971", "Lance Stroll": "#229971",
+  "Alonso": "#229971", "Stroll": "#229971",
+  "Valtteri Bottas": "#C0C0C0", "Sergio Perez": "#C0C0C0",
+  "Bottas": "#C0C0C0", "Perez": "#C0C0C0",
+};
+
+// ── Next race static data ───────────────────────────────────────────────────
+const NEXT_RACE = {
+  name: "Japanese Grand Prix",
+  circuit: "Suzuka International Racing Course",
+  round: 3,
+  country: "\u{1F1EF}\u{1F1F5}",
+  laps: 53,
+  length: "5.807 km",
+  scRate: 35,
+  poleConversion: 72,
+};
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type QualifyingEntry = { name: string; code: string; gap: string; color: string; pct: number };
@@ -181,12 +231,86 @@ async function getQualifyingData(): Promise<QualifyingEntry[]> {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// Server Component — fetches all data, renders content
+// ═══════════════════════════════════════════════════════════════════════════════
+
 export default async function AnalyticsPage() {
-  const qualifying = await getQualifyingData();
-  return <AnalyticsPageContent qualifying={qualifying} />;
+  const [qualifying, markets] = await Promise.all([
+    getQualifyingData(),
+    getF1Markets({ closed: false, limit: 100, order: "volume24hr", ascending: false }).catch(() => [] as GammaMarket[]),
+  ]);
+
+  const { wdc, wcc } = findChampionshipMarkets(markets);
+  const raceMarkets = filterMarketsForRace(markets, NEXT_RACE.name);
+
+  // Parse WDC outcomes for odds charts
+  const wdcOutcomes = wdc ? parseMarketOutcomes(wdc) : [];
+  const topWdcDrivers = wdcOutcomes
+    .filter(o => o.price > 0.02)
+    .sort((a, b) => b.price - a.price)
+    .slice(0, 6)
+    .map(o => {
+      const parts = o.outcome.split(" ");
+      const lastName = parts[parts.length - 1];
+      const code = lastName.slice(0, 3).toUpperCase();
+      return {
+        name: o.outcome,
+        code,
+        color: DRIVER_COLORS[o.outcome] || DRIVER_COLORS[lastName] || "#666",
+        tokenId: o.tokenId,
+      };
+    });
+
+  // Parse WCC outcomes
+  const wccOutcomes = wcc ? parseMarketOutcomes(wcc) : [];
+  const topWccTeams = wccOutcomes
+    .filter(o => o.price > 0.02)
+    .sort((a, b) => b.price - a.price)
+    .slice(0, 6)
+    .map(o => ({
+      name: o.outcome,
+      code: o.outcome.slice(0, 3).toUpperCase(),
+      color: getTeamColor(o.outcome),
+      tokenId: o.tokenId,
+    }));
+
+  return (
+    <AnalyticsPageContent
+      qualifying={qualifying}
+      markets={markets}
+      raceMarkets={raceMarkets}
+      wdc={wdc}
+      wcc={wcc}
+      wdcDrivers={topWdcDrivers}
+      wccTeams={topWccTeams}
+    />
+  );
 }
 
-function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] }) {
+// ═══════════════════════════════════════════════════════════════════════════════
+// Content — uses translations, renders header + tabs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface ContentProps {
+  qualifying: QualifyingEntry[];
+  markets: GammaMarket[];
+  raceMarkets: GammaMarket[];
+  wdc: GammaMarket | null;
+  wcc: GammaMarket | null;
+  wdcDrivers: { name: string; code: string; color: string; tokenId: string }[];
+  wccTeams: { name: string; code: string; color: string; tokenId: string }[];
+}
+
+function AnalyticsPageContent({
+  qualifying,
+  markets,
+  raceMarkets,
+  wdc,
+  wcc,
+  wdcDrivers,
+  wccTeams,
+}: ContentProps) {
   const t = useTranslations("analytics");
 
   const roundsCompleted = TEAMMATE_BATTLES.length > 0
@@ -202,6 +326,9 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
     })
     .sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
 
+  // Suzuka safety car data
+  const suzukaSC = SAFETY_CAR.find(c => c.circuit === "Suzuka");
+
   return (
     <div className="min-h-screen bg-[#080808]">
       <div className="mx-auto max-w-7xl px-5 py-8">
@@ -212,23 +339,463 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
           <p className="f1-label mt-1">{t("dataFromRounds", { count: roundsCompleted })} &middot; {t("season2026")}</p>
         </div>
 
-        {/* ── Sticky Tab / Pill Bar ──────────────────────────────────────── */}
-        <nav className="sticky top-12 z-40 bg-[#080808]/95 backdrop-blur-xl border-b border-[#1c1c1c] mb-6">
-          <div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide">
-            {TAB_CATEGORIES.map((tab) => (
-              <a
-                key={tab.href}
-                href={tab.href}
-                className="shrink-0 rounded-full px-4 py-1.5 f1-label border border-[#1c1c1c] bg-[#0c0c0c] f1-transition hover:!text-white hover:border-[#333] hover:bg-[#161616]"
-              >
-                {tab.label}
-              </a>
-            ))}
+        {/* ── Tab Switcher ──────────────────────────────────────────────── */}
+        <TabSwitcher
+          tabs={[
+            {
+              id: "next-race",
+              label: t("tabs.nextRace"),
+              icon: "\u{1F3C1}",
+              content: (
+                <NextRaceBriefingTab
+                  t={t}
+                  raceMarkets={raceMarkets}
+                  wdcDrivers={wdcDrivers}
+                  sortedBettingEdge={sortedBettingEdge}
+                  suzukaSC={suzukaSC}
+                />
+              ),
+            },
+            {
+              id: "championship",
+              label: t("tabs.championship"),
+              icon: "\u{1F3C6}",
+              content: (
+                <ChampionshipTrackerTab
+                  t={t}
+                  wdc={wdc}
+                  wcc={wcc}
+                  wdcDrivers={wdcDrivers}
+                  wccTeams={wccTeams}
+                  sortedBettingEdge={sortedBettingEdge}
+                  roundsCompleted={roundsCompleted}
+                />
+              ),
+            },
+            {
+              id: "deep",
+              label: t("tabs.deep"),
+              icon: "\u{1F4CA}",
+              content: (
+                <DeepAnalyticsTab
+                  t={t}
+                  qualifying={qualifying}
+                  sortedBettingEdge={sortedBettingEdge}
+                  roundsCompleted={roundsCompleted}
+                />
+              ),
+            },
+          ]}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab 1 — Next Race Briefing
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function NextRaceBriefingTab({
+  t,
+  raceMarkets,
+  wdcDrivers,
+  sortedBettingEdge,
+  suzukaSC,
+}: {
+  t: any;
+  raceMarkets: GammaMarket[];
+  wdcDrivers: { name: string; code: string; color: string; tokenId: string }[];
+  sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
+  suzukaSC: (typeof SAFETY_CAR)[0] | undefined;
+}) {
+  return (
+    <div className="space-y-4">
+      {/* ── Race Header ──────────────────────────────────────────────── */}
+      <div className="f1-surface p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">{NEXT_RACE.country}</span>
+              <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+                R{NEXT_RACE.round}
+              </span>
+            </div>
+            <h2 className="f1-heading text-white text-lg">{NEXT_RACE.name}</h2>
+            <p className="f1-label mt-0.5">{NEXT_RACE.circuit}</p>
           </div>
-        </nav>
+          <div className="flex gap-4">
+            <div className="text-center">
+              <p className="f1-data-lg text-white">{NEXT_RACE.laps}</p>
+              <p className="f1-label-xs">Laps</p>
+            </div>
+            <div className="text-center">
+              <p className="f1-data-lg text-white">{NEXT_RACE.length}</p>
+              <p className="f1-label-xs">Length</p>
+            </div>
+            <div className="text-center">
+              <p className="f1-data-lg text-[#f59e0b]">{NEXT_RACE.scRate}%</p>
+              <p className="f1-label-xs">SC Rate</p>
+            </div>
+            <div className="text-center">
+              <p className="f1-data-lg text-[#22c55e]">{NEXT_RACE.poleConversion}%</p>
+              <p className="f1-label-xs">Pole Conv.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Market Overview ──────────────────────────────────────────── */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <div className="f1-accent-bar" />
+          <span className="f1-heading text-white">{t("nextRace.marketOverview")}</span>
+          <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+            Polymarket
+          </span>
+        </div>
+        {raceMarkets.length > 0 ? (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {raceMarkets.map((market) => {
+              const outcomes = parseMarketOutcomes(market);
+              return (
+                <MarketCard
+                  key={market.id}
+                  question={market.question}
+                  outcomes={outcomes}
+                  volume={market.volume}
+                  volume24hr={market.volume24hr}
+                  openInterest={market.openInterest}
+                  spread={market.spread}
+                  marketUrl={`https://polymarket.com/event/${market.slug}`}
+                  compact
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="f1-surface p-8 text-center">
+            <p className="f1-label">{t("nextRace.noMarketsFound")}</p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Odds Movement ────────────────────────────────────────────── */}
+      {wdcDrivers.length > 0 && (
+        <OddsMovementChart
+          drivers={wdcDrivers}
+          title={t("nextRace.oddsMovement")}
+          subtitle="WDC odds movement heading into the race weekend"
+        />
+      )}
+
+      {/* ── Value Detector ───────────────────────────────────────────── */}
+      <div className="f1-surface p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <div className="f1-accent-bar" />
+          <span className="f1-heading text-white">{t("nextRace.valueDetector")}</span>
+          <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Where market odds diverge from performance data">&#9432;</span>
+        </div>
+        <p className="f1-label mb-4">{t("nextRace.whereDataDisagrees")}</p>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {sortedBettingEdge.slice(0, 3).map((d) => {
+            const isValue = d.gap > 0;
+            const signal = Math.abs(d.gap) > 10 ? (isValue ? t("nextRace.potentialValue") : t("nextRace.overvalued")) : t("nextRace.fair");
+            const signalColor = Math.abs(d.gap) > 10 ? (isValue ? "#22c55e" : "#ef4444") : "var(--text-dim)";
+            return (
+              <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
+                <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
+                    <span className="f1-body-sm font-semibold text-white">{d.name}</span>
+                    <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="f1-label-xs">{t("nextRace.edge")}</span>
+                    <span className="f1-data text-sm font-bold" style={{ color: isValue ? "#22c55e" : "#ef4444" }}>
+                      {isValue ? "+" : ""}{d.gap.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[0.625rem]">
+                    <span className="f1-label-xs">{t("nextRace.supportingData")}</span>
+                    <span className="f1-label-xs rounded px-1.5 py-0.5" style={{ backgroundColor: `${signalColor}15`, color: signalColor }}>
+                      {signal}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Circuit Intelligence ─────────────────────────────────────── */}
+      <div className="f1-surface p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <div className="f1-accent-bar" />
+          <span className="f1-heading text-white">{t("nextRace.circuitIntel")}</span>
+        </div>
+        <p className="f1-label mb-4">{NEXT_RACE.circuit} &mdash; {t("nextRace.trackStats")}</p>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {/* Safety car rate */}
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
+            <p className="f1-label-xs mb-2">{t("nextRace.safetyCarRate")}</p>
+            <p className="f1-data-lg text-[#f59e0b]">{suzukaSC?.rate ?? NEXT_RACE.scRate}%</p>
+            <div className="h-[3px] w-full rounded-full bg-[#161616] mt-2">
+              <div className="h-[3px] rounded-full bg-[#f59e0b]" style={{ width: `${suzukaSC?.rate ?? NEXT_RACE.scRate}%` }} />
+            </div>
+            <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
+              Rank: {SAFETY_CAR.findIndex(c => c.circuit === "Suzuka") + 1}/{SAFETY_CAR.length} circuits
+            </p>
+          </div>
+
+          {/* Pole conversion */}
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
+            <p className="f1-label-xs mb-2">{t("nextRace.poleConversion")}</p>
+            <p className="f1-data-lg text-[#22c55e]">{NEXT_RACE.poleConversion}%</p>
+            <div className="h-[3px] w-full rounded-full bg-[#161616] mt-2">
+              <div className="h-[3px] rounded-full bg-[#22c55e]" style={{ width: `${NEXT_RACE.poleConversion}%` }} />
+            </div>
+            <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
+              High conversion circuit
+            </p>
+          </div>
+
+          {/* Grid impact */}
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
+            <p className="f1-label-xs mb-2">{t("nextRace.gridImpact")}</p>
+            <div className="space-y-1.5 mt-3">
+              {GRID_VS_FINISH.slice(0, 4).map(d => (
+                <div key={d.code} className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <div className="f1-team-bar h-3" style={{ backgroundColor: d.color }} />
+                    <span className="f1-label-xs">{d.code}</span>
+                  </div>
+                  <span className="f1-data text-[0.625rem]" style={{ color: d.delta > 0 ? "#22c55e" : d.delta < 0 ? "#ef4444" : "var(--text-dim)" }}>
+                    {d.delta > 0 ? "+" : ""}{d.delta.toFixed(1)} pos
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab 2 — Championship Tracker
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ChampionshipTrackerTab({
+  t,
+  wdc,
+  wcc,
+  wdcDrivers,
+  wccTeams,
+  sortedBettingEdge,
+  roundsCompleted,
+}: {
+  t: any;
+  wdc: GammaMarket | null;
+  wcc: GammaMarket | null;
+  wdcDrivers: { name: string; code: string; color: string; tokenId: string }[];
+  wccTeams: { name: string; code: string; color: string; tokenId: string }[];
+  sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
+  roundsCompleted: number;
+}) {
+  return (
+    <div className="space-y-4">
+      {/* ── WDC Odds Trajectory ──────────────────────────────────────── */}
+      {wdcDrivers.length > 0 && (
+        <OddsMovementChart
+          drivers={wdcDrivers}
+          title={t("championship.oddsTrajectory")}
+          subtitle="Season-long WDC championship probability"
+        />
+      )}
+
+      {/* ── WCC Odds Trajectory ──────────────────────────────────────── */}
+      {wccTeams.length > 0 && (
+        <OddsMovementChart
+          drivers={wccTeams}
+          title={t("championship.wccOddsTrajectory")}
+          subtitle="Season-long WCC championship probability"
+        />
+      )}
+
+      {/* ── Championship Value Detector (full table) ─────────────────── */}
+      <div className="f1-surface p-5">
+        <div className="mb-1 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="f1-accent-bar" />
+            <span className="f1-heading text-white">{t("championship.valueDetector")}</span>
+          </div>
+          <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+            Polymarket
+          </span>
+        </div>
+        <p className="f1-label mb-4">{t("championship.afterRounds", { count: roundsCompleted })}</p>
+
+        {/* Early season warning */}
+        {roundsCompleted <= 4 && (
+          <div className="rounded border border-[#f59e0b]/20 bg-[#f59e0b]/5 p-3 mb-4">
+            <p className="f1-label-xs !text-[#f59e0b]">
+              {t("championship.earlyWarning", { count: roundsCompleted })}
+            </p>
+          </div>
+        )}
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#1c1c1c]">
+                <th className="f1-label-xs text-left py-2 pr-4">Driver</th>
+                <th className="f1-label-xs text-right py-2 px-3">{t("championship.mktOdds")}</th>
+                <th className="f1-label-xs text-right py-2 px-3">{t("championship.ptsShare")}</th>
+                <th className="f1-label-xs text-right py-2 px-3">{t("championship.projected")}</th>
+                <th className="f1-label-xs text-right py-2 pl-3">{t("championship.signal")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedBettingEdge.map((d) => {
+                const isValue = d.gap > 0;
+                const projectedPts = Math.round((d.ptsShare / 100) * 24 * (TOTAL_POINTS / roundsCompleted));
+                const signal = Math.abs(d.gap) > 10
+                  ? (isValue ? t("valueBet") : t("overvalued"))
+                  : "Fair";
+                const signalColor = Math.abs(d.gap) > 10
+                  ? (isValue ? "#22c55e" : "#ef4444")
+                  : "var(--text-dim)";
+
+                return (
+                  <tr key={d.code} className="border-b border-[#0f0f0f] hover:bg-[#111] transition-colors">
+                    <td className="py-2.5 pr-4">
+                      <Link href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="flex items-center gap-2">
+                        <div className="f1-team-bar h-4" style={{ backgroundColor: d.color }} />
+                        <span className="f1-body-sm font-semibold text-white">{d.name}</span>
+                        <span className="f1-data text-[0.5625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
+                      </Link>
+                    </td>
+                    <td className="f1-data text-sm text-right py-2.5 px-3 text-white">{d.odds}%</td>
+                    <td className="f1-data text-sm text-right py-2.5 px-3 text-white">{d.ptsShare}%</td>
+                    <td className="f1-data text-sm text-right py-2.5 px-3" style={{ color: "var(--text-muted)" }}>{projectedPts} pts</td>
+                    <td className="text-right py-2.5 pl-3">
+                      <span
+                        className="f1-label-xs rounded px-1.5 py-0.5"
+                        style={{ backgroundColor: `${signalColor}15`, color: signalColor }}
+                      >
+                        {isValue ? "+" : ""}{d.gap.toFixed(1)}% {signal}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Methodology note */}
+        <div className="mt-4 border-t border-[#1c1c1c] pt-3">
+          <p className="f1-label-xs" style={{ color: "var(--text-dim)" }}>
+            {t("championship.methodology")}: Points share = driver points / total points scored. Gap = pts share - market odds. Positive gap = market undervalues driver.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Points Projection Chart ──────────────────────────────────── */}
+      <PointsProgressionChart />
+
+      {/* ── Market Health ────────────────────────────────────────────── */}
+      <div className="f1-surface p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <div className="f1-accent-bar" />
+          <span className="f1-heading text-white">{t("championship.marketHealth")}</span>
+        </div>
+        <p className="f1-label mb-4">WDC &amp; WCC market overview</p>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+            <p className="f1-label-xs mb-2">{t("championship.totalVolume")}</p>
+            <p className="f1-data-lg text-white">
+              {formatVolume((wdc?.volume ?? 0) + (wcc?.volume ?? 0))}
+            </p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>WDC + WCC combined</p>
+          </div>
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+            <p className="f1-label-xs mb-2">{t("championship.openInterest")}</p>
+            <p className="f1-data-lg text-white">
+              {formatVolume((wdc?.openInterest ?? 0) + (wcc?.openInterest ?? 0))}
+            </p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>Capital at stake</p>
+          </div>
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+            <p className="f1-label-xs mb-2">{t("championship.volume24h")}</p>
+            <p className="f1-data-lg text-white">
+              {formatVolume((wdc?.volume24hr ?? 0) + (wcc?.volume24hr ?? 0))}
+            </p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>Recent activity</p>
+          </div>
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+            <p className="f1-label-xs mb-2">Avg Spread</p>
+            <p className="f1-data-lg text-white">
+              {Math.round(((wdc?.spread ?? 0) + (wcc?.spread ?? 0)) / 2 * 100)}&#162;
+            </p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>
+              {((wdc?.spread ?? 0) + (wcc?.spread ?? 0)) / 2 < 0.03 ? "Tight spreads" : "Moderate spreads"}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Tab 3 — Deep Analytics (all existing widgets reorganized)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DeepAnalyticsTab({
+  t,
+  qualifying,
+  sortedBettingEdge,
+  roundsCompleted,
+}: {
+  t: any;
+  qualifying: QualifyingEntry[];
+  sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
+  roundsCompleted: number;
+}) {
+  return (
+    <div className="space-y-6">
+      {/* ── Sub-nav ──────────────────────────────────────────────────── */}
+      <nav className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+        {TAB_CATEGORIES.map((tab) => (
+          <a
+            key={tab.href}
+            href={tab.href}
+            className="shrink-0 rounded-full px-4 py-1.5 f1-label border border-[#1c1c1c] bg-[#0c0c0c] f1-transition hover:!text-white hover:border-[#333] hover:bg-[#161616]"
+          >
+            {tab.label}
+          </a>
+        ))}
+      </nav>
+
+      {/* ═══ PERFORMANCE ═══════════════════════════════════════════════ */}
+      <div>
+        <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
+          <span className="text-[#E10600]">//</span> {t("deep.performance")}
+        </h3>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {/* ── 1. QUALIFYING PACE ──────────────────────────────────────── */}
+          {/* ── Qualifying Pace ───────────────────────────────────────── */}
           <div id="pace" className="f1-surface p-5" style={{ scrollMarginTop: "4rem" }}>
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
@@ -257,7 +824,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             </div>
           </div>
 
-          {/* ── 2. GRID vs FINISH ───────────────────────────────────────── */}
+          {/* ── Grid vs Finish ────────────────────────────────────────── */}
           <div id="grid-vs-finish" className="f1-surface p-5" style={{ scrollMarginTop: "4rem" }}>
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
@@ -294,133 +861,22 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               })}
             </div>
           </div>
-
-          {/* ── 3. BETTING EDGE FINDER (full width) ─────────────────────── */}
-          <div id="betting" className="f1-surface p-5 md:col-span-2" style={{ scrollMarginTop: "4rem" }}>
-            <div className="mb-1 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">{t("bettingEdge")}</span>
-                <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Compares Polymarket championship odds to actual points share — positive gap suggests the market undervalues this driver">&#9432;</span>
-              </div>
-              <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
-                Polymarket
-              </span>
-            </div>
-            <p className="f1-label mb-4">{t("bettingEdgeDesc")}</p>
-
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {sortedBettingEdge.map((d) => {
-                const isValue = d.gap > 0;
-                const label = isValue ? t("valueBet") : t("overvalued");
-                return (
-                  <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
-                    <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                        <span className="f1-body-sm font-semibold text-white">{d.name}</span>
-                        <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
-                      </div>
-
-                      <div className="space-y-2 mb-3">
-                        <div className="flex items-center justify-between">
-                          <span className="f1-label-xs">{t("marketOdds")}</span>
-                          <span className="f1-data text-sm text-white">{d.odds}%</span>
-                        </div>
-                        <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                          <div className="h-[3px] rounded-full bg-[var(--text-muted)]" style={{ width: `${d.odds}%` }} />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="f1-label-xs">{t("actualPtsShare")}</span>
-                          <span className="f1-data text-sm text-white">{d.ptsShare}%</span>
-                        </div>
-                        <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                          <div className="h-[3px] rounded-full" style={{ width: `${d.ptsShare}%`, backgroundColor: d.color }} />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-2">
-                        <span
-                          className="f1-data text-xs font-bold"
-                          style={{ color: isValue ? "#22c55e" : "#ef4444" }}
-                        >
-                          {isValue ? "+" : ""}{d.gap.toFixed(1)}%
-                        </span>
-                        <span
-                          className="f1-label-xs rounded px-1.5 py-0.5"
-                          style={{
-                            backgroundColor: isValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
-                            color: isValue ? "#22c55e" : "#ef4444",
-                          }}
-                        >
-                          {label}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ── 4. TIRE STRATEGY TRENDS (full width) ────────────────────── */}
-          <div id="strategy" className="f1-surface p-5 md:col-span-2" style={{ scrollMarginTop: "4rem" }}>
-            <div className="mb-1 flex items-center gap-2">
-              <div className="f1-accent-bar" />
-              <span className="f1-heading text-white">Tire Strategy Trends</span>
-            </div>
-            <p className="f1-label mb-4">Compound distribution across {roundsCompleted} rounds</p>
-
-            {/* Stacked bar */}
-            <div className="flex h-6 w-full overflow-hidden rounded-full mb-4">
-              {TIRE_STRATEGY.compounds.map((c) => (
-                <div
-                  key={c.abbr}
-                  className="flex items-center justify-center f1-data text-[0.625rem]"
-                  style={{
-                    width: `${c.pct}%`,
-                    backgroundColor: c.color,
-                    color: c.textColor,
-                  }}
-                >
-                  {c.abbr} {c.pct}%
-                </div>
-              ))}
-            </div>
-
-            {/* Stat cards */}
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
-                <p className="f1-label-xs mb-2">Most Used</p>
-                <p className="f1-data-lg text-white">Hard</p>
-                <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>47%</p>
-              </div>
-              <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
-                <p className="f1-label-xs mb-2">Avg Stints</p>
-                <p className="f1-data-lg text-white">{TIRE_STRATEGY.avgStints.toFixed(1)}</p>
-              </div>
-              <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
-                <p className="f1-label-xs mb-2">Popular Strategy</p>
-                <p className="f1-data-lg text-white">{TIRE_STRATEGY.mostPopularStrategy}</p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* ── Points Progression Chart ────────────────────────────────── */}
-        <div className="mt-4">
-          <PointsProgressionChart />
-        </div>
-
-        {/* ── Lap Time Comparison ─────────────────────────────────────── */}
+        {/* ── Lap Time Comparison (full width) ───────────────────────── */}
         <div className="mt-4">
           <LapComparisonChart />
         </div>
+      </div>
 
-        {/* ── DNF + Safety Car (2-column grid) ───────────────────────── */}
-        <div id="reliability" className="grid gap-4 md:grid-cols-2 mt-4" style={{ scrollMarginTop: "4rem" }}>
-          {/* ── DNF RATE BY TEAM ─────────────────────────────────────── */}
+      {/* ═══ RELIABILITY ═══════════════════════════════════════════════ */}
+      <div>
+        <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
+          <span className="text-[#E10600]">//</span> {t("deep.reliability")}
+        </h3>
+
+        <div id="reliability" className="grid gap-4 md:grid-cols-2" style={{ scrollMarginTop: "4rem" }}>
+          {/* ── DNF Rate by Team ──────────────────────────────────────── */}
           <div className="f1-surface p-5">
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
@@ -445,7 +901,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             </div>
           </div>
 
-          {/* ── SAFETY CAR PROBABILITY ───────────────────────────────── */}
+          {/* ── Safety Car Probability ────────────────────────────────── */}
           <div className="f1-surface p-5">
             <div className="mb-1 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -475,8 +931,136 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ── TEAMMATE BATTLES (full width) ──────────────────────────── */}
+      {/* ═══ STRATEGY ═════════════════════════════════════════════════ */}
+      <div>
+        <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
+          <span className="text-[#E10600]">//</span> {t("deep.strategy")}
+        </h3>
+
+        <div id="strategy" className="f1-surface p-5" style={{ scrollMarginTop: "4rem" }}>
+          <div className="mb-1 flex items-center gap-2">
+            <div className="f1-accent-bar" />
+            <span className="f1-heading text-white">Tire Strategy Trends</span>
+          </div>
+          <p className="f1-label mb-4">Compound distribution across {roundsCompleted} rounds</p>
+
+          {/* Stacked bar */}
+          <div className="flex h-6 w-full overflow-hidden rounded-full mb-4">
+            {TIRE_STRATEGY.compounds.map((c) => (
+              <div
+                key={c.abbr}
+                className="flex items-center justify-center f1-data text-[0.625rem]"
+                style={{
+                  width: `${c.pct}%`,
+                  backgroundColor: c.color,
+                  color: c.textColor,
+                }}
+              >
+                {c.abbr} {c.pct}%
+              </div>
+            ))}
+          </div>
+
+          {/* Stat cards */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+              <p className="f1-label-xs mb-2">Most Used</p>
+              <p className="f1-data-lg text-white">Hard</p>
+              <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>47%</p>
+            </div>
+            <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+              <p className="f1-label-xs mb-2">Avg Stints</p>
+              <p className="f1-data-lg text-white">{TIRE_STRATEGY.avgStints.toFixed(1)}</p>
+            </div>
+            <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
+              <p className="f1-label-xs mb-2">Popular Strategy</p>
+              <p className="f1-data-lg text-white">{TIRE_STRATEGY.mostPopularStrategy}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Betting Edge (full width) ──────────────────────────────── */}
+        <div id="betting" className="f1-surface p-5 mt-4" style={{ scrollMarginTop: "4rem" }}>
+          <div className="mb-1 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="f1-accent-bar" />
+              <span className="f1-heading text-white">{t("bettingEdge")}</span>
+              <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Compares Polymarket championship odds to actual points share — positive gap suggests the market undervalues this driver">&#9432;</span>
+            </div>
+            <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+              Polymarket
+            </span>
+          </div>
+          <p className="f1-label mb-4">{t("bettingEdgeDesc")}</p>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {sortedBettingEdge.map((d) => {
+              const isValue = d.gap > 0;
+              const label = isValue ? t("valueBet") : t("overvalued");
+              return (
+                <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
+                  <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
+                      <span className="f1-body-sm font-semibold text-white">{d.name}</span>
+                      <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
+                    </div>
+
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center justify-between">
+                        <span className="f1-label-xs">{t("marketOdds")}</span>
+                        <span className="f1-data text-sm text-white">{d.odds}%</span>
+                      </div>
+                      <div className="h-[3px] w-full rounded-full bg-[#161616]">
+                        <div className="h-[3px] rounded-full bg-[var(--text-muted)]" style={{ width: `${d.odds}%` }} />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="f1-label-xs">{t("actualPtsShare")}</span>
+                        <span className="f1-data text-sm text-white">{d.ptsShare}%</span>
+                      </div>
+                      <div className="h-[3px] w-full rounded-full bg-[#161616]">
+                        <div className="h-[3px] rounded-full" style={{ width: `${d.ptsShare}%`, backgroundColor: d.color }} />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-2">
+                      <span
+                        className="f1-data text-xs font-bold"
+                        style={{ color: isValue ? "#22c55e" : "#ef4444" }}
+                      >
+                        {isValue ? "+" : ""}{d.gap.toFixed(1)}%
+                      </span>
+                      <span
+                        className="f1-label-xs rounded px-1.5 py-0.5"
+                        style={{
+                          backgroundColor: isValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                          color: isValue ? "#22c55e" : "#ef4444",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══ HEAD-TO-HEAD ═════════════════════════════════════════════ */}
+      <div>
+        <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
+          <span className="text-[#E10600]">//</span> {t("deep.headToHead")}
+        </h3>
+
+        {/* ── Points Progression Chart ───────────────────────────────── */}
+        <PointsProgressionChart />
+
+        {/* ── Teammate Battles ───────────────────────────────────────── */}
         <div id="head-to-head" className="mt-4" style={{ scrollMarginTop: "4rem" }}>
           <div className="f1-surface p-5">
             <div className="mb-1 flex items-center gap-2">

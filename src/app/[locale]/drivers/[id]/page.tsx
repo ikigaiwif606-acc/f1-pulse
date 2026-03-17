@@ -8,17 +8,17 @@ function finishBadgeClass(pos: number): string {
   if (pos === 1) return "bg-[#E10600] text-white";
   if (pos <= 3) return "bg-[#27F4D2]/10 text-[#27F4D2]";
   if (pos <= 10) return "bg-[#131313] text-white";
-  return "bg-[#131313] text-[#555]";
+  return "bg-[#131313] text-[var(--text-muted)]";
 }
 
 function gridBadgeClass(pos: number): string {
   if (pos === 1) return "text-[#E10600]";
   if (pos <= 3) return "text-[#27F4D2]";
-  return "text-[#555]";
+  return "text-[var(--text-muted)]";
 }
 
 function changeColor(n: number): string {
-  return n > 0 ? "text-[#22c55e]" : n < 0 ? "text-[#E10600]" : "text-[#555]";
+  return n > 0 ? "text-[#22c55e]" : n < 0 ? "text-[#E10600]" : "text-[var(--text-muted)]";
 }
 
 function changeSign(n: number): string {
@@ -32,7 +32,7 @@ function DriverNotFound() {
   return (
     <div className="min-h-screen bg-[#080808] flex items-center justify-center">
       <div className="text-center">
-        <p className="f1-data-lg text-[#333] mb-2">{t("driverNotFound")}</p>
+        <p className="f1-data-lg text-[var(--text-subtle)] mb-2">{t("driverNotFound")}</p>
         <Link href="/drivers" className="f1-label !text-[#E10600] hover:opacity-70">
           &larr; {t("allDrivers")}
         </Link>
@@ -96,7 +96,7 @@ function DriverDetailContent({
       {/* ── Back + breadcrumb ── */}
       <div className="border-b border-[#1c1c1c]">
         <div className="mx-auto max-w-7xl px-5 py-3 flex items-center gap-2">
-          <Link href="/drivers" className="f1-transition f1-label !text-[#444] hover:!text-white flex items-center gap-1.5">
+          <Link href="/drivers" className="f1-transition f1-label !text-[var(--text-dim)] hover:!text-white flex items-center gap-1.5">
             <span className="text-xs leading-none">&larr;</span>
             {tNav("drivers")}
           </Link>
@@ -238,7 +238,7 @@ function DriverDetailContent({
                       {r.fl && (
                         <span className="f1-label-xs rounded bg-[#9333ea]/20 px-1 py-0.5 !text-[#a855f7]">FL</span>
                       )}
-                      <span className={`f1-data text-xs ${r.gap === "WINNER" ? "text-[#E10600]" : "text-[#555]"}`}>{r.gap}</span>
+                      <span className={`f1-data text-xs ${r.gap === "WINNER" ? "text-[#E10600]" : "text-[var(--text-muted)]"}`}>{r.gap}</span>
                     </div>
                   </div>
                 ))}
@@ -260,7 +260,7 @@ function DriverDetailContent({
                 <div key={m.label} className="f1-surface-inner p-3 rounded mb-2">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <span className="f1-label rounded bg-[#131313] px-1.5 py-0.5 !text-[#444]">{m.label}</span>
+                      <span className="f1-label rounded bg-[#131313] px-1.5 py-0.5 !text-[var(--text-dim)]">{m.label}</span>
                       <p className="f1-body-sm mt-1 text-white">{m.desc}</p>
                     </div>
                     <div className="text-right">
@@ -302,10 +302,10 @@ function DriverDetailContent({
                           <div className="h-[2px] rounded-full" style={{ width: s.pos === 1 ? "100%" : "60%", backgroundColor: driver.teamColor }} />
                         </div>
                       </div>
-                      <span className={`f1-data text-xs w-12 text-right ${s.pos === 1 ? "text-[#E10600]" : "text-[#555]"}`}>
+                      <span className={`f1-data text-xs w-12 text-right ${s.pos === 1 ? "text-[#E10600]" : "text-[var(--text-muted)]"}`}>
                         {s.pos === 1 ? "POLE" : s.gap}
                       </span>
-                      <span className={`f1-data text-[0.625rem] w-4 text-center ${s.pos === 1 ? "text-[#E10600]" : "text-[#555]"}`}>
+                      <span className={`f1-data text-[0.625rem] w-4 text-center ${s.pos === 1 ? "text-[#E10600]" : "text-[var(--text-muted)]"}`}>
                         P{s.pos}
                       </span>
                     </div>
@@ -428,9 +428,9 @@ function DriverDetailContent({
                     </div>
                     <span className="f1-label-xs text-center truncate" style={{ color: "var(--text-subtle)" }}>{c.note.split("—")[0].trim()}</span>
                     <span className="f1-data text-xs text-center text-white">{c.entries}</span>
-                    <span className={`f1-data text-xs text-center ${c.wins > 0 ? "text-[#E10600]" : "text-[#333]"}`}>{c.wins}</span>
-                    <span className={`f1-data text-xs text-center ${c.podiums > 0 ? "text-[#27F4D2]" : "text-[#333]"}`}>{c.podiums}</span>
-                    <span className={`f1-data text-xs text-center ${c.poles > 0 ? "text-white" : "text-[#333]"}`}>{c.poles}</span>
+                    <span className={`f1-data text-xs text-center ${c.wins > 0 ? "text-[#E10600]" : "text-[var(--text-subtle)]"}`}>{c.wins}</span>
+                    <span className={`f1-data text-xs text-center ${c.podiums > 0 ? "text-[#27F4D2]" : "text-[var(--text-subtle)]"}`}>{c.podiums}</span>
+                    <span className={`f1-data text-xs text-center ${c.poles > 0 ? "text-white" : "text-[var(--text-subtle)]"}`}>{c.poles}</span>
                     <div className="text-center">
                       <span className="f1-data text-xs text-white">P{c.bestFinish}</span>
                       <span className="f1-label-xs ml-1" style={{ color: "var(--text-subtle)" }}>/ {c.avgFinish.toFixed(1)}</span>
@@ -458,7 +458,7 @@ function DriverDetailContent({
           <p className="f1-label-xs" style={{ color: "var(--text-ghost)" }}>
             {tCommon("appName")} &middot; 2026 Season &middot; Data through R{races.length}
           </p>
-          <Link href="/drivers" className="f1-transition f1-label !text-[#333] hover:!text-white flex items-center gap-1">
+          <Link href="/drivers" className="f1-transition f1-label !text-[var(--text-subtle)] hover:!text-white flex items-center gap-1">
             &larr; {t("allDrivers")}
           </Link>
         </div>

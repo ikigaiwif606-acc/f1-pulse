@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import {
   getSponsorshipData,
@@ -21,7 +22,7 @@ export default function SponsorshipsPage() {
 
 function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshipData> }) {
   const t = useTranslations("sponsorships");
-  const locale = useTranslations()("" as never) ? "en" : "en"; // fallback
+  const locale = useLocale();
 
   // Count total sponsors and title deals
   const totalSponsors = teams.reduce((s, t) => s + t.sponsors.length, 0);
@@ -32,10 +33,10 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
       <div className="mx-auto max-w-7xl px-5 py-8">
         {/* Header */}
         <div className="mb-6">
-          <span className="f1-label !text-[#E10600]">Intelligence</span>
+          <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
           <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
           <p className="f1-label mt-1">
-            {teams.length} teams &middot; {totalSponsors} partnerships &middot; {titleDeals} title sponsors
+            {teams.length} {t("teams_count")} &middot; {totalSponsors} {t("partnerships")} &middot; {titleDeals} {t("titleSponsorsCount")}
           </p>
         </div>
 
@@ -50,7 +51,7 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
             <div key={s.label} className="f1-surface p-4 text-center">
               <p className="f1-label-xs mb-2">{s.label}</p>
               <p className="f1-data-lg text-white">{s.value}</p>
-              {s.sub && <p className="f1-label-xs mt-1" style={{ color: "#444" }}>{s.sub}</p>}
+              {s.sub && <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>{s.sub}</p>}
             </div>
           ))}
         </div>
@@ -71,7 +72,7 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
                         {team.team}
                       </Link>
                       {team.titleSponsor && (
-                        <span className="f1-label-xs ml-2" style={{ color: "#444" }}>
+                        <span className="f1-label-xs ml-2" style={{ color: "var(--text-dim)" }}>
                           {team.titleSponsor}
                         </span>
                       )}
@@ -79,7 +80,7 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-2 py-0.5">
-                      {team.sponsors.length} partners
+                      {team.sponsors.length} {t("partners")}
                     </span>
                     <span className="hidden sm:inline f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-2 py-0.5 !text-[#22c55e]">
                       {estValue}
@@ -103,14 +104,14 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
             <div className="f1-accent-bar" />
             <span className="f1-heading text-white">{t("globalPartners")}</span>
           </div>
-          <p className="f1-label mb-4">Official Formula 1 series-level partnerships</p>
+          <p className="f1-label mb-4">{locale === "zh" ? "F1官方系列赛赞助合作" : "Official Formula 1 series-level partnerships"}</p>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {F1_GLOBAL_PARTNERS.map((p) => (
               <div key={p.name} className="f1-surface-inner p-3 rounded">
                 <p className="f1-body-sm font-semibold text-white">{p.name}</p>
-                <p className="f1-label-xs mt-0.5" style={{ color: "#444" }}>{p.role}</p>
-                <p className="f1-label-xs mt-1" style={{ color: "#333" }}>{p.industry}</p>
+                <p className="f1-label-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{p.role}</p>
+                <p className="f1-label-xs mt-1" style={{ color: "var(--text-subtle)" }}>{p.industry}</p>
               </div>
             ))}
           </div>
@@ -118,8 +119,10 @@ function SponsorshipsContent({ teams }: { teams: ReturnType<typeof getSponsorshi
 
         {/* Footer */}
         <div className="mt-6 border-t border-[#131313] pt-5">
-          <p className="f1-label-xs" style={{ color: "#222" }}>
-            F1 Pulse &middot; Sponsorship data curated from official team websites and press releases &middot; Values are reported estimates
+          <p className="f1-label-xs" style={{ color: "var(--text-ghost)" }}>
+            {locale === "zh"
+              ? "F1 Pulse · 赞助数据来自官方车队网站和新闻发布 · 金额为报道估计值"
+              : "F1 Pulse · Sponsorship data curated from official team websites and press releases · Values are reported estimates"}
           </p>
         </div>
       </div>
@@ -135,16 +138,16 @@ function SponsorCard({ sponsor, teamColor }: { sponsor: Sponsor; teamColor: stri
       <div className="flex items-start justify-between mb-2">
         <span className="f1-body-sm font-semibold text-white">{sponsor.name}</span>
         <span className={`f1-label rounded px-1.5 py-0.5 shrink-0 ml-2 ${badge.cls}`}>
-          {badge.label}
+          {locale === "zh" ? badge.labelZh : badge.label}
         </span>
       </div>
-      <p className="f1-label-xs mb-2" style={{ color: "#333" }}>{sponsor.industry}</p>
+      <p className="f1-label-xs mb-2" style={{ color: "var(--text-subtle)" }}>{sponsor.industry}</p>
       <div className="flex items-center gap-3">
         {sponsor.reportedValue && (
           <span className="f1-data text-xs text-[#22c55e]">{sponsor.reportedValue}</span>
         )}
         {sponsor.contractEnd && (
-          <span className="f1-label-xs" style={{ color: "#444" }}>→ {sponsor.contractEnd}</span>
+          <span className="f1-label-xs" style={{ color: "var(--text-dim)" }}>→ {sponsor.contractEnd}</span>
         )}
       </div>
     </div>

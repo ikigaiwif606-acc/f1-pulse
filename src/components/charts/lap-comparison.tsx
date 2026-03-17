@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 // ── Static lap time data (China GP R2, 20 representative laps) ──────────────
 interface DriverLapData {
@@ -73,6 +74,7 @@ function formatLapTime(seconds: number): string {
 }
 
 export function LapComparisonChart() {
+  const t = useTranslations("analytics");
   const [driverACode, setDriverACode] = useState("RUS");
   const [driverBCode, setDriverBCode] = useState("ANT");
 
@@ -108,7 +110,7 @@ export function LapComparisonChart() {
       {/* Header */}
       <div className="mb-1 flex items-center gap-2">
         <div className="f1-accent-bar" />
-        <span className="f1-heading text-white">Lap Time Comparison</span>
+        <span className="f1-heading text-white">{t("lapComparison")}</span>
       </div>
       <p className="f1-label mb-4">China GP — R2</p>
 
@@ -122,9 +124,10 @@ export function LapComparisonChart() {
           <select
             value={driverACode}
             onChange={(e) => setDriverACode(e.target.value)}
+            aria-label="Select first driver"
             className="rounded border border-[#1c1c1c] bg-[#0a0a0a] px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-[#E10600]"
           >
-            {LAP_DRIVERS.map((d) => (
+            {LAP_DRIVERS.filter((d) => d.code !== driverBCode).map((d) => (
               <option key={d.code} value={d.code}>
                 {d.name} ({d.code})
               </option>
@@ -142,9 +145,10 @@ export function LapComparisonChart() {
           <select
             value={driverBCode}
             onChange={(e) => setDriverBCode(e.target.value)}
+            aria-label="Select second driver"
             className="rounded border border-[#1c1c1c] bg-[#0a0a0a] px-3 py-1.5 font-mono text-xs text-white outline-none focus:border-[#E10600]"
           >
-            {LAP_DRIVERS.map((d) => (
+            {LAP_DRIVERS.filter((d) => d.code !== driverACode).map((d) => (
               <option key={d.code} value={d.code}>
                 {d.name} ({d.code})
               </option>
@@ -262,7 +266,7 @@ export function LapComparisonChart() {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {/* Driver A avg */}
         <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3">
-          <p className="f1-label text-[0.5rem] mb-1">Avg Lap Time</p>
+          <p className="f1-label text-[0.5rem] mb-1">{t("avgLapTime")}</p>
           <div className="flex items-center gap-1.5">
             <div className="f1-team-bar h-4" style={{ backgroundColor: driverA.color }} />
             <span className="f1-data text-sm text-white">{stats.avgA.toFixed(3)}s</span>
@@ -272,7 +276,7 @@ export function LapComparisonChart() {
 
         {/* Driver B avg */}
         <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3">
-          <p className="f1-label text-[0.5rem] mb-1">Avg Lap Time</p>
+          <p className="f1-label text-[0.5rem] mb-1">{t("avgLapTime")}</p>
           <div className="flex items-center gap-1.5">
             <div className="f1-team-bar h-4" style={{ backgroundColor: driverB.color }} />
             <span className="f1-data text-sm text-white">{stats.avgB.toFixed(3)}s</span>
@@ -282,7 +286,7 @@ export function LapComparisonChart() {
 
         {/* Driver A fastest */}
         <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3">
-          <p className="f1-label text-[0.5rem] mb-1">Fastest Lap</p>
+          <p className="f1-label text-[0.5rem] mb-1">{t("fastestLap")}</p>
           <div className="flex items-center gap-1.5">
             <div className="f1-team-bar h-4" style={{ backgroundColor: driverA.color }} />
             <span className="f1-data text-sm text-white">{stats.fastA.toFixed(3)}s</span>
@@ -292,7 +296,7 @@ export function LapComparisonChart() {
 
         {/* Driver B fastest */}
         <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3">
-          <p className="f1-label text-[0.5rem] mb-1">Fastest Lap</p>
+          <p className="f1-label text-[0.5rem] mb-1">{t("fastestLap")}</p>
           <div className="flex items-center gap-1.5">
             <div className="f1-team-bar h-4" style={{ backgroundColor: driverB.color }} />
             <span className="f1-data text-sm text-white">{stats.fastB.toFixed(3)}s</span>
@@ -303,10 +307,10 @@ export function LapComparisonChart() {
 
       {/* Gap */}
       <div className="mt-3 rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3 text-center">
-        <p className="f1-label text-[0.5rem] mb-1">Average Gap</p>
+        <p className="f1-label text-[0.5rem] mb-1">{t("averageGap")}</p>
         <span className="f1-data text-lg text-white">{stats.gap.toFixed(3)}s</span>
         <p className="f1-label text-[0.5rem] mt-0.5" style={{ color: "#666" }}>
-          {stats.avgA < stats.avgB ? driverA.code : driverB.code} faster on average
+          {t("fasterOnAvg", { code: stats.avgA < stats.avgB ? driverA.code : driverB.code })}
         </p>
       </div>
     </div>

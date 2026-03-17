@@ -54,16 +54,16 @@ function HomePageContent({ data }: { data: HomepageData }) {
           <div className="mb-8 flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="f1-label !text-[#E10600]">Live Dashboard</span>
+                <span className="f1-label !text-[#E10600]">{t("liveDashboard")}</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-[#E10600] animate-live" />
               </div>
               <h1 className="f1-display-xl text-white">{tCommon("appName")}</h1>
-              <p className="f1-body-sm mt-1" style={{ color: "#444" }}>
+              <p className="f1-body-sm mt-1" style={{ color: "var(--text-dim)" }}>
                 {tCommon("tagline")}
               </p>
             </div>
             <div className="hidden text-right sm:block">
-              <p className="f1-label-xs">2026 Season</p>
+              <p className="f1-label-xs">{t("season2026")}</p>
               <p className="f1-data-lg text-[#666] mt-0.5">
                 R{completedCount}<span style={{ color: "#2a2a2a" }}>/</span>{totalRounds}
               </p>

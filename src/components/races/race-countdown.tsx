@@ -52,11 +52,11 @@ export function RaceCountdown({ race }: RaceCountdownProps) {
       {/* Tags */}
       <div className="mb-2 flex items-center gap-2">
         <span className="f1-label rounded bg-[#E10600] px-1.5 py-0.5 !text-white">
-          Round {race.round}
+          {t("round")} {race.round}
         </span>
         {race.isSprint && (
           <span className="f1-label rounded border border-[#E10600]/30 px-1.5 py-0.5 !text-[#E10600]">
-            Sprint
+            {tRace("sprint")}
           </span>
         )}
       </div>

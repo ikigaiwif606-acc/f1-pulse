@@ -38,10 +38,10 @@ function StocksContent() {
       <div className="mx-auto max-w-7xl px-5 py-8">
         {/* Header */}
         <div className="mb-6">
-          <span className="f1-label !text-[#E10600]">Financial Intelligence</span>
+          <span className="f1-label !text-[#E10600]">{t("financialIntelligence")}</span>
           <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
           <p className="f1-label mt-1">
-            {F1_STOCKS.length} tickers &middot; Auto, Luxury &amp; Media &middot; Daily close
+            {F1_STOCKS.length} {t("tickers")} &middot; {t("autoLuxuryMedia")} &middot; {t("dailyClose")}
           </p>
         </div>
 
@@ -58,12 +58,12 @@ function StocksContent() {
           <div className="f1-surface p-4 text-center">
             <p className="f1-label-xs mb-2">{t("bestPerformer")}</p>
             <p className="f1-data-lg text-[#22c55e]">GM</p>
-            <p className="f1-label-xs mt-1" style={{ color: "#444" }}>+12.3% YTD</p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>+12.3% YTD</p>
           </div>
           <div className="f1-surface p-4 text-center">
             <p className="f1-label-xs mb-2">{t("worstPerformer")}</p>
             <p className="f1-data-lg text-[#E10600]">AML</p>
-            <p className="f1-label-xs mt-1" style={{ color: "#444" }}>-22.4% YTD</p>
+            <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>-22.4% YTD</p>
           </div>
         </div>
 
@@ -80,7 +80,7 @@ function StocksContent() {
             <div className="f1-accent-bar" />
             <span className="f1-heading text-white">{t("correlation")}</span>
           </div>
-          <p className="f1-label mb-4">How F1 performance connects to stock price movements</p>
+          <p className="f1-label mb-4">{t("correlationDesc")}</p>
 
           <div className="space-y-2">
             {CORRELATION_INSIGHTS.map((c) => {
@@ -92,7 +92,7 @@ function StocksContent() {
                       <div className="f1-team-bar h-5" style={{ backgroundColor: stock?.teamColor ?? "#666" }} />
                       <span className="f1-data text-sm font-bold text-white">{c.ticker}</span>
                     </div>
-                    <span className="f1-label-xs" style={{ color: "#444" }}>{stock?.team}</span>
+                    <span className="f1-label-xs" style={{ color: "var(--text-dim)" }}>{stock?.team}</span>
                   </div>
                   <p className="f1-body-sm text-[#888] flex-1">{c.insight}</p>
                 </div>
@@ -124,7 +124,7 @@ function StocksContent() {
                     <div className="flex items-center gap-2">
                       <div className="f1-team-bar h-4" style={{ backgroundColor: stock.teamColor }} />
                       <span className="f1-data text-sm font-bold text-white">{stock.ticker}</span>
-                      <span className="f1-label-xs" style={{ color: "#444" }}>{stock.team}</span>
+                      <span className="f1-label-xs" style={{ color: "var(--text-dim)" }}>{stock.team}</span>
                     </div>
                     <span className="f1-data text-sm text-white">
                       {stock.currency === "USD" ? "$" : stock.currency === "EUR" ? "€" : ""}{stock.price.toFixed(2)}
@@ -152,7 +152,7 @@ function StocksContent() {
                   </div>
                   <div className="min-w-0">
                     <span className="f1-body-sm text-white truncate block">{stock.company}</span>
-                    <span className="f1-label-xs" style={{ color: "#333" }}>{stock.team} &middot; {stock.exchange}</span>
+                    <span className="f1-label-xs" style={{ color: "var(--text-subtle)" }}>{stock.team} &middot; {stock.exchange}</span>
                   </div>
                   <span className="f1-data text-sm text-white">
                     {stock.currency === "USD" ? "$" : stock.currency === "EUR" ? "€" : ""}{stock.price.toFixed(2)}
@@ -169,8 +169,8 @@ function StocksContent() {
                       />
                     </div>
                     <div className="mt-1 flex justify-between">
-                      <span className="f1-label-xs" style={{ color: "#333" }}>{stock.low52w}</span>
-                      <span className="f1-label-xs" style={{ color: "#333" }}>{stock.high52w}</span>
+                      <span className="f1-label-xs" style={{ color: "var(--text-subtle)" }}>{stock.low52w}</span>
+                      <span className="f1-label-xs" style={{ color: "var(--text-subtle)" }}>{stock.high52w}</span>
                     </div>
                   </div>
                 </div>
@@ -181,8 +181,8 @@ function StocksContent() {
 
         {/* Disclaimer */}
         <div className="mt-6 border-t border-[#131313] pt-5">
-          <p className="f1-label-xs" style={{ color: "#222" }}>
-            F1 Pulse &middot; Stock data is delayed and for informational purposes only &middot; Not financial advice &middot; Prices from public sources
+          <p className="f1-label-xs" style={{ color: "var(--text-ghost)" }}>
+            {t("disclaimer")}
           </p>
         </div>
       </div>
@@ -191,6 +191,7 @@ function StocksContent() {
 }
 
 function StockCard({ stock }: { stock: F1Stock }) {
+  const t = useTranslations("stocks");
   const pos = pricePosition(stock);
   const currSymbol = stock.currency === "USD" ? "$" : stock.currency === "EUR" ? "€" : "";
   const suffix = stock.currency === "GBp" ? "p" : "";
@@ -204,7 +205,7 @@ function StockCard({ stock }: { stock: F1Stock }) {
             <div className="f1-team-bar h-5" style={{ backgroundColor: stock.teamColor }} />
             <span className="f1-data text-lg font-bold text-white">{stock.ticker}</span>
           </div>
-          <p className="f1-label-xs mt-0.5" style={{ color: "#444" }}>{stock.company}</p>
+          <p className="f1-label-xs mt-0.5" style={{ color: "var(--text-dim)" }}>{stock.company}</p>
         </div>
         {stock.team && (
           <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5 shrink-0" style={{ color: stock.teamColor }}>
@@ -235,7 +236,7 @@ function StockCard({ stock }: { stock: F1Stock }) {
 
       {/* Sparkline */}
       <div className="mb-3 flex items-center justify-between">
-        <span className="f1-label-xs">30D Trend</span>
+        <span className="f1-label-xs">{t("trend30d")}</span>
         <StockSparkline
           data={generateSparklineData(stock.price, stock.changeYtd)}
           color={stock.teamColor}
@@ -245,7 +246,7 @@ function StockCard({ stock }: { stock: F1Stock }) {
 
       {/* 52-week range */}
       <div>
-        <p className="f1-label-xs mb-1">52W Range</p>
+        <p className="f1-label-xs mb-1">{t("range52w")}</p>
         <div className="h-[3px] w-full rounded-full bg-[#161616] relative">
           <div
             className="absolute top-1/2 -translate-y-1/2 h-2 w-2 rounded-full border border-[#0a0a0a]"
@@ -253,13 +254,13 @@ function StockCard({ stock }: { stock: F1Stock }) {
           />
         </div>
         <div className="mt-1 flex justify-between">
-          <span className="f1-label-xs" style={{ color: "#333" }}>{currSymbol}{stock.low52w}{suffix}</span>
-          <span className="f1-label-xs" style={{ color: "#333" }}>{currSymbol}{stock.high52w}{suffix}</span>
+          <span className="f1-label-xs" style={{ color: "var(--text-subtle)" }}>{currSymbol}{stock.low52w}{suffix}</span>
+          <span className="f1-label-xs" style={{ color: "var(--text-subtle)" }}>{currSymbol}{stock.high52w}{suffix}</span>
         </div>
       </div>
 
       {/* Note */}
-      <p className="f1-label-xs mt-3" style={{ color: "#444", lineHeight: 1.4 }}>{stock.note}</p>
+      <p className="f1-label-xs mt-3" style={{ color: "var(--text-dim)", lineHeight: 1.4 }}>{stock.note}</p>
     </div>
   );
 }

@@ -162,9 +162,9 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
       <div className="mx-auto max-w-7xl px-5 py-8">
         {/* Header */}
         <div className="mb-6">
-          <span className="f1-label !text-[#E10600]">Intelligence</span>
+          <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
           <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
-          <p className="f1-label mt-1">Data from 2 rounds &middot; 2026 Season</p>
+          <p className="f1-label mt-1">{t("dataFromRounds", { count: 2 })} &middot; {t("season2026")}</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

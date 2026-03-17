@@ -27,12 +27,12 @@ export function MarketsContent() {
           <span className="f1-label !text-[#E10600]">Polymarket</span>
           <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
           <p className="f1-label mt-1">
-            Live odds &middot; Updated every 60s
-            {isLoading && <span className="ml-2 text-[#E10600]">Refreshing...</span>}
+            {t("liveOdds")} &middot; {t("updatedEvery60s")}
+            {isLoading && <span className="ml-2 text-[#E10600]">{t("refreshing")}</span>}
           </p>
         </div>
         <div className="hidden items-center gap-1.5 rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2.5 py-1 sm:flex">
-          <span className="f1-label-xs">Total Vol</span>
+          <span className="f1-label-xs">{t("totalVol")}</span>
           <span className="f1-data text-sm text-white">{totalVolume}</span>
         </div>
       </div>
@@ -60,10 +60,10 @@ export function MarketsContent() {
                     <h3 className="f1-display-md text-white">{market.question}</h3>
                     <div className="flex gap-2">
                       <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-2 py-0.5">
-                        Vol {market.volume}
+                        {t("volume")} {market.volume}
                       </span>
                       <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-2 py-0.5">
-                        Ends {market.endDate}
+                        {t("ends")} {market.endDate}
                       </span>
                     </div>
                   </div>
@@ -101,7 +101,7 @@ export function MarketsContent() {
 
                   <div className="mt-3 flex items-center justify-between border-t border-[#131313] pt-3">
                     <span className="f1-label-xs" style={{ color: "#2a2a2a" }}>
-                      {t("lastUpdated")}: {isLoading ? "refreshing..." : "just now"}
+                      {t("lastUpdated")}: {isLoading ? t("refreshing") : t("justNow")}
                     </span>
                     <a
                       href="https://polymarket.com"

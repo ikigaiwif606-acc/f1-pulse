@@ -28,6 +28,7 @@ export const TEAM_COLORS: Record<string, string> = {
   "Racing Bulls": "#6692FF",
   "Visa Cash App RB": "#6692FF",
   "RB F1 Team": "#6692FF",
+  "Visa Cash App Racing Bulls": "#6692FF",
 };
 
 const DRIVER_CODES: Record<string, string> = {

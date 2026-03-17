@@ -212,7 +212,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
   },
 
   rb: {
-    fullName: "Visa Cash App RB F1 Team",
+    fullName: "Visa Cash App Racing Bulls",
     polymarket: {
       probability: 0.01,
       volume: "$12.1M",

@@ -9,7 +9,7 @@ const FALLBACK_TEAMS: TeamListItem[] = [
   { id: "mclaren", name: "McLaren", drivers: ["Norris", "Piastri"], pts: 18, wins: 0, podiums: 0, pos: 3, color: "#FF8000" },
   { id: "haas", name: "Haas F1 Team", drivers: ["Bearman", "Ocon"], pts: 17, wins: 0, podiums: 0, pos: 4, color: "#B6BABD" },
   { id: "red_bull", name: "Red Bull", drivers: ["Verstappen", "Hadjar"], pts: 12, wins: 0, podiums: 0, pos: 5, color: "#3671C6" },
-  { id: "rb", name: "RB F1 Team", drivers: ["Lawson", "Lindblad"], pts: 12, wins: 0, podiums: 0, pos: 6, color: "#6692FF" },
+  { id: "rb", name: "Racing Bulls", drivers: ["Lawson", "Lindblad"], pts: 12, wins: 0, podiums: 0, pos: 6, color: "#6692FF" },
   { id: "alpine", name: "Alpine F1 Team", drivers: ["Gasly", "Colapinto"], pts: 10, wins: 0, podiums: 0, pos: 7, color: "#0093CC" },
   { id: "sauber", name: "Audi", drivers: ["Bortoleto", "Hülkenberg"], pts: 2, wins: 0, podiums: 0, pos: 8, color: "#00594F" },
   { id: "williams", name: "Williams", drivers: ["Sainz", "Albon"], pts: 2, wins: 0, podiums: 0, pos: 9, color: "#1868DB" },

@@ -318,13 +318,13 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                        <span className="f1-heading text-sm text-white">{d.name}</span>
+                        <span className="f1-body-sm font-semibold text-white">{d.name}</span>
                         <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
                       </div>
 
                       <div className="space-y-2 mb-3">
                         <div className="flex items-center justify-between">
-                          <span className="f1-label text-[0.625rem]">{t("marketOdds")}</span>
+                          <span className="f1-label-xs">{t("marketOdds")}</span>
                           <span className="f1-data text-sm text-white">{d.odds}%</span>
                         </div>
                         <div className="h-[3px] w-full rounded-full bg-[#161616]">
@@ -332,7 +332,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="f1-label text-[0.625rem]">{t("actualPtsShare")}</span>
+                          <span className="f1-label-xs">{t("actualPtsShare")}</span>
                           <span className="f1-data text-sm text-white">{d.ptsShare}%</span>
                         </div>
                         <div className="h-[3px] w-full rounded-full bg-[#161616]">
@@ -498,27 +498,27 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     {/* Team header */}
                     <div className="flex items-center gap-2 mb-3">
                       <div className="f1-team-bar h-5" style={{ backgroundColor: b.color }} />
-                      <span className="f1-label text-[0.625rem] uppercase tracking-wider" style={{ color: b.color }}>{b.team}</span>
+                      <span className="f1-label-xs" style={{ color: b.color }}>{b.team}</span>
                     </div>
 
                     {/* Driver names and points */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-left">
                         <span className="f1-data text-sm font-bold text-white">{b.c1}</span>
-                        <p className="f1-data text-[0.625rem] text-[var(--text-muted)]">{b.pts[0]} pts</p>
+                        <p className="f1-data text-[0.5625rem] text-[var(--text-muted)]">{b.pts[0]} pts</p>
                       </div>
-                      <span className="f1-label text-[0.5rem] text-[var(--text-subtle)]">vs</span>
+                      <span className="f1-label-xs !text-[var(--text-subtle)]">vs</span>
                       <div className="text-right">
                         <span className="f1-data text-sm font-bold text-white">{b.c2}</span>
-                        <p className="f1-data text-[0.625rem] text-[var(--text-muted)]">{b.pts[1]} pts</p>
+                        <p className="f1-data text-[0.5625rem] text-[var(--text-muted)]">{b.pts[1]} pts</p>
                       </div>
                     </div>
 
                     {/* Quali H2H bar */}
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="f1-label text-[0.5rem]">{t("qualifying")}</span>
-                        <span className="f1-data text-[0.5rem] text-[var(--text-dim)]">{b.qualiH2H[0]}-{b.qualiH2H[1]}</span>
+                        <span className="f1-label-xs">{t("qualifying")}</span>
+                        <span className="f1-data text-[0.5625rem] text-[var(--text-dim)]">{b.qualiH2H[0]}-{b.qualiH2H[1]}</span>
                       </div>
                       <div className="flex h-[4px] w-full overflow-hidden rounded-full">
                         <div className="h-full" style={{ width: `${qualiPct1}%`, backgroundColor: b.color }} />
@@ -529,8 +529,8 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     {/* Race H2H bar */}
                     <div>
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="f1-label text-[0.5rem]">{t("raceH2H")}</span>
-                        <span className="f1-data text-[0.5rem] text-[var(--text-dim)]">{b.raceH2H[0]}-{b.raceH2H[1]}</span>
+                        <span className="f1-label-xs">{t("raceH2H")}</span>
+                        <span className="f1-data text-[0.5625rem] text-[var(--text-dim)]">{b.raceH2H[0]}-{b.raceH2H[1]}</span>
                       </div>
                       <div className="flex h-[4px] w-full overflow-hidden rounded-full">
                         <div className="h-full" style={{ width: `${racePct1}%`, backgroundColor: b.color }} />

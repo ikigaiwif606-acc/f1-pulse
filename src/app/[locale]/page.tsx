@@ -5,6 +5,23 @@ import { Link } from "@/lib/i18n/navigation";
 import { getHomepageData } from "@/lib/data/home";
 import type { HomepageData } from "@/types";
 
+// ── Top Movers (static enrichment for homepage) ──────────────────────────────
+const TOP_MOVERS = [
+  { name: "George Russell", code: "RUS", market: "WDC", oldPct: 57, newPct: 60, color: "#27F4D2" },
+  { name: "Kimi Antonelli", code: "ANT", market: "JPN Win", oldPct: 16, newPct: 21, color: "#27F4D2" },
+  { name: "Safety Car", code: "SC", market: "JPN GP", oldPct: 55, newPct: 67, color: "#f59e0b" },
+  { name: "Max Verstappen", code: "VER", market: "WDC", oldPct: 5, newPct: 3, color: "#3671C6" },
+  { name: "Charles Leclerc", code: "LEC", market: "JPN Win", oldPct: 11, newPct: 8, color: "#E80020" },
+];
+
+// ── Latest Deals ─────────────────────────────────────────────────────────────
+const LATEST_DEALS = [
+  { team: "Ferrari", color: "#E80020", sponsor: "HP", type: "Title", value: "$100M/yr" },
+  { team: "Red Bull", color: "#3671C6", sponsor: "Oracle", type: "Title", value: "$100M/yr" },
+  { team: "Aston Martin", color: "#229971", sponsor: "Aramco", type: "Title", value: "$100M/yr" },
+  { team: "Cadillac", color: "#C0C0C0", sponsor: "GM / TWG Global", type: "New Team", value: "TBD" },
+];
+
 export default async function HomePage() {
   const data = await getHomepageData();
   return <HomePageContent data={data} />;
@@ -80,6 +97,45 @@ function HomePageContent({ data }: { data: HomepageData }) {
 
           {/* Right column */}
           <div className="flex flex-col gap-4">
+            {/* Top Movers */}
+            <div className="f1-surface p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="f1-accent-bar" />
+                  <span className="f1-heading text-white">{t("topMovers")}</span>
+                </div>
+                <span className="f1-label-xs" style={{ color: "#333" }}>24h</span>
+              </div>
+
+              <div className="space-y-1.5">
+                {TOP_MOVERS.map((m) => {
+                  const change = m.newPct - m.oldPct;
+                  const isUp = change > 0;
+
+                  return (
+                    <div key={m.name + m.market} className="f1-transition flex items-center gap-2.5 f1-surface-inner p-2 hover:bg-[#0d0d0d]">
+                      <div className="f1-team-bar h-4" style={{ backgroundColor: m.color }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="f1-data text-[0.625rem]" style={{ color: "#444" }}>{m.code}</span>
+                          <span className="f1-body-sm font-semibold text-white truncate">{m.name}</span>
+                        </div>
+                        <span className="f1-label-xs" style={{ color: "#333" }}>{m.market}</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className={`f1-data text-xs font-bold ${isUp ? "text-[#22c55e]" : "text-[#E10600]"}`}>
+                          {isUp ? "▲" : "▼"} {isUp ? "+" : ""}{change}%
+                        </span>
+                        <p className="f1-label-xs" style={{ color: "#444" }}>
+                          {m.oldPct}% → {m.newPct}%
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Standings */}
             <div className="f1-surface p-5">
               <div className="mb-4 flex items-center justify-between">
@@ -114,28 +170,58 @@ function HomePageContent({ data }: { data: HomepageData }) {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Recent Results */}
-            <div className="f1-surface p-5">
-              <div className="mb-4 flex items-center gap-2">
+        {/* ── Second row: Recent Results + Latest Deals ── */}
+        <div className="grid gap-4 lg:grid-cols-2 mt-4">
+          {/* Recent Results */}
+          <div className="f1-surface p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="f1-accent-bar" />
+              <span className="f1-heading text-white">{t("recentResults")}</span>
+            </div>
+
+            <div className="space-y-1.5">
+              {recent.map((r) => (
+                <Link key={r.round} href={`/races/${r.slug}` as "/"} className="f1-transition flex items-center gap-3 f1-surface-inner p-2.5 hover:bg-[#0d0d0d]">
+                  <span className="flex h-6 w-6 items-center justify-center rounded bg-[#131313] f1-data text-[0.625rem]" style={{ color: "#444" }}>
+                    R{r.round}
+                  </span>
+                  <span className="f1-body-sm flex-1" style={{ color: "#666" }}>{r.name}</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="f1-team-bar h-3" style={{ backgroundColor: r.color }} />
+                    <span className="f1-data text-xs font-bold" style={{ color: r.color }}>{r.code}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Latest Sponsorship Deals */}
+          <div className="f1-surface p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">{t("recentResults")}</span>
+                <span className="f1-heading text-white">{t("latestDeals")}</span>
               </div>
+              <Link href="/sponsorships" className="f1-transition f1-label hover:!text-white">
+                {tCommon("viewAll")} &rarr;
+              </Link>
+            </div>
 
-              <div className="space-y-1.5">
-                {recent.map((r) => (
-                  <Link key={r.round} href={`/races/${r.slug}` as "/"} className="f1-transition flex items-center gap-3 f1-surface-inner p-2.5 hover:bg-[#0d0d0d]">
-                    <span className="flex h-6 w-6 items-center justify-center rounded bg-[#131313] f1-data text-[0.625rem]" style={{ color: "#444" }}>
-                      R{r.round}
-                    </span>
-                    <span className="f1-body-sm flex-1" style={{ color: "#666" }}>{r.name}</span>
-                    <div className="flex items-center gap-1.5">
-                      <div className="f1-team-bar h-3" style={{ backgroundColor: r.color }} />
-                      <span className="f1-data text-xs font-bold" style={{ color: r.color }}>{r.code}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+            <div className="space-y-1.5">
+              {LATEST_DEALS.map((deal) => (
+                <div key={deal.sponsor} className="f1-transition flex items-center gap-3 f1-surface-inner p-2.5 hover:bg-[#0d0d0d]">
+                  <div className="f1-team-bar h-5" style={{ backgroundColor: deal.color }} />
+                  <div className="flex-1 min-w-0">
+                    <span className="f1-body-sm font-semibold text-white truncate block">{deal.sponsor}</span>
+                    <span className="f1-label-xs" style={{ color: "#444" }}>{deal.team}</span>
+                  </div>
+                  <span className="f1-label rounded bg-[#131313] px-1.5 py-0.5 !text-[#444] shrink-0">{deal.type}</span>
+                  <span className="f1-data text-xs text-[#22c55e] shrink-0">{deal.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

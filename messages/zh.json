@@ -13,6 +13,7 @@
     "drivers": "车手",
     "teams": "车队",
     "markets": "预测市场",
+    "sponsorships": "赞助商",
     "analytics": "数据分析"
   },
   "home": {
@@ -25,6 +26,7 @@
     "liveOdds": "Polymarket 实时赔率",
     "recentResults": "最新赛果",
     "topMovers": "赔率变动",
+    "latestDeals": "最新赞助",
     "championshipStandings": "积分榜"
   },
   "race": {
@@ -86,6 +88,14 @@
     "circuitComparison": "赛道对比",
     "safetyCarProbability": "安全车出动概率",
     "preRegulationData": "2026 规则变更前数据"
+  },
+  "sponsorships": {
+    "title": "赞助商追踪",
+    "totalPartners": "合作伙伴总数",
+    "titleSponsors": "冠名赞助",
+    "topDeal": "最大交易",
+    "newEntrant": "新车队",
+    "globalPartners": "F1 全球合作伙伴"
   },
   "footer": {
     "disclaimer": "F1 Pulse 仅展示预测市场数据，不构成投资建议。请自行研究后做出决策。",

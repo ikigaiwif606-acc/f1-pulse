@@ -14,6 +14,7 @@
     "teams": "Teams",
     "markets": "Markets",
     "sponsorships": "Sponsors",
+    "stocks": "Stocks",
     "analytics": "Analytics"
   },
   "home": {
@@ -88,6 +89,17 @@
     "circuitComparison": "Circuit Comparison",
     "safetyCarProbability": "Safety Car Probability",
     "preRegulationData": "Pre-2026 regulation data"
+  },
+  "stocks": {
+    "title": "F1 Stock Tracker",
+    "price": "Price",
+    "change": "Change",
+    "trackedStocks": "Tracked Stocks",
+    "avgDailyChange": "Avg Daily Change",
+    "bestPerformer": "Best YTD",
+    "worstPerformer": "Worst YTD",
+    "correlation": "Race-Stock Correlation",
+    "detailedView": "Detailed View"
   },
   "sponsorships": {
     "title": "Sponsorship Tracker",

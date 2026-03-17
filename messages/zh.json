@@ -14,6 +14,7 @@
     "teams": "车队",
     "markets": "预测市场",
     "sponsorships": "赞助商",
+    "stocks": "股票",
     "analytics": "数据分析"
   },
   "home": {
@@ -88,6 +89,17 @@
     "circuitComparison": "赛道对比",
     "safetyCarProbability": "安全车出动概率",
     "preRegulationData": "2026 规则变更前数据"
+  },
+  "stocks": {
+    "title": "F1 股票追踪",
+    "price": "股价",
+    "change": "涨跌",
+    "trackedStocks": "追踪股票",
+    "avgDailyChange": "日均涨跌",
+    "bestPerformer": "年度最佳",
+    "worstPerformer": "年度最差",
+    "correlation": "比赛-股价关联",
+    "detailedView": "详细数据"
   },
   "sponsorships": {
     "title": "赞助商追踪",

@@ -16,10 +16,11 @@ const TOP_MOVERS = [
 
 // ── Latest Deals ─────────────────────────────────────────────────────────────
 const LATEST_DEALS = [
-  { team: "Ferrari", color: "#E80020", sponsor: "HP", type: "Title", value: "$100M/yr" },
-  { team: "Red Bull", color: "#3671C6", sponsor: "Oracle", type: "Title", value: "$100M/yr" },
-  { team: "Aston Martin", color: "#229971", sponsor: "Aramco", type: "Title", value: "$100M/yr" },
-  { team: "Cadillac", color: "#C0C0C0", sponsor: "GM / TWG Global", type: "New Team", value: "TBD" },
+  { team: "F1 Global", color: "#E10600", sponsor: "LVMH (10-yr deal)", type: "Global", value: "$150M/yr" },
+  { team: "McLaren", color: "#FF8000", sponsor: "Mastercard", type: "Title", value: "$100M/yr" },
+  { team: "Red Bull", color: "#3671C6", sponsor: "Oracle (extended)", type: "Title", value: "$110M/yr" },
+  { team: "Haas", color: "#B6BABD", sponsor: "Toyota Gazoo Racing", type: "New Title", value: "TBD" },
+  { team: "Williams", color: "#1868DB", sponsor: "Atlassian", type: "New Title", value: "TBD" },
 ];
 
 export default async function HomePage() {

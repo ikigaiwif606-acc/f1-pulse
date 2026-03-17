@@ -219,7 +219,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               <a
                 key={tab.href}
                 href={tab.href}
-                className="shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#999] border border-[#1c1c1c] bg-[#0c0c0c] transition-colors hover:text-white hover:border-[#333] hover:bg-[#161616]"
+                className="shrink-0 rounded-full px-4 py-1.5 f1-label border border-[#1c1c1c] bg-[#0c0c0c] f1-transition hover:!text-white hover:border-[#333] hover:bg-[#161616]"
               >
                 {tab.label}
               </a>
@@ -233,11 +233,11 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
               <span className="f1-heading text-white">{t("qualifyingPace")}</span>
-              <span className="cursor-help text-[#666] text-xs" title="Average gap to pole position across all qualifying sessions this season">&#9432;</span>
+              <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Average gap to pole position across all qualifying sessions this season">&#9432;</span>
             </div>
             <div className="flex items-center justify-between mb-4">
               <p className="f1-label">{t("qualifyingPaceDesc")}</p>
-              <span className="f1-label text-[0.6rem] rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">Top 10 shown</span>
+              <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">Top 10 shown</span>
             </div>
 
             <div className="space-y-2">
@@ -262,7 +262,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
               <span className="f1-heading text-white">{t("gridVsFinish")}</span>
-              <span className="cursor-help text-[#666] text-xs" title="Compares average starting position to average finishing position — positive delta means gaining places">&#9432;</span>
+              <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Compares average starting position to average finishing position — positive delta means gaining places">&#9432;</span>
             </div>
             <p className="f1-label mb-4">{t("gridVsFinishDesc")}</p>
 
@@ -275,13 +275,13 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
                     <span className="f1-data w-8 text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
                     <div className="flex items-center gap-2 flex-1">
-                      <span className="f1-body-sm w-8 text-center" style={{ color: "var(--text-muted)" }}>P{d.avgGrid.toFixed(1)}</span>
+                      <span className="f1-data w-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>P{d.avgGrid.toFixed(1)}</span>
                       <div className="flex-1 flex items-center justify-center">
                         <svg width="16" height="10" viewBox="0 0 16 10" className="mx-1">
                           <path d="M0 5 L12 5 M9 2 L12 5 L9 8" stroke={isGain ? "#22c55e" : isLoss ? "#ef4444" : "var(--text-dim)"} strokeWidth="1.5" fill="none" />
                         </svg>
                       </div>
-                      <span className="f1-body-sm w-8 text-center" style={{ color: "var(--text-muted)" }}>P{d.avgFinish.toFixed(1)}</span>
+                      <span className="f1-data w-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>P{d.avgFinish.toFixed(1)}</span>
                     </div>
                     <span
                       className="f1-data w-12 text-right text-xs font-semibold"
@@ -301,7 +301,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               <div className="flex items-center gap-2">
                 <div className="f1-accent-bar" />
                 <span className="f1-heading text-white">{t("bettingEdge")}</span>
-                <span className="cursor-help text-[#666] text-xs" title="Compares Polymarket championship odds to actual points share — positive gap suggests the market undervalues this driver">&#9432;</span>
+                <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Compares Polymarket championship odds to actual points share — positive gap suggests the market undervalues this driver">&#9432;</span>
               </div>
               <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
                 Polymarket
@@ -348,7 +348,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                           {isValue ? "+" : ""}{d.gap.toFixed(1)}%
                         </span>
                         <span
-                          className="rounded px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider"
+                          className="f1-label-xs rounded px-1.5 py-0.5"
                           style={{
                             backgroundColor: isValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
                             color: isValue ? "#22c55e" : "#ef4444",
@@ -377,7 +377,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               {TIRE_STRATEGY.compounds.map((c) => (
                 <div
                   key={c.abbr}
-                  className="flex items-center justify-center text-[0.625rem] font-bold"
+                  className="flex items-center justify-center f1-data text-[0.625rem]"
                   style={{
                     width: `${c.pct}%`,
                     backgroundColor: c.color,
@@ -392,16 +392,17 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             {/* Stat cards */}
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
-                <p className="f1-label text-[0.625rem] mb-1">Most Used</p>
-                <p className="f1-heading text-white text-lg">Hard (47%)</p>
+                <p className="f1-label-xs mb-2">Most Used</p>
+                <p className="f1-data-lg text-white">Hard</p>
+                <p className="f1-label-xs mt-1" style={{ color: "var(--text-dim)" }}>47%</p>
               </div>
               <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
-                <p className="f1-label text-[0.625rem] mb-1">Avg Stints</p>
-                <p className="f1-heading text-white text-lg">{TIRE_STRATEGY.avgStints.toFixed(1)}</p>
+                <p className="f1-label-xs mb-2">Avg Stints</p>
+                <p className="f1-data-lg text-white">{TIRE_STRATEGY.avgStints.toFixed(1)}</p>
               </div>
               <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 text-center">
-                <p className="f1-label text-[0.625rem] mb-1">Popular Strategy</p>
-                <p className="f1-heading text-white text-lg">{TIRE_STRATEGY.mostPopularStrategy}</p>
+                <p className="f1-label-xs mb-2">Popular Strategy</p>
+                <p className="f1-data-lg text-white">{TIRE_STRATEGY.mostPopularStrategy}</p>
               </div>
             </div>
           </div>
@@ -424,7 +425,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
               <span className="f1-heading text-white">{t("dnfRate")}</span>
-              <span className="cursor-help text-[#666] text-xs" title="Percentage of race starts that ended in retirement per team">&#9432;</span>
+              <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Percentage of race starts that ended in retirement per team">&#9432;</span>
             </div>
             <p className="f1-label mb-4">{t("dnfRateDesc")}</p>
 
@@ -432,7 +433,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               {DNF.map((d) => (
                 <div key={d.team} className="flex items-center gap-3">
                   <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                  <span className="f1-body-sm w-24" style={{ color: "#999" }}>{d.team}</span>
+                  <span className="f1-body-sm w-24" style={{ color: "var(--text-muted)" }}>{d.team}</span>
                   <div className="flex-1">
                     <div className="h-[3px] w-full rounded-full bg-[#161616]">
                       <div className="h-[3px] rounded-full" style={{ width: `${Math.max(d.rate, 1)}%`, backgroundColor: d.color }} />
@@ -450,7 +451,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               <div className="flex items-center gap-2">
                 <div className="f1-accent-bar" />
                 <span className="f1-heading text-white">{t("safetyCarProbability")}</span>
-                <span className="cursor-help text-[#666] text-xs" title="Historical safety car deployment rate at each circuit (pre-2026 data)">&#9432;</span>
+                <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Historical safety car deployment rate at each circuit (pre-2026 data)">&#9432;</span>
               </div>
               <span className="f1-label rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
                 {t("preRegulationData")}
@@ -462,7 +463,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
               {SAFETY_CAR.map((c) => (
                 <div key={c.circuit} className="flex items-center gap-3">
                   <span className="hidden text-sm sm:block">{c.icon}</span>
-                  <span className="f1-body-sm w-24 truncate" style={{ color: "#999" }}>{c.circuit}</span>
+                  <span className="f1-body-sm w-24 truncate" style={{ color: "var(--text-muted)" }}>{c.circuit}</span>
                   <div className="flex-1">
                     <div className="h-[3px] w-full rounded-full bg-[#161616]">
                       <div className="h-[3px] rounded-full bg-[#f59e0b]" style={{ width: `${c.rate}%` }} />
@@ -481,7 +482,7 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
             <div className="mb-1 flex items-center gap-2">
               <div className="f1-accent-bar" />
               <span className="f1-heading text-white">{t("teammateBattles")}</span>
-              <span className="cursor-help text-[#666] text-xs" title="Head-to-head qualifying and race finishing position comparison between teammates">&#9432;</span>
+              <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Head-to-head qualifying and race finishing position comparison between teammates">&#9432;</span>
             </div>
             <p className="f1-label mb-4">{t("teammateBattlesDesc")}</p>
 
@@ -503,12 +504,12 @@ function AnalyticsPageContent({ qualifying }: { qualifying: QualifyingEntry[] })
                     {/* Driver names and points */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-left">
-                        <span className="f1-heading text-sm text-white">{b.c1}</span>
+                        <span className="f1-data text-sm font-bold text-white">{b.c1}</span>
                         <p className="f1-data text-[0.625rem] text-[var(--text-muted)]">{b.pts[0]} pts</p>
                       </div>
                       <span className="f1-label text-[0.5rem] text-[var(--text-subtle)]">vs</span>
                       <div className="text-right">
-                        <span className="f1-heading text-sm text-white">{b.c2}</span>
+                        <span className="f1-data text-sm font-bold text-white">{b.c2}</span>
                         <p className="f1-data text-[0.625rem] text-[var(--text-muted)]">{b.pts[1]} pts</p>
                       </div>
                     </div>

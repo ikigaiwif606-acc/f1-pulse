@@ -23,7 +23,7 @@ export function OddsSummary() {
         {odds.map((entry, i) => (
           <div
             key={entry.name}
-            className="f1-transition group flex items-center gap-3 rounded bg-[#0f0f0f] p-2.5 hover:bg-[#131313]"
+            className="f1-transition group flex items-center gap-3 rounded bg-[#0f0f0f] p-2.5 hover:bg-[#0d0d0d]"
           >
             <span className="f1-data w-4 text-center text-xs" style={{ color: "#444" }}>
               {i + 1}

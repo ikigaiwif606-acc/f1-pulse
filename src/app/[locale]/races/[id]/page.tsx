@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { getRaceDetailData, type RaceData } from "@/lib/data/race-detail";
+import { getRacesList } from "@/lib/data/races";
 
 // ── Code → driver slug mapping ───────────────────────────────────────────────
 const DRIVER_SLUG: Record<string, string> = {
@@ -79,14 +80,21 @@ export default async function RaceDetailPage({
     return <RaceNotFound />;
   }
 
-  return <RaceDetailContent race={race} />;
+  const racesList = await getRacesList();
+  const currentIdx = racesList.findIndex(r => r.slug === id);
+  const prevRace = currentIdx > 0 ? racesList[currentIdx - 1] : null;
+  const nextRace = currentIdx < racesList.length - 1 ? racesList[currentIdx + 1] : null;
+
+  return <RaceDetailContent race={race} prevRace={prevRace} nextRace={nextRace} />;
 }
 
-function RaceDetailContent({ race }: { race: RaceData }) {
-  return <RaceDetailInner race={race} />;
+type AdjacentRace = { slug: string; round: number; name: string } | null;
+
+function RaceDetailContent({ race, prevRace, nextRace }: { race: RaceData; prevRace: AdjacentRace; nextRace: AdjacentRace }) {
+  return <RaceDetailInner race={race} prevRace={prevRace} nextRace={nextRace} />;
 }
 
-function RaceDetailInner({ race }: { race: RaceData }) {
+function RaceDetailInner({ race, prevRace, nextRace }: { race: RaceData; prevRace: AdjacentRace; nextRace: AdjacentRace }) {
   const t = useTranslations("race");
   const tCommon = useTranslations("common");
   const tMarkets = useTranslations("markets");
@@ -575,21 +583,21 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                 <span className="f1-heading text-white">{t("bettingIntel")}</span>
               </div>
               <div className="space-y-2">
-                <a href={race.polymarket.market_url} target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#131313]">
+                <a href={race.polymarket.market_url} target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
                   <div>
                     <p className="f1-body-sm font-semibold text-white">{t("raceWinner")}</p>
                     <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol {race.polymarket.volume}</p>
                   </div>
                   <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
-                <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#131313]">
+                <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
                   <div>
                     <p className="f1-body-sm font-semibold text-white">{t("safetyCar")}</p>
                     <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol $340K</p>
                   </div>
                   <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
-                <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#131313]">
+                <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
                   <div>
                     <p className="f1-body-sm font-semibold text-white">{t("fastestLap")}</p>
                     <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol $210K</p>
@@ -604,6 +612,30 @@ function RaceDetailInner({ race }: { race: RaceData }) {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Race Navigation */}
+      <div className="mx-auto max-w-7xl px-5 pb-8">
+        <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-5">
+          {prevRace ? (
+            <Link href={`/races/${prevRace.slug}` as "/"} className="f1-transition group flex items-center gap-2 hover:!text-white">
+              <span className="f1-label !text-[#666] group-hover:!text-white">&larr;</span>
+              <div>
+                <p className="f1-label-xs" style={{ color: "var(--text-dim)" }}>R{prevRace.round}</p>
+                <p className="f1-body-sm text-white">{prevRace.name.replace(/ Grand Prix$/i, " GP")}</p>
+              </div>
+            </Link>
+          ) : <div />}
+          {nextRace ? (
+            <Link href={`/races/${nextRace.slug}` as "/"} className="f1-transition group flex items-center gap-2 text-right hover:!text-white">
+              <div>
+                <p className="f1-label-xs" style={{ color: "var(--text-dim)" }}>R{nextRace.round}</p>
+                <p className="f1-body-sm text-white">{nextRace.name.replace(/ Grand Prix$/i, " GP")}</p>
+              </div>
+              <span className="f1-label !text-[#666] group-hover:!text-white">&rarr;</span>
+            </Link>
+          ) : <div />}
         </div>
       </div>
     </div>

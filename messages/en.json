@@ -85,10 +85,26 @@
   "analytics": {
     "title": "Analytics Lab",
     "qualifyingPace": "Qualifying Pace Analysis",
+    "qualifyingPaceDesc": "Average gap to pole — 2026",
     "racePace": "Race Pace Analysis",
     "circuitComparison": "Circuit Comparison",
     "safetyCarProbability": "Safety Car Probability",
-    "preRegulationData": "Pre-2026 regulation data"
+    "safetyCarDesc": "Historical SC rate by circuit",
+    "preRegulationData": "Pre-2026 regulation data",
+    "dnfRate": "DNF Rate by Team",
+    "dnfRateDesc": "Retirement percentage — 2026",
+    "teammateBattles": "Teammate Battles",
+    "teammateBattlesDesc": "Head-to-head qualifying & race results — after R2",
+    "qualifying": "QUALI",
+    "raceH2H": "RACE",
+    "gridVsFinish": "Grid vs Finish",
+    "gridVsFinishDesc": "Avg grid position vs avg race finish — top 10",
+    "bettingEdge": "Betting Edge Finder",
+    "bettingEdgeDesc": "Polymarket championship odds vs actual points share",
+    "marketOdds": "MARKET ODDS",
+    "actualPtsShare": "ACTUAL PTS %",
+    "valueBet": "Value Bet",
+    "overvalued": "Overvalued"
   },
   "stocks": {
     "title": "F1 Stock Tracker",

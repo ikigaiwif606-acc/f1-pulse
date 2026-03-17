@@ -85,10 +85,26 @@
   "analytics": {
     "title": "数据分析实验室",
     "qualifyingPace": "排位赛速度分析",
+    "qualifyingPaceDesc": "与杆位差距 — 2026赛季",
     "racePace": "正赛速度分析",
     "circuitComparison": "赛道对比",
     "safetyCarProbability": "安全车出动概率",
-    "preRegulationData": "2026 规则变更前数据"
+    "safetyCarDesc": "各赛道历史安全车出动率",
+    "preRegulationData": "2026 规则变更前数据",
+    "dnfRate": "车队退赛率",
+    "dnfRateDesc": "退赛百分比 — 2026赛季",
+    "teammateBattles": "队友对决",
+    "teammateBattlesDesc": "排位赛与正赛队内对决 — R2后数据",
+    "qualifying": "排位",
+    "raceH2H": "正赛",
+    "gridVsFinish": "发车位 vs 完赛位",
+    "gridVsFinishDesc": "平均发车位与平均完赛位对比 — 前10名",
+    "bettingEdge": "投注价值发现",
+    "bettingEdgeDesc": "Polymarket冠军赔率与实际积分占比对比",
+    "marketOdds": "市场赔率",
+    "actualPtsShare": "实际积分占比",
+    "valueBet": "价值投注",
+    "overvalued": "高估"
   },
   "stocks": {
     "title": "F1 股票追踪",

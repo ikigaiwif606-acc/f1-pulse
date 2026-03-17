@@ -2,7 +2,10 @@
 const BASE_URL = "https://api.jolpi.ca/ergast/f1";
 
 async function fetchErgast<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}.json`, { next: { revalidate: 3600 } });
+  const res = await fetch(`${BASE_URL}${path}.json`, {
+    next: { revalidate: 3600 },
+    signal: AbortSignal.timeout(8000), // 8s timeout to prevent hanging
+  });
   if (!res.ok) throw new Error(`Ergast ${path}: ${res.status}`);
   return res.json();
 }

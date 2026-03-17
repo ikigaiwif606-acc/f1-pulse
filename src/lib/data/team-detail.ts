@@ -69,6 +69,7 @@ const ID_ALIASES: Record<string, string> = {
   redbull: "red_bull",
   "aston-martin": "aston_martin",
   "racing-bulls": "rb",
+  audi: "sauber",
 };
 
 function normalizeId(id: string): string {

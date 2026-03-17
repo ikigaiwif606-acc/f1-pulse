@@ -36,14 +36,15 @@ export default async function TeamDetailPage({
 }) {
   const { id } = await params;
   const team = await getTeamDetailData(id);
+  const t = useTranslations("team");
 
   if (!team) {
     return (
       <div className="min-h-screen bg-[#080808] flex items-center justify-center">
         <div className="text-center">
-          <p className="f1-display-md text-white mb-3">Team not found</p>
+          <p className="f1-display-md text-white mb-3">{t("teamNotFound")}</p>
           <Link href="/teams" className="f1-transition f1-label !text-[#E10600] hover:opacity-70">
-            &larr; Back to Teams
+            &larr; {t("backToTeams")}
           </Link>
         </div>
       </div>
@@ -61,15 +62,17 @@ function TeamDetailContent({ team }: { team: TeamData }) {
 
   return (
     <div className="min-h-screen bg-[#080808]">
-      <div className="mx-auto max-w-7xl px-5 py-8">
-
-        {/* ── Back link ── */}
-        <div className="mb-6">
-          <Link href="/teams" className="f1-transition f1-label hover:!text-white inline-flex items-center gap-1.5">
-            <span>&larr;</span>
-            <span>Constructors&apos; Championship</span>
+      <div className="border-b border-[#1c1c1c]">
+        <div className="mx-auto max-w-7xl px-5 py-3 flex items-center gap-2">
+          <Link href="/teams" className="f1-transition f1-label !text-[#444] hover:!text-white flex items-center gap-1.5">
+            <span className="text-xs leading-none">&larr;</span>
+            {t("constructorChampionship")}
           </Link>
+          <span className="f1-label-xs" style={{ color: "var(--text-ghost)" }}>/</span>
+          <span className="f1-label !text-[#666]">{team.name}</span>
         </div>
+      </div>
+      <div className="mx-auto max-w-7xl px-5 py-8">
 
         {/* ── Hero ── */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -80,8 +83,8 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                 <PosBadge pos={team.championship.pos} />
                 <span className="f1-label" style={{ color: team.color }}>
                   {team.championship.pos === 1
-                    ? "Constructors\u2019 Championship Leader"
-                    : `${ordinal(team.championship.pos)} in Constructors\u2019 Championship`}
+                    ? t("constructorsLeader")
+                    : t("constructorsPos", { ordinal: ordinal(team.championship.pos) })}
                 </span>
               </div>
               <h1 className="f1-display-xl text-white">{team.name}</h1>
@@ -99,12 +102,12 @@ function TeamDetailContent({ team }: { team: TeamData }) {
         {/* ── Stats grid ── */}
         <div className="mb-6 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
           {[
-            { label: "Points", value: team.championship.pts, accent: true },
-            { label: "Wins", value: team.championship.wins, accent: false },
-            { label: "Podiums", value: team.championship.podiums, accent: false },
-            { label: "Poles", value: team.championship.poles, accent: false },
-            { label: "DNFs", value: team.championship.dnfs, accent: false },
-            { label: "Position", value: `P${team.championship.pos}`, accent: false },
+            { label: t("points"), value: team.championship.pts, accent: true },
+            { label: t("wins"), value: team.championship.wins, accent: false },
+            { label: t("podiums"), value: team.championship.podiums, accent: false },
+            { label: t("poles"), value: team.championship.poles, accent: false },
+            { label: t("dnfs"), value: team.championship.dnfs, accent: false },
+            { label: t("position"), value: `P${team.championship.pos}`, accent: false },
           ].map((s) => (
             <div key={s.label} className="f1-surface p-3 text-center">
               <p className="f1-label-xs mb-1.5">{s.label}</p>
@@ -123,7 +126,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
             <div className="f1-surface p-5">
               <div className="mb-4 flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">Constructors&apos; Championship Odds</span>
+                <span className="f1-heading text-white">{t("constructorsOdds")}</span>
               </div>
               <div className="flex items-center gap-4 f1-surface-inner p-4">
                 <div className="flex-1">
@@ -136,7 +139,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                       {(team.polymarket.probability * 100).toFixed(0)}
                       <span className="f1-label-xs ml-0.5" style={{ color: team.color, opacity: 0.7 }}>%</span>
                     </p>
-                    <p className="f1-label-xs mt-0.5" style={{ color: team.color, opacity: 0.6 }}>Win Prob</p>
+                    <p className="f1-label-xs mt-0.5" style={{ color: team.color, opacity: 0.6 }}>{t("winProb")}</p>
                   </div>
                 </div>
               </div>
@@ -146,9 +149,9 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-[#131313] pt-3">
-                <span className="f1-label-xs" style={{ color: "#2a2a2a" }}>Last updated: 2 min ago</span>
+                <span className="f1-label-xs" style={{ color: "#2a2a2a" }}>{t("lastUpdated")}</span>
                 <a href={team.polymarket.url} target="_blank" rel="noopener noreferrer" className="f1-transition f1-label !text-[#E10600] hover:opacity-70">
-                  Bet on Polymarket &rarr;
+                  {t("betOnPolymarket")} &rarr;
                 </a>
               </div>
             </div>
@@ -157,7 +160,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
             <div className="f1-surface p-5">
               <div className="mb-5 flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">Driver Comparison</span>
+                <span className="f1-heading text-white">{t("driverComparison")}</span>
               </div>
               <div className="mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                 <div className="flex items-center gap-2">
@@ -167,7 +170,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                     <p className="f1-label-xs">{d1.name}</p>
                   </div>
                 </div>
-                <div className="f1-label text-center" style={{ color: "#2a2a2a" }}>VS</div>
+                <div className="f1-label text-center" style={{ color: "#2a2a2a" }}>{t("vs")}</div>
                 <div className="flex items-center justify-end gap-2">
                   <div className="text-right">
                     <p className="f1-display-md text-white">{d2.code}</p>
@@ -178,8 +181,8 @@ function TeamDetailContent({ team }: { team: TeamData }) {
               </div>
               <div className="space-y-3">
                 {[
-                  { label: "Points", v1: d1.pts, v2: d2.pts },
-                  { label: "Wins", v1: d1.wins, v2: d2.wins },
+                  { label: t("points"), v1: d1.pts, v2: d2.pts },
+                  { label: t("wins"), v1: d1.wins, v2: d2.wins },
                   { label: "Qualifying H2H", v1: d1.qualifyingH2H, v2: d2.qualifyingH2H },
                   { label: "Race H2H", v1: d1.raceH2H, v2: d2.raceH2H },
                 ].map((row) => (
@@ -226,14 +229,14 @@ function TeamDetailContent({ team }: { team: TeamData }) {
               <div className="f1-surface p-5">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="f1-accent-bar" />
-                  <span className="f1-heading text-white">Race-by-Race Results</span>
+                  <span className="f1-heading text-white">{t("raceByRace")}</span>
                 </div>
                 <div className="mb-1 grid grid-cols-[2rem_1fr_3rem_3rem_3.5rem] gap-2 px-2">
                   <span className="f1-label-xs">RND</span>
                   <span className="f1-label-xs">Race</span>
                   <span className="f1-label-xs text-center">{d1.code}</span>
                   <span className="f1-label-xs text-center">{d2.code}</span>
-                  <span className="f1-label-xs text-right">Team PTS</span>
+                  <span className="f1-label-xs text-right">{t("teamPts")}</span>
                 </div>
                 <div className="space-y-1">
                   {team.raceResults.map((r) => (
@@ -250,7 +253,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                 </div>
                 <div className="mt-3 border-t border-[#131313] pt-3">
                   <div className="flex items-center justify-between">
-                    <span className="f1-label">{racesCompleted} of 24 races completed</span>
+                    <span className="f1-label">{t("racesCompleted", { count: racesCompleted })}</span>
                     <span className="f1-data text-sm" style={{ color: team.color }}>{team.championship.pts} pts</span>
                   </div>
                   <div className="mt-1.5 h-[3px] w-full rounded-full bg-[#161616]">
@@ -268,7 +271,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
             <div className="f1-surface p-5">
               <div className="mb-4 flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">Drivers</span>
+                <span className="f1-heading text-white">{t("drivers")}</span>
               </div>
               <div className="space-y-2">
                 {team.drivers.map((d: Driver, i: number) => {
@@ -302,7 +305,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
                       </div>
                       <div className="mt-2">
                         <div className="flex items-center justify-between mb-0.5">
-                          <span className="f1-label-xs">Points share</span>
+                          <span className="f1-label-xs">{t("pointsShare")}</span>
                           <span className="f1-label-xs" style={{ color: team.color }}>{ptsShare}%</span>
                         </div>
                         <div className="h-[2px] w-full rounded-full bg-[#161616]">
@@ -319,15 +322,15 @@ function TeamDetailContent({ team }: { team: TeamData }) {
             <div className="f1-surface p-5">
               <div className="mb-4 flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">Technical</span>
+                <span className="f1-heading text-white">{t("technical")}</span>
               </div>
               <div className="space-y-2.5">
                 {[
-                  { label: "Power Unit", value: team.technical.powerUnit },
-                  { label: "Chassis", value: team.technical.chassis },
-                  { label: "Tyres", value: team.technical.tyreSupplier },
-                  { label: "Base", value: team.technical.base },
-                  { label: "Tech Director", value: team.technical.technicalDirector },
+                  { label: t("powerUnit"), value: team.technical.powerUnit },
+                  { label: t("chassis"), value: team.technical.chassis },
+                  { label: t("tyres"), value: team.technical.tyreSupplier },
+                  { label: t("base"), value: team.technical.base },
+                  { label: t("techDirector"), value: team.technical.technicalDirector },
                 ].map((row) => (
                   <div key={row.label} className="flex flex-col gap-0.5 f1-surface-inner px-3 py-2">
                     <span className="f1-label-xs">{row.label}</span>
@@ -338,7 +341,7 @@ function TeamDetailContent({ team }: { team: TeamData }) {
               <div className="mt-4">
                 <div className="mb-2 flex items-center gap-1.5">
                   <div className="f1-accent-bar" style={{ background: "#E10600", height: "10px" }} />
-                  <span className="f1-label !text-[#E10600]">2026 Reg Changes</span>
+                  <span className="f1-label !text-[#E10600]">{t("regChanges")}</span>
                 </div>
                 <ul className="space-y-1.5">
                   {team.technical.reg2026.map((note, i) => (
@@ -355,14 +358,14 @@ function TeamDetailContent({ team }: { team: TeamData }) {
             <div className="f1-surface p-5">
               <div className="mb-3 flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">Explore</span>
+                <span className="f1-heading text-white">{t("explore")}</span>
               </div>
               <div className="space-y-1.5">
                 {[
-                  { href: "/teams", label: "All Constructors" },
-                  { href: "/drivers", label: "Driver Standings" },
-                  { href: "/markets", label: "Polymarket Odds" },
-                  { href: "/races", label: "Race Calendar" },
+                  { href: "/teams", label: t("allConstructors") },
+                  { href: "/drivers", label: t("driverStandings") },
+                  { href: "/markets", label: t("polymarketOdds") },
+                  { href: "/races", label: t("raceCalendar") },
                 ].map((link) => (
                   <Link key={link.href} href={link.href as "/"} className="f1-transition f1-hover flex items-center justify-between f1-surface-inner px-3 py-2.5">
                     <span className="f1-body-sm text-white">{link.label}</span>

@@ -55,6 +55,18 @@ function RainBar({ pct }: { pct: number }) {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
+function RaceNotFound() {
+  const t = useTranslations("race");
+  return (
+    <div className="min-h-screen bg-[#080808] flex items-center justify-center">
+      <div className="text-center">
+        <p className="f1-heading text-white mb-2">{t("raceNotFound")}</p>
+        <Link href="/races" className="f1-label !text-[#E10600]">{t("backToCalendar")}</Link>
+      </div>
+    </div>
+  );
+}
+
 export default async function RaceDetailPage({
   params,
 }: {
@@ -64,14 +76,7 @@ export default async function RaceDetailPage({
   const race = await getRaceDetailData(id);
 
   if (!race) {
-    return (
-      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
-        <div className="text-center">
-          <p className="f1-heading text-white mb-2">Race not found</p>
-          <Link href="/races" className="f1-label !text-[#E10600]">Back to Calendar</Link>
-        </div>
-      </div>
-    );
+    return <RaceNotFound />;
   }
 
   return <RaceDetailContent race={race} />;
@@ -83,6 +88,7 @@ function RaceDetailContent({ race }: { race: RaceData }) {
 
 function RaceDetailInner({ race }: { race: RaceData }) {
   const t = useTranslations("race");
+  const tCommon = useTranslations("common");
   const tMarkets = useTranslations("markets");
 
   const raceSession = race.sessions.find((s) => s.label === "Race");
@@ -97,8 +103,8 @@ function RaceDetailInner({ race }: { race: RaceData }) {
             href="/races"
             className="f1-transition f1-label inline-flex items-center gap-2 hover:!text-white"
           >
-            <span style={{ color: "#444" }}>&#8592;</span>
-            <span>Back to Calendar</span>
+            <span style={{ color: "var(--text-dim)" }}>&#8592;</span>
+            <span>{t("backToCalendar")}</span>
           </Link>
         </div>
       </div>
@@ -113,24 +119,24 @@ function RaceDetailInner({ race }: { race: RaceData }) {
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <span className="f1-label rounded bg-[#E10600] px-2 py-0.5 !text-white">
-                  Round {race.round}
+                  {t("round")} {race.round}
                 </span>
                 <span className="f1-label rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2 py-0.5">
-                  {race.season} Season
+                  {race.season} {t("season")}
                 </span>
                 {race.completed ? (
                   <span className="f1-label flex items-center gap-1.5 rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2 py-0.5 !text-[#555]">
-                    Completed
+                    {t("completed")}
                   </span>
                 ) : (
                   <span className="f1-label flex items-center gap-1.5 rounded border border-[#E10600]/20 bg-[#E10600]/[0.04] px-2 py-0.5 !text-[#E10600]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#E10600] animate-live" />
-                    Upcoming
+                    {t("upcoming")}
                   </span>
                 )}
                 {race.sprint && (
                   <span className="f1-label rounded border border-[#E10600]/20 bg-[#E10600]/10 px-2 py-0.5 !text-[#E10600]">
-                    Sprint
+                    {t("sprint")}
                   </span>
                 )}
               </div>
@@ -139,10 +145,10 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                 <span className="mt-1 text-4xl leading-none">{race.flag}</span>
                 <div>
                   <h1 className="f1-display-xl text-white">{race.name}</h1>
-                  <p className="f1-body-sm mt-1" style={{ color: "#555" }}>
+                  <p className="f1-body-sm mt-1" style={{ color: "var(--text-muted)" }}>
                     {race.circuit}
                   </p>
-                  <p className="f1-label mt-0.5" style={{ color: "#444" }}>
+                  <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>
                     {race.hero.locality} &middot; {race.country}
                   </p>
                 </div>
@@ -151,12 +157,12 @@ function RaceDetailInner({ race }: { race: RaceData }) {
 
             <div className="shrink-0 space-y-2">
               <div className="flex items-center justify-end gap-2">
-                <span className="f1-label-xs">Race Date</span>
+                <span className="f1-label-xs">{t("raceDate")}</span>
                 <span className="f1-data text-sm text-white">{race.date}</span>
               </div>
               {raceSession && (
                 <div className="flex items-center justify-end gap-2">
-                  <span className="f1-label-xs">Race Start</span>
+                  <span className="f1-label-xs">{t("raceStart")}</span>
                   <span className="f1-data text-sm" style={{ color: "#E10600" }}>
                     {raceSession.time} {raceSession.utc}
                   </span>
@@ -164,7 +170,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
               )}
               {qualSession && (
                 <div className="flex items-center justify-end gap-2">
-                  <span className="f1-label-xs">Qualifying</span>
+                  <span className="f1-label-xs">{t("qualifying")}</span>
                   <span className="f1-data text-sm text-[#666]">
                     {qualSession.time} {qualSession.utc} SAT
                   </span>
@@ -187,7 +193,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
               <div className="f1-surface p-5">
                 <div className="mb-5 flex items-center gap-2">
                   <div className="f1-accent-bar" />
-                  <span className="f1-heading text-white">Race Result</span>
+                  <span className="f1-heading text-white">{t("raceResult")}</span>
                 </div>
                 <div className="space-y-1">
                   {race.results.map((r) => (
@@ -195,12 +201,12 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                       key={r.pos}
                       className="flex items-center gap-3 f1-surface-inner p-2.5"
                     >
-                      <span className="f1-data w-5 shrink-0 text-center text-xs" style={{ color: r.pos === 1 ? "#f59e0b" : "#333" }}>
+                      <span className="f1-data w-5 shrink-0 text-center text-xs" style={{ color: r.pos === 1 ? "#f59e0b" : "var(--text-subtle)" }}>
                         {r.pos}
                       </span>
                       <div className="f1-team-bar h-5" style={{ backgroundColor: r.color }} />
                       <span className="f1-body-sm flex-1 font-semibold text-white">{r.driver}</span>
-                      <span className="f1-data text-xs" style={{ color: "#444" }}>{r.team}</span>
+                      <span className="f1-data text-xs" style={{ color: "var(--text-dim)" }}>{r.team}</span>
                       <span className="f1-data w-8 text-right text-xs font-bold" style={{ color: r.color }}>{r.code}</span>
                       {r.time && (
                         <span className="f1-data hidden w-24 text-right text-xs text-[#555] sm:block">{r.time}</span>
@@ -216,7 +222,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
               <div className="f1-surface p-5">
                 <div className="mb-5 flex items-center gap-2">
                   <div className="f1-accent-bar" />
-                  <span className="f1-heading text-white">Tire Strategy</span>
+                  <span className="f1-heading text-white">{t("tireStrategy")}</span>
                 </div>
                 <div className="space-y-2">
                   {race.tireStrategy.map((ds) => {
@@ -226,7 +232,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                         <div className="mb-1.5 flex items-center gap-2">
                           <div className="f1-team-bar h-4" style={{ backgroundColor: ds.color }} />
                           <span className="f1-data w-8 text-xs font-bold" style={{ color: ds.color }}>{ds.code}</span>
-                          <span className="f1-label-xs" style={{ color: "#444" }}>{totalLaps} laps</span>
+                          <span className="f1-label-xs" style={{ color: "var(--text-dim)" }}>{totalLaps} laps</span>
                         </div>
                         <div className="flex h-7 w-full overflow-hidden rounded">
                           {ds.stints.map((stint, i) => {
@@ -301,7 +307,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                           {session.label}
                         </p>
                         <p className="f1-data mt-1.5 text-xs text-[#666]">{session.day}</p>
-                        <p className="f1-label mt-0.5" style={{ color: "#444" }}>{session.date}</p>
+                        <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>{session.date}</p>
                         <p className={`f1-data mt-1.5 text-sm ${isRace ? "text-white" : "text-[#555]"}`}>
                           {session.time}
                           <span className="f1-label-xs ml-1">{session.utc}</span>
@@ -333,24 +339,24 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                   </div>
                 </div>
 
-                <p className="f1-body-sm mb-4" style={{ color: "#555" }}>
+                <p className="f1-body-sm mb-4" style={{ color: "var(--text-muted)" }}>
                   {race.polymarket.question}
                 </p>
 
                 <div className="space-y-1">
                   {race.polymarket.outcomes.map((o, i) => (
                     <div key={o.name} className="f1-transition flex items-center gap-3 f1-surface-inner p-2.5 hover:bg-[#0d0d0d]">
-                      <span className="f1-data w-4 shrink-0 text-center text-xs" style={{ color: "#333" }}>{i + 1}</span>
+                      <span className="f1-data w-4 shrink-0 text-center text-xs" style={{ color: "var(--text-subtle)" }}>{i + 1}</span>
                       <div className="f1-team-bar h-6" style={{ backgroundColor: o.color }} />
                       <div className="flex min-w-0 flex-1 items-center gap-2">
-                        <span className="f1-data w-7 shrink-0 text-[0.625rem]" style={{ color: "#444" }}>{o.code}</span>
+                        <span className="f1-data w-7 shrink-0 text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{o.code}</span>
                         <div className="min-w-0 flex-1">
                           {DRIVER_SLUG[o.code] ? (
                             <Link href={`/drivers/${DRIVER_SLUG[o.code]}`} className="f1-body-sm block truncate font-semibold text-white hover:text-[#E10600] f1-transition">{o.name}</Link>
                           ) : (
                             <span className="f1-body-sm block truncate font-semibold text-white">{o.name}</span>
                           )}
-                          <span className="f1-label-xs block" style={{ color: "#333" }}>{o.team}</span>
+                          <span className="f1-label-xs block" style={{ color: "var(--text-subtle)" }}>{o.team}</span>
                         </div>
                       </div>
                       <div className="hidden w-28 sm:block">
@@ -387,22 +393,22 @@ function RaceDetailInner({ race }: { race: RaceData }) {
 
                 <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   <div className="f1-surface-inner p-4 text-center">
-                    <p className="f1-label-xs mb-2">Safety Car Rate</p>
+                    <p className="f1-label-xs mb-2">{t("safetyCarRate")}</p>
                     <div>
                       <span className="f1-data-lg text-[#f59e0b]">{race.history.safety_car_rate}</span>
                       <span className="f1-label ml-1">%</span>
                     </div>
                   </div>
                   <div className="f1-surface-inner p-4 text-center">
-                    <p className="f1-label-xs mb-2">Avg. Overtakes</p>
+                    <p className="f1-label-xs mb-2">{t("overtakes")}</p>
                     <div><span className="f1-data-lg text-white">{race.history.avg_overtakes}</span></div>
                   </div>
                   {race.circuit_info.lap_record !== "N/A" && (
                     <div className="col-span-2 f1-surface-inner p-4 sm:col-span-1">
-                      <p className="f1-label-xs mb-2">Lap Record</p>
+                      <p className="f1-label-xs mb-2">{t("lapRecord")}</p>
                       <p className="f1-data text-sm text-white">{race.circuit_info.lap_record}</p>
-                      <p className="f1-body-sm mt-0.5" style={{ color: "#555" }}>{race.circuit_info.lap_record_holder}</p>
-                      <p className="f1-label mt-0.5" style={{ color: "#333" }}>{race.circuit_info.lap_record_year}</p>
+                      <p className="f1-body-sm mt-0.5" style={{ color: "var(--text-muted)" }}>{race.circuit_info.lap_record_holder}</p>
+                      <p className="f1-label mt-0.5" style={{ color: "var(--text-subtle)" }}>{race.circuit_info.lap_record_year}</p>
                     </div>
                   )}
                 </div>
@@ -412,8 +418,8 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                   const maxWins = Math.max(...race.circuitRecords.map((r) => r.wins));
                   return (
                     <div className="mb-5">
-                      <p className="f1-label mb-3" style={{ color: "#555" }}>
-                        Circuit Kings
+                      <p className="f1-label mb-3" style={{ color: "var(--text-muted)" }}>
+                        {t("circuitKings")}
                       </p>
                       <div className="space-y-1">
                         {race.circuitRecords.map((record) => {
@@ -427,7 +433,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                               <span className="f1-data w-8 shrink-0 text-xs font-bold" style={{ color: record.color }}>{record.code}</span>
                               <span className="f1-body-sm flex-1 font-semibold text-white">
                                 {record.driver}
-                                {isKing && <span className="ml-1.5 f1-label-xs !text-[#f59e0b]">KING</span>}
+                                {isKing && <span className="ml-1.5 f1-label-xs !text-[#f59e0b]">{t("king")}</span>}
                               </span>
                               <div className="flex items-center gap-3">
                                 <div className="text-center">
@@ -452,16 +458,16 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                 })()}
 
                 <div>
-                  <p className="f1-label mb-3" style={{ color: "#555" }}>
-                    Last {race.history.last_winners.length} Winners
+                  <p className="f1-label mb-3" style={{ color: "var(--text-muted)" }}>
+                    {t("lastWinners", { count: race.history.last_winners.length })}
                   </p>
                   <div className="space-y-1.5">
                     {race.history.last_winners.map((w) => (
                       <div key={w.year} className="flex items-center gap-3 f1-surface-inner p-2.5">
-                        <span className="f1-data w-9 shrink-0 text-center text-xs" style={{ color: "#333" }}>{w.year}</span>
+                        <span className="f1-data w-9 shrink-0 text-center text-xs" style={{ color: "var(--text-subtle)" }}>{w.year}</span>
                         <div className="f1-team-bar h-4" style={{ backgroundColor: w.color }} />
                         <span className="f1-body-sm flex-1 font-semibold text-white">{w.driver}</span>
-                        <span className="f1-data text-xs" style={{ color: "#444" }}>{w.team}</span>
+                        <span className="f1-data text-xs" style={{ color: "var(--text-dim)" }}>{w.team}</span>
                         <span className="f1-data w-8 text-right text-xs font-bold" style={{ color: w.color }}>{w.code}</span>
                       </div>
                     ))}
@@ -484,31 +490,31 @@ function RaceDetailInner({ race }: { race: RaceData }) {
 
                 <div className="space-y-px">
                   {[
-                    { label: "Track Length", value: race.circuit_info.length },
-                    { label: "Number of Turns", value: String(race.circuit_info.turns) },
-                    { label: "Layout", value: race.circuit_info.layout },
-                    { label: "Direction", value: race.circuit_info.direction },
-                    { label: "Lap Record", value: race.circuit_info.lap_record },
-                    { label: "Record Holder", value: race.circuit_info.lap_record_holder },
-                    { label: "Record Year", value: String(race.circuit_info.lap_record_year) },
+                    { label: t("trackLength"), value: race.circuit_info.length },
+                    { label: t("numberOfTurns"), value: String(race.circuit_info.turns) },
+                    { label: t("layout"), value: race.circuit_info.layout },
+                    { label: t("direction"), value: race.circuit_info.direction },
+                    { label: t("lapRecord"), value: race.circuit_info.lap_record },
+                    { label: t("recordHolder"), value: race.circuit_info.lap_record_holder },
+                    { label: t("recordYear"), value: String(race.circuit_info.lap_record_year) },
                   ].map((row) => (
                     <div key={row.label} className="flex items-center justify-between f1-surface-inner px-3 py-2.5">
-                      <span className="f1-label" style={{ color: "#555" }}>{row.label}</span>
+                      <span className="f1-label" style={{ color: "var(--text-muted)" }}>{row.label}</span>
                       <span className="f1-data text-sm text-white">{row.value}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-4 rounded border border-[#1c1c1c] bg-[#0a0a0a] p-3">
-                  <p className="f1-label mb-3" style={{ color: "#555" }}>2026 Overtake Mode Zones</p>
+                  <p className="f1-label mb-3" style={{ color: "var(--text-muted)" }}>{t("overtakeModeZones")}</p>
                   <div className="flex items-center gap-4">
                     <div className="text-center">
                       <p className="f1-data-lg text-[#E10600]">{race.circuit_info.overtake_mode_zones}</p>
-                      <p className="f1-label-xs mt-0.5">Zones</p>
+                      <p className="f1-label-xs mt-0.5">{t("zones")}</p>
                     </div>
                     <div className="flex-1 border-l border-[#1c1c1c] pl-4">
-                      <p className="f1-body-sm" style={{ color: "#555" }}>
-                        Active overtake windows replacing legacy DRS system under 2026 regulations.
+                      <p className="f1-body-sm" style={{ color: "var(--text-muted)" }}>
+                        {t("overtakeModeDesc")}
                       </p>
                     </div>
                   </div>
@@ -532,7 +538,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                         <div className="mb-2 flex items-center justify-between">
                           <div>
                             <p className={`f1-label-xs ${isRaceDay ? "!text-[#E10600]" : ""}`}>{day.day}</p>
-                            <p className="f1-label mt-0.5" style={{ color: "#333" }}>{day.date}</p>
+                            <p className="f1-label mt-0.5" style={{ color: "var(--text-subtle)" }}>{day.date}</p>
                           </div>
                           <div className="flex items-center gap-2">
                             <WeatherIcon type={day.icon} />
@@ -541,16 +547,16 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           <div className="f1-surface-inner p-2 text-center">
-                            <p className="f1-label-xs">Hi / Lo</p>
-                            <p className="f1-data mt-1 text-xs text-white">{day.temp_hi}°<span style={{ color: "#444" }}>/{day.temp_lo}°</span></p>
+                            <p className="f1-label-xs">{t("hiLo")}</p>
+                            <p className="f1-data mt-1 text-xs text-white">{day.temp_hi}°<span style={{ color: "var(--text-dim)" }}>/{day.temp_lo}°</span></p>
                           </div>
                           <div className="f1-surface-inner p-2 text-center">
-                            <p className="f1-label-xs">Rain</p>
+                            <p className="f1-label-xs">{t("rain")}</p>
                             <p className={`f1-data mt-1 text-xs ${day.rain >= 60 ? "text-blue-400" : day.rain >= 30 ? "text-blue-500/70" : "text-[#444]"}`}>{day.rain}%</p>
                             <RainBar pct={day.rain} />
                           </div>
                           <div className="f1-surface-inner p-2 text-center">
-                            <p className="f1-label-xs">Wind</p>
+                            <p className="f1-label-xs">{t("wind")}</p>
                             <p className="f1-data mt-1 text-[0.625rem] text-[#555]">{day.wind}</p>
                           </div>
                         </div>
@@ -558,7 +564,7 @@ function RaceDetailInner({ race }: { race: RaceData }) {
                     );
                   })}
                 </div>
-                <p className="f1-label-xs mt-3" style={{ color: "#2a2a2a" }}>Forecast updated 6h before each session</p>
+                <p className="f1-label-xs mt-3" style={{ color: "#2a2a2a" }}>{t("forecastNote")}</p>
               </div>
             )}
 
@@ -566,34 +572,34 @@ function RaceDetailInner({ race }: { race: RaceData }) {
             <div className="f1-surface p-5">
               <div className="mb-4 flex items-center gap-2">
                 <div className="f1-accent-bar" />
-                <span className="f1-heading text-white">Betting Intel</span>
+                <span className="f1-heading text-white">{t("bettingIntel")}</span>
               </div>
               <div className="space-y-2">
                 <a href={race.polymarket.market_url} target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#131313]">
                   <div>
-                    <p className="f1-body-sm font-semibold text-white">Race Winner</p>
-                    <p className="f1-label mt-0.5" style={{ color: "#444" }}>Vol {race.polymarket.volume}</p>
+                    <p className="f1-body-sm font-semibold text-white">{t("raceWinner")}</p>
+                    <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol {race.polymarket.volume}</p>
                   </div>
-                  <span className="f1-label !text-[#E10600]">Bet &rarr;</span>
+                  <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
                 <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#131313]">
                   <div>
-                    <p className="f1-body-sm font-semibold text-white">Safety Car?</p>
-                    <p className="f1-label mt-0.5" style={{ color: "#444" }}>Vol $340K</p>
+                    <p className="f1-body-sm font-semibold text-white">{t("safetyCar")}</p>
+                    <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol $340K</p>
                   </div>
-                  <span className="f1-label !text-[#E10600]">Bet &rarr;</span>
+                  <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
                 <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#131313]">
                   <div>
-                    <p className="f1-body-sm font-semibold text-white">Fastest Lap</p>
-                    <p className="f1-label mt-0.5" style={{ color: "#444" }}>Vol $210K</p>
+                    <p className="f1-body-sm font-semibold text-white">{t("fastestLap")}</p>
+                    <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol $210K</p>
                   </div>
-                  <span className="f1-label !text-[#E10600]">Bet &rarr;</span>
+                  <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
               </div>
               <div className="mt-4 border-t border-[#131313] pt-3">
                 <Link href="/markets" className="f1-transition f1-label block text-center !text-[#E10600] hover:opacity-70">
-                  View all F1 markets &rarr;
+                  {t("viewAllMarkets")} &rarr;
                 </Link>
               </div>
             </div>

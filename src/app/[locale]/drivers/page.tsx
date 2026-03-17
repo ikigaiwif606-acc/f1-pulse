@@ -167,7 +167,7 @@ function DriversPageContent({ drivers }: { drivers: DriverListItem[] }) {
                           </div>
 
                           {/* Stats row */}
-                          <div className="grid grid-cols-4 gap-1">
+                          <div className="grid grid-cols-2 gap-1 sm:grid-cols-4">
                             {[
                               { label: "PTS", value: d.pts, highlight: true },
                               { label: "WIN", value: d.wins },

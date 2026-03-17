@@ -208,7 +208,7 @@
   letter-spacing: 0.1em;
   line-height: 1;
   font-size: 0.625rem; /* 10px */
-  color: #555;
+  color: #777;
 }
 .f1-label-xs {
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -217,7 +217,7 @@
   letter-spacing: 0.15em;
   line-height: 1;
   font-size: 0.5625rem; /* 9px */
-  color: #444;
+  color: #666;
 }
 
 /* Body text */
@@ -313,6 +313,68 @@
 /* Red glow */
 .glow-red {
   box-shadow: 0 0 30px rgba(225, 6, 0, 0.1), 0 0 80px rgba(225, 6, 0, 0.04);
+}
+
+/* ── Card Elevation Hierarchy ────────────────────────── */
+
+/* Primary card — featured content with subtle glow */
+.f1-surface-primary {
+  background: #0f0f0f;
+  border: 1px solid #252525;
+  border-radius: 0.375rem;
+  transition: border-color var(--duration) var(--ease);
+  box-shadow: 0 0 40px rgba(225, 6, 0, 0.03), 0 0 2px rgba(255, 255, 255, 0.02);
+}
+.f1-surface-primary:hover {
+  border-color: #333;
+}
+
+/* Tertiary card — minimal, background-only */
+.f1-surface-tertiary {
+  background: #0c0c0c;
+  border-radius: 0.375rem;
+  transition: background var(--duration) var(--ease);
+}
+.f1-surface-tertiary:hover {
+  background: #111;
+}
+
+/* ── Accessibility — Focus States ────────────────────── */
+*:focus-visible {
+  outline: 2px solid #E10600 !important;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Scroll Animations ───────────────────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s var(--ease) both;
+}
+
+/* Staggered delays for grid children */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+
+/* Hover scale for interactive cards */
+.f1-hover-scale {
+  transition: all var(--duration) var(--ease);
+}
+.f1-hover-scale:hover {
+  transform: scale(1.01);
+  border-color: #2a2a2a !important;
 }
 
 /* Accent bar — small vertical red line used as section markers */

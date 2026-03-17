@@ -47,7 +47,7 @@ function HomePageContent({ data }: { data: HomepageData }) {
       {/* ── Hero ── */}
       <section className="relative overflow-hidden border-b border-[#1c1c1c]">
         <div className="absolute inset-0 bg-grid" />
-        <div className="absolute -top-32 left-1/2 h-64 w-[500px] -translate-x-1/2 rounded-full bg-[#E10600]/6 blur-[100px]" />
+        <div className="absolute -top-32 left-1/2 h-64 w-[500px] -translate-x-1/2 rounded-full bg-[#E10600]/8 blur-[100px] animate-live" style={{ animationDuration: "4s" }} />
 
         <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-8">
           <div className="mb-8 flex items-end justify-between">
@@ -69,7 +69,7 @@ function HomePageContent({ data }: { data: HomepageData }) {
             </div>
           </div>
 
-          <Link href={`/races/${nextRaceSlug}` as "/"} className="f1-surface block p-5 sm:p-6 f1-transition hover:!border-[#2a2a2a]">
+          <Link href={`/races/${nextRaceSlug}` as "/"} className="f1-surface-primary glow-red block p-5 sm:p-6 f1-transition animate-fade-up">
             <div className="mb-4 flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#E10600] animate-live" />
               <span className="f1-label !text-[#E10600]">{t("nextRace")}</span>
@@ -83,7 +83,7 @@ function HomePageContent({ data }: { data: HomepageData }) {
       <section className="mx-auto max-w-7xl px-5 py-8">
         <div className="grid gap-4 lg:grid-cols-3">
           {/* Odds — 2 cols */}
-          <div className="f1-surface p-5 lg:col-span-2">
+          <div className="f1-surface p-5 lg:col-span-2 animate-fade-up stagger-1">
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="f1-accent-bar" />

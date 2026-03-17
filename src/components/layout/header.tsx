@@ -1,19 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/lib/i18n/navigation";
 import { useLocale } from "next-intl";
 
-const navItems = [
+const primaryNav = [
   { key: "races", href: "/races" },
   { key: "drivers", href: "/drivers" },
   { key: "teams", href: "/teams" },
   { key: "markets", href: "/markets" },
-  { key: "sponsorships", href: "/sponsorships" },
-  { key: "stocks", href: "/stocks" },
   { key: "analytics", href: "/analytics" },
 ] as const;
+
+const moreNav = [
+  { key: "sponsorships", href: "/sponsorships" },
+  { key: "stocks", href: "/stocks" },
+] as const;
+
+const allNav = [...primaryNav, ...moreNav];
 
 export function Header() {
   const t = useTranslations("nav");
@@ -21,6 +26,8 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   function switchLocale() {
     const next = locale === "en" ? "zh" : "en";
@@ -29,6 +36,19 @@ export function Header() {
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + "/");
+
+  const isMoreActive = moreNav.some((item) => isActive(item.href));
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-[#080808]/95 backdrop-blur-xl">
@@ -45,12 +65,12 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-0.5 md:flex">
-          {navItems.map((item) => (
+          {primaryNav.map((item) => (
             <Link
               key={item.key}
               href={item.href}
               className={`f1-transition relative px-3 py-1.5 f1-label ${
-                isActive(item.href) ? "!text-white" : "!text-[#555] hover:!text-white"
+                isActive(item.href) ? "!text-white" : "!text-[#666] hover:!text-white"
               }`}
               style={{ fontSize: "0.6875rem" }}
             >
@@ -60,6 +80,43 @@ export function Header() {
               )}
             </Link>
           ))}
+
+          {/* More dropdown */}
+          <div ref={moreRef} className="relative">
+            <button
+              onClick={() => setMoreOpen(!moreOpen)}
+              className={`f1-transition relative flex items-center gap-1 px-3 py-1.5 f1-label ${
+                isMoreActive ? "!text-white" : "!text-[#666] hover:!text-white"
+              }`}
+              style={{ fontSize: "0.6875rem" }}
+            >
+              {t("more")}
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" className={`f1-transition ${moreOpen ? "rotate-180" : ""}`}>
+                <path d="M2 3L4 5L6 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              </svg>
+              {isMoreActive && (
+                <span className="absolute bottom-0 left-1/2 h-px w-4 -translate-x-1/2 bg-[#E10600]" />
+              )}
+            </button>
+
+            {moreOpen && (
+              <div className="absolute right-0 top-full mt-1 w-40 rounded border border-[#1c1c1c] bg-[#0f0f0f] py-1 shadow-xl shadow-black/50 animate-fade-up" style={{ animationDuration: "0.2s" }}>
+                {moreNav.map((item) => (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    onClick={() => setMoreOpen(false)}
+                    className={`f1-transition block px-3 py-2 f1-label ${
+                      isActive(item.href) ? "!text-[#E10600] bg-[#E10600]/5" : "!text-[#888] hover:!text-white hover:bg-[#161616]"
+                    }`}
+                    style={{ fontSize: "0.6875rem" }}
+                  >
+                    {t(item.key)}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -73,7 +130,7 @@ export function Header() {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="f1-transition flex h-8 w-8 items-center justify-center rounded hover:bg-[#161616] md:hidden"
+            className="f1-transition flex h-10 w-10 items-center justify-center rounded hover:bg-[#161616] md:hidden"
             aria-label="Toggle menu"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -88,17 +145,17 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <nav className="border-t border-[#1c1c1c] bg-[#080808] px-5 py-3 md:hidden">
+        <nav className="border-t border-[#1c1c1c] bg-[#080808] px-5 py-3 md:hidden animate-fade-up" style={{ animationDuration: "0.25s" }}>
           <div className="flex flex-col gap-0.5">
-            {navItems.map((item) => (
+            {allNav.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`f1-transition rounded px-3 py-2.5 f1-label ${
+                className={`f1-transition rounded px-3 py-3 f1-label ${
                   isActive(item.href)
                     ? "bg-[#E10600]/10 !text-[#E10600]"
-                    : "!text-[#555] hover:!text-white"
+                    : "!text-[#666] hover:!text-white"
                 }`}
                 style={{ fontSize: "0.6875rem" }}
               >

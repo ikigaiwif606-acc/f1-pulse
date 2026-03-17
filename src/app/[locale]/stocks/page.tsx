@@ -193,7 +193,7 @@ function StockCard({ stock }: { stock: F1Stock }) {
   const suffix = stock.currency === "GBp" ? "p" : "";
 
   return (
-    <div className="f1-surface p-4 f1-transition hover:!border-[#2a2a2a]">
+    <div className="f1-surface p-4 f1-hover-scale">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div>

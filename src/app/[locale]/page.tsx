@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { RaceCountdown } from "@/components/races/race-countdown";
 import { OddsSummary } from "@/components/markets/odds-summary";
+import { OnThisDay } from "@/components/shared/on-this-day";
 import { Link } from "@/lib/i18n/navigation";
 import { getHomepageData } from "@/lib/data/home";
 import type { HomepageData } from "@/types";
@@ -225,6 +226,11 @@ function HomePageContent({ data }: { data: HomepageData }) {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* ── Third row: On This Day ── */}
+        <div className="mt-4">
+          <OnThisDay />
         </div>
       </section>
     </div>

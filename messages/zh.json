@@ -29,7 +29,8 @@
     "recentResults": "最新赛果",
     "topMovers": "赔率变动",
     "latestDeals": "最新赞助",
-    "championshipStandings": "积分榜"
+    "championshipStandings": "积分榜",
+    "onThisDay": "历史上的今天"
   },
   "race": {
     "circuit": "赛道",
@@ -105,7 +106,11 @@
     "marketOdds": "市场赔率",
     "actualPtsShare": "实际积分占比",
     "valueBet": "价值投注",
-    "overvalued": "高估"
+    "overvalued": "高估",
+    "lapComparison": "单圈时间对比",
+    "lapComparisonDesc": "选择两位车手对比逐圈速度",
+    "avgLapTime": "平均圈速",
+    "fastestLap": "最快圈速"
   },
   "stocks": {
     "title": "F1 股票追踪",

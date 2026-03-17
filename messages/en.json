@@ -29,7 +29,8 @@
     "recentResults": "Recent Results",
     "topMovers": "Top Movers",
     "latestDeals": "Latest Deals",
-    "championshipStandings": "Championship Standings"
+    "championshipStandings": "Championship Standings",
+    "onThisDay": "On This Day"
   },
   "race": {
     "circuit": "Circuit",
@@ -105,7 +106,11 @@
     "marketOdds": "MARKET ODDS",
     "actualPtsShare": "ACTUAL PTS %",
     "valueBet": "Value Bet",
-    "overvalued": "Overvalued"
+    "overvalued": "Overvalued",
+    "lapComparison": "Lap Time Comparison",
+    "lapComparisonDesc": "Select two drivers to compare lap-by-lap pace",
+    "avgLapTime": "Avg Lap Time",
+    "fastestLap": "Fastest Lap"
   },
   "stocks": {
     "title": "F1 Stock Tracker",

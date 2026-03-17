@@ -147,7 +147,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 28,
     nextRaceWinChange: +2.1,
     volume: "$18.2M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   antonelli: {
     championshipPct: 15,
@@ -155,7 +155,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 18,
     nextRaceWinChange: +1.4,
     volume: "$6.4M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   leclerc: {
     championshipPct: 10,
@@ -163,7 +163,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 14,
     nextRaceWinChange: -0.5,
     volume: "$9.1M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   hamilton: {
     championshipPct: 5,
@@ -171,7 +171,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 8,
     nextRaceWinChange: -1.1,
     volume: "$12.3M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   norris: {
     championshipPct: 4,
@@ -179,7 +179,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 10,
     nextRaceWinChange: -0.8,
     volume: "$7.8M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   verstappen: {
     championshipPct: 3,
@@ -187,7 +187,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 6,
     nextRaceWinChange: -2.3,
     volume: "$14.5M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   bearman: {
     championshipPct: 2,
@@ -195,7 +195,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 4,
     nextRaceWinChange: +0.9,
     volume: "$2.1M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   gasly: {
     championshipPct: 1,
@@ -203,7 +203,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 3,
     nextRaceWinChange: +0.3,
     volume: "$1.8M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   lawson: {
     championshipPct: 1,
@@ -211,7 +211,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 2,
     nextRaceWinChange: +0.2,
     volume: "$1.2M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   piastri: {
     championshipPct: 2,
@@ -219,7 +219,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 5,
     nextRaceWinChange: -0.6,
     volume: "$4.3M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   hadjar: {
     championshipPct: 1,
@@ -227,7 +227,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 2,
     nextRaceWinChange: +0.1,
     volume: "$1.0M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   lindblad: {
     championshipPct: 0.5,
@@ -235,7 +235,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 1,
     nextRaceWinChange: +0.1,
     volume: "$0.8M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   sainz: {
     championshipPct: 0.5,
@@ -243,7 +243,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 1,
     nextRaceWinChange: -0.1,
     volume: "$2.5M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   albon: {
     championshipPct: 0.3,
@@ -251,7 +251,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.5,
     nextRaceWinChange: -0.1,
     volume: "$1.5M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   bortoleto: {
     championshipPct: 0.3,
@@ -259,7 +259,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.5,
     nextRaceWinChange: 0,
     volume: "$0.6M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   hulkenberg: {
     championshipPct: 0.2,
@@ -267,7 +267,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.5,
     nextRaceWinChange: 0,
     volume: "$0.9M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   colapinto: {
     championshipPct: 0.2,
@@ -275,7 +275,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.5,
     nextRaceWinChange: +0.1,
     volume: "$0.7M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   ocon: {
     championshipPct: 0.2,
@@ -283,7 +283,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.5,
     nextRaceWinChange: 0,
     volume: "$0.8M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   alonso: {
     championshipPct: 0.1,
@@ -291,7 +291,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.5,
     nextRaceWinChange: -0.2,
     volume: "$3.2M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   stroll: {
     championshipPct: 0.1,
@@ -299,7 +299,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.3,
     nextRaceWinChange: 0,
     volume: "$0.5M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   bottas: {
     championshipPct: 0.1,
@@ -307,7 +307,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.3,
     nextRaceWinChange: 0,
     volume: "$0.4M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
   perez: {
     championshipPct: 0.1,
@@ -315,7 +315,7 @@ const STATIC_DRIVER_POLYMARKET: Record<string, PolymarketEntry> = {
     nextRaceWinPct: 0.3,
     nextRaceWinChange: -0.1,
     volume: "$2.8M",
-    url: "https://polymarket.com/event/f1-2026-wdc",
+    url: "https://polymarket.com/event/2026-f1-drivers-champion",
   },
 };
 

@@ -590,14 +590,14 @@ function RaceDetailInner({ race, prevRace, nextRace }: { race: RaceData; prevRac
                   </div>
                   <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
-                <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
+                <a href="https://polymarket.com/sports/f1/props" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
                   <div>
                     <p className="f1-body-sm font-semibold text-white">{t("safetyCar")}</p>
                     <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol $340K</p>
                   </div>
                   <span className="f1-label !text-[#E10600]">{t("bet")} &rarr;</span>
                 </a>
-                <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
+                <a href="https://polymarket.com/sports/f1/props" target="_blank" rel="noopener noreferrer" className="f1-transition f1-hover flex items-center justify-between f1-surface-inner p-3 hover:bg-[#0d0d0d]">
                   <div>
                     <p className="f1-body-sm font-semibold text-white">{t("fastestLap")}</p>
                     <p className="f1-label mt-0.5" style={{ color: "var(--text-dim)" }}>Vol $210K</p>

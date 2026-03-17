@@ -84,7 +84,7 @@ type StaticEnrichment = {
 const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   "australian-gp": {
     circuit_info: { length: "5.278 km", turns: 16, lap_record: "1:20.235", lap_record_holder: "Charles Leclerc", lap_record_year: 2022, drs_zones: 4, overtake_mode_zones: 4, layout: "Street/Park", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Australian Grand Prix?", volume: "$1.8M", market_url: "https://polymarket.com/event/f1-australian-gp-2026", updated: "Race completed", outcomes: [
+    polymarket: { question: "Who will win the 2026 Australian Grand Prix?", volume: "$1.8M", market_url: "https://polymarket.com/sports/f1", updated: "Race completed", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.38, color: "#27F4D2", change: +0.10 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.24, color: "#27F4D2", change: +0.06 },
       { name: "Charles Leclerc", code: "LEC", team: "Ferrari", price: 0.16, color: "#E80020", change: -0.04 },
@@ -113,7 +113,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "chinese-gp": {
     circuit_info: { length: "5.451 km", turns: 16, lap_record: "1:32.238", lap_record_holder: "Michael Schumacher", lap_record_year: 2004, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Chinese Grand Prix?", volume: "$2.1M", market_url: "https://polymarket.com/event/f1-chinese-gp-2026", updated: "Race completed", outcomes: [
+    polymarket: { question: "Who will win the 2026 Chinese Grand Prix?", volume: "$2.1M", market_url: "https://polymarket.com/sports/f1", updated: "Race completed", outcomes: [
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.32, color: "#27F4D2", change: +0.08 },
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.25, color: "#27F4D2", change: -0.03 },
       { name: "Charles Leclerc", code: "LEC", team: "Ferrari", price: 0.18, color: "#E80020", change: +0.02 },
@@ -142,7 +142,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "japanese-gp": {
     circuit_info: { length: "5.807 km", turns: 18, lap_record: "1:30.983", lap_record_holder: "Lewis Hamilton", lap_record_year: 2019, drs_zones: 2, overtake_mode_zones: 3, layout: "Figure-8", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Japanese Grand Prix?", volume: "$2.4M", market_url: "https://polymarket.com/event/f1-japanese-gp-2026", updated: "5 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Japanese Grand Prix?", volume: "$2.4M", market_url: "https://polymarket.com/event/f1-japanese-grand-prix-winner-2026-03-29", updated: "5 min ago", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.28, color: "#27F4D2", change: +0.03 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.05 },
       { name: "Charles Leclerc", code: "LEC", team: "Ferrari", price: 0.15, color: "#E80020", change: -0.02 },
@@ -166,7 +166,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "bahrain-gp": {
     circuit_info: { length: "5.412 km", turns: 15, lap_record: "1:31.447", lap_record_holder: "Pedro de la Rosa", lap_record_year: 2005, drs_zones: 3, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Bahrain Grand Prix?", volume: "$1.9M", market_url: "https://polymarket.com/event/f1-bahrain-gp-2026", updated: "10 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Bahrain Grand Prix?", volume: "$1.9M", market_url: "https://polymarket.com/sports/f1/props", updated: "10 min ago", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.26, color: "#27F4D2", change: +0.03 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.02 },
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.18, color: "#3671C6", change: +0.01 },
@@ -190,7 +190,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "saudi-arabian-gp": {
     circuit_info: { length: "6.174 km", turns: 27, lap_record: "1:30.734", lap_record_holder: "Lewis Hamilton", lap_record_year: 2021, drs_zones: 3, overtake_mode_zones: 3, layout: "Street", direction: "Anti-clockwise" },
-    polymarket: { question: "Who will win the 2026 Saudi Arabian Grand Prix?", volume: "$1.7M", market_url: "https://polymarket.com/event/f1-saudi-arabian-gp-2026", updated: "8 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Saudi Arabian Grand Prix?", volume: "$1.7M", market_url: "https://polymarket.com/sports/f1/props", updated: "8 min ago", outcomes: [
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.24, color: "#3671C6", change: +0.03 },
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.01 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.18, color: "#27F4D2", change: +0.02 },
@@ -213,7 +213,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "miami-gp": {
     circuit_info: { length: "5.412 km", turns: 19, lap_record: "1:29.708", lap_record_holder: "Max Verstappen", lap_record_year: 2023, drs_zones: 3, overtake_mode_zones: 4, layout: "Street/Temporary", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Miami Grand Prix?", volume: "$2.0M", market_url: "https://polymarket.com/event/f1-miami-gp-2026", updated: "8 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Miami Grand Prix?", volume: "$2.0M", market_url: "https://polymarket.com/sports/f1/props", updated: "8 min ago", outcomes: [
       { name: "Lando Norris", code: "NOR", team: "McLaren", price: 0.26, color: "#FF8000", change: +0.04 },
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.02 },
       { name: "Oscar Piastri", code: "PIA", team: "McLaren", price: 0.18, color: "#FF8000", change: +0.03 },
@@ -236,7 +236,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "canadian-gp": {
     circuit_info: { length: "4.361 km", turns: 14, lap_record: "1:13.078", lap_record_holder: "Valtteri Bottas", lap_record_year: 2019, drs_zones: 2, overtake_mode_zones: 3, layout: "Semi-Street", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Canadian Grand Prix?", volume: "$1.6M", market_url: "https://polymarket.com/event/f1-canadian-gp-2026", updated: "20 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Canadian Grand Prix?", volume: "$1.6M", market_url: "https://polymarket.com/sports/f1/props", updated: "20 min ago", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.24, color: "#27F4D2", change: +0.02 },
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.21, color: "#3671C6", change: +0.03 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.19, color: "#27F4D2", change: +0.01 },
@@ -255,7 +255,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "monaco-gp": {
     circuit_info: { length: "3.337 km", turns: 19, lap_record: "1:12.909", lap_record_holder: "Rubens Barrichello", lap_record_year: 2004, drs_zones: 1, overtake_mode_zones: 1, layout: "Street", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Monaco Grand Prix?", volume: "$3.2M", market_url: "https://polymarket.com/event/f1-monaco-gp-2026", updated: "3 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Monaco Grand Prix?", volume: "$3.2M", market_url: "https://polymarket.com/sports/f1/props", updated: "3 min ago", outcomes: [
       { name: "Charles Leclerc", code: "LEC", team: "Ferrari", price: 0.30, color: "#E80020", change: +0.05 },
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.02 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.16, color: "#27F4D2", change: +0.01 },
@@ -274,7 +274,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "spanish-gp": {
     circuit_info: { length: "4.657 km", turns: 14, lap_record: "1:16.330", lap_record_holder: "Max Verstappen", lap_record_year: 2023, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Spanish Grand Prix?", volume: "$1.7M", market_url: "https://polymarket.com/event/f1-spanish-gp-2026", updated: "15 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Spanish Grand Prix?", volume: "$1.7M", market_url: "https://polymarket.com/sports/f1/props", updated: "15 min ago", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.26, color: "#27F4D2", change: +0.01 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.03 },
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.18, color: "#3671C6", change: +0.02 },
@@ -293,7 +293,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "austrian-gp": {
     circuit_info: { length: "4.318 km", turns: 10, lap_record: "1:05.619", lap_record_holder: "Carlos Sainz", lap_record_year: 2020, drs_zones: 3, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Austrian Grand Prix?", volume: "$1.4M", market_url: "https://polymarket.com/event/f1-austrian-gp-2026", updated: "18 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Austrian Grand Prix?", volume: "$1.4M", market_url: "https://polymarket.com/sports/f1/props", updated: "18 min ago", outcomes: [
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.28, color: "#3671C6", change: +0.05 },
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.22, color: "#27F4D2", change: +0.01 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.18, color: "#27F4D2", change: +0.02 },
@@ -312,7 +312,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "british-gp": {
     circuit_info: { length: "5.891 km", turns: 18, lap_record: "1:27.097", lap_record_holder: "Max Verstappen", lap_record_year: 2020, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 British Grand Prix?", volume: "$2.8M", market_url: "https://polymarket.com/event/f1-british-gp-2026", updated: "7 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 British Grand Prix?", volume: "$2.8M", market_url: "https://polymarket.com/sports/f1/props", updated: "7 min ago", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.30, color: "#27F4D2", change: +0.06 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.21, color: "#27F4D2", change: +0.02 },
       { name: "Lando Norris", code: "NOR", team: "McLaren", price: 0.19, color: "#FF8000", change: +0.04 },
@@ -331,7 +331,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "belgian-gp": {
     circuit_info: { length: "7.004 km", turns: 19, lap_record: "1:46.286", lap_record_holder: "Valtteri Bottas", lap_record_year: 2018, drs_zones: 2, overtake_mode_zones: 3, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Belgian Grand Prix?", volume: "$1.9M", market_url: "https://polymarket.com/event/f1-belgian-gp-2026", updated: "11 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Belgian Grand Prix?", volume: "$1.9M", market_url: "https://polymarket.com/sports/f1/props", updated: "11 min ago", outcomes: [
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.26, color: "#3671C6", change: +0.03 },
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.23, color: "#27F4D2", change: +0.02 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.17, color: "#27F4D2", change: +0.01 },
@@ -350,7 +350,7 @@ const STATIC_RACE_DATA: Record<string, StaticEnrichment> = {
   },
   "hungarian-gp": {
     circuit_info: { length: "4.381 km", turns: 14, lap_record: "1:16.627", lap_record_holder: "Lewis Hamilton", lap_record_year: 2020, drs_zones: 2, overtake_mode_zones: 2, layout: "Permanent", direction: "Clockwise" },
-    polymarket: { question: "Who will win the 2026 Hungarian Grand Prix?", volume: "$1.3M", market_url: "https://polymarket.com/event/f1-hungarian-gp-2026", updated: "25 min ago", outcomes: [
+    polymarket: { question: "Who will win the 2026 Hungarian Grand Prix?", volume: "$1.3M", market_url: "https://polymarket.com/sports/f1/props", updated: "25 min ago", outcomes: [
       { name: "George Russell", code: "RUS", team: "Mercedes", price: 0.25, color: "#27F4D2", change: +0.02 },
       { name: "Kimi Antonelli", code: "ANT", team: "Mercedes", price: 0.21, color: "#27F4D2", change: +0.03 },
       { name: "Max Verstappen", code: "VER", team: "Red Bull", price: 0.18, color: "#3671C6", change: +0.02 },
@@ -624,7 +624,7 @@ export async function getRaceDetailData(slug: string): Promise<RaceData | null> 
       },
       polymarket: staticData?.polymarket ?? {
         question: `Who will win the 2026 ${raceItem.name}?`,
-        volume: "N/A", market_url: "", updated: "N/A", outcomes: [],
+        volume: "N/A", market_url: "https://polymarket.com/sports/f1/props", updated: "N/A", outcomes: [],
       },
       history: {
         safety_car_rate: staticData?.safety_car_rate ?? 0,

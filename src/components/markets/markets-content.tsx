@@ -104,7 +104,7 @@ export function MarketsContent() {
                       {t("lastUpdated")}: {isLoading ? t("refreshing") : t("justNow")}
                     </span>
                     <a
-                      href="https://polymarket.com"
+                      href="https://polymarket.com/sports/f1/props"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="f1-transition f1-label !text-[#E10600] hover:opacity-70"

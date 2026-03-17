@@ -103,7 +103,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.65,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Mercedes-AMG F1 M17 E Performance",
@@ -126,7 +126,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.16,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Ferrari 066/10",
@@ -149,7 +149,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.08,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Mercedes-AMG F1 M17 E Performance",
@@ -172,7 +172,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.04,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Red Bull Powertrains RBPTH1",
@@ -195,7 +195,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.01,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Ferrari 066/10",
@@ -218,7 +218,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.01,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Red Bull Powertrains RBPTH1",
@@ -241,7 +241,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.01,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Mercedes-AMG F1 M17 E Performance",
@@ -264,7 +264,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.01,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Audi PU",
@@ -287,7 +287,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.01,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Mercedes-AMG F1 M17 E Performance",
@@ -310,7 +310,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.01,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Cadillac V6 Hybrid",
@@ -333,7 +333,7 @@ const STATIC_TEAM_DATA: Record<string, StaticTeamInfo> = {
       probability: 0.02,
       volume: "$12.1M",
       question: "Who will win the 2026 Constructors' Championship?",
-      url: "https://polymarket.com",
+      url: "https://polymarket.com/event/f1-constructors-champion",
     },
     technical: {
       powerUnit: "Honda RBPTH2",
@@ -685,7 +685,7 @@ export async function getTeamDetailData(id: string): Promise<TeamData | null> {
         probability: 0,
         volume: "$0",
         question: "Who will win the 2026 Constructors' Championship?",
-        url: "https://polymarket.com",
+        url: "https://polymarket.com/event/f1-constructors-champion",
       },
       drivers: [driverArray[0], driverArray[1]],
       raceResults: correctedRaceResults,

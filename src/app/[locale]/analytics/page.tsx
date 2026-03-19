@@ -332,17 +332,39 @@ function AnalyticsPageContent({
   return (
     <div className="min-h-screen bg-[#080808]">
       <div className="mx-auto max-w-7xl px-5 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-1">
-            <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
-            <span className="f1-freshness-badge">
+        {/* ── Compact Header + Race Context Bar ─────────────────────── */}
+        <div className="mb-2">
+          {/* Row 1: Title + freshness */}
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
+              <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
+            </div>
+            <span className="f1-freshness-badge mb-1">
               <span className="pulse-dot" />
               Updated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
             </span>
           </div>
-          <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
-          <div className="flex items-center gap-2 mt-2">
+
+          {/* Row 2: Race context bar — compact, ambient */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded border border-[#1c1c1c] bg-[#0c0c0c] px-4 py-2.5">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{NEXT_RACE.country}</span>
+              <span className="f1-heading text-white">{NEXT_RACE.name}</span>
+              <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+                R{NEXT_RACE.round}
+              </span>
+            </div>
+            <span className="hidden sm:block text-[#1c1c1c]">|</span>
+            <span className="f1-label">{NEXT_RACE.circuit}</span>
+            <span className="hidden sm:block text-[#1c1c1c]">|</span>
+            <div className="flex items-center gap-3">
+              <span className="f1-data text-xs text-white">{NEXT_RACE.laps} <span className="f1-label-xs">Laps</span></span>
+              <span className="f1-data text-xs text-white">{NEXT_RACE.length}</span>
+              <span className="f1-data text-xs text-[#f59e0b]">{NEXT_RACE.scRate}% <span className="f1-label-xs">SC</span></span>
+              <span className="f1-data text-xs text-[#22c55e]">{NEXT_RACE.poleConversion}% <span className="f1-label-xs">Pole</span></span>
+            </div>
+            <span className="hidden sm:block text-[#1c1c1c]">|</span>
             <span className="f1-freshness-badge">
               {t("dataFromRounds", { count: roundsCompleted })} &middot; {t("season2026")}
             </span>
@@ -421,52 +443,148 @@ function NextRaceBriefingTab({
   suzukaSC: (typeof SAFETY_CAR)[0] | undefined;
 }) {
   return (
-    <div className="space-y-8">
-      {/* ── Race Header ──────────────────────────────────────────────── */}
-      <div className="f1-surface p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl">{NEXT_RACE.country}</span>
-              <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
-                R{NEXT_RACE.round}
-              </span>
-            </div>
-            <h2 className="f1-heading text-white text-lg">{NEXT_RACE.name}</h2>
-            <p className="f1-label mt-0.5">{NEXT_RACE.circuit}</p>
+    <div className="space-y-6">
+      {/* ═══ ROW 1: Value Detector + Circuit Intel (2-column data-first) ═══ */}
+      <div className="grid gap-4 lg:grid-cols-5">
+        {/* ── Value Detector (3/5 width) ─────────────────────────────── */}
+        <div className="lg:col-span-3 f1-surface p-5">
+          <div className="mb-1 flex items-center gap-2">
+            <div className="f1-accent-bar" />
+            <span className="f1-heading text-white">{t("nextRace.valueDetector")}</span>
+            <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Where market odds diverge from performance data">&#9432;</span>
           </div>
-          {/* 2x2 grid on mobile, row on desktop */}
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
-            <div className="text-center">
-              <p className="f1-data-lg text-white">{NEXT_RACE.laps}</p>
-              <p className="f1-label-xs">Laps</p>
+          <p className="f1-label mb-4">{t("nextRace.whereDataDisagrees")}</p>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {sortedBettingEdge.slice(0, 3).map((d) => {
+              const isValue = d.gap > 0;
+              const signal = Math.abs(d.gap) > 10 ? (isValue ? t("nextRace.potentialValue") : t("nextRace.overvalued")) : t("nextRace.fair");
+              const signalColor = Math.abs(d.gap) > 10 ? (isValue ? "#22c55e" : "#ef4444") : "var(--text-dim)";
+              const arrow = isValue ? "\u25B2" : d.gap < 0 ? "\u25BC" : "\u2014";
+              return (
+                <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
+                  <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3.5 transition-colors hover:border-[#333] h-full flex flex-col">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
+                      <span className="f1-body-sm font-semibold text-white">{d.name}</span>
+                      <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
+                    </div>
+                    {/* Hero edge number */}
+                    <div className="text-center mb-3 flex-1 flex flex-col justify-center">
+                      <span className="f1-data text-2xl font-bold" style={{ color: isValue ? "#22c55e" : "#ef4444" }}>
+                        {arrow} {isValue ? "+" : ""}{d.gap.toFixed(1)}%
+                      </span>
+                      <p className="f1-label-xs mt-1">{t("nextRace.edge")}</p>
+                    </div>
+                    {/* Signal badge */}
+                    <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-2.5">
+                      <span className="f1-label-xs">{t("nextRace.supportingData")}</span>
+                      <span className="f1-label-xs rounded px-2 py-1" style={{ backgroundColor: `${signalColor}15`, color: signalColor }}>
+                        {signal}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Circuit Intelligence (2/5 width) ───────────────────────── */}
+        <div className="lg:col-span-2 f1-surface p-5">
+          <div className="mb-1 flex items-center gap-2">
+            <div className="f1-accent-bar" />
+            <span className="f1-heading text-white">{t("nextRace.circuitIntel")}</span>
+          </div>
+          <p className="f1-label mb-4">{NEXT_RACE.circuit}</p>
+
+          {/* Gauges row */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Safety car rate */}
+            <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3 flex flex-col items-center">
+              <p className="f1-label-xs mb-2 self-start">{t("nextRace.safetyCarRate")}</p>
+              <div className="f1-radial-gauge">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#161616" strokeWidth="6" />
+                  <circle
+                    cx="40" cy="40" r="34" fill="none" stroke="#f59e0b" strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray={`${((suzukaSC?.rate ?? NEXT_RACE.scRate) / 100) * 213.6} 213.6`}
+                  />
+                </svg>
+                <div className="gauge-value">
+                  <span className="f1-data text-lg font-bold text-[#f59e0b]">{suzukaSC?.rate ?? NEXT_RACE.scRate}%</span>
+                </div>
+              </div>
+              <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
+                #{SAFETY_CAR.findIndex(c => c.circuit === "Suzuka") + 1}/{SAFETY_CAR.length}
+              </p>
             </div>
-            <div className="text-center">
-              <p className="f1-data-lg text-white">{NEXT_RACE.length}</p>
-              <p className="f1-label-xs">Length</p>
+
+            {/* Pole conversion */}
+            <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3 flex flex-col items-center">
+              <p className="f1-label-xs mb-2 self-start">{t("nextRace.poleConversion")}</p>
+              <div className="f1-radial-gauge">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#161616" strokeWidth="6" />
+                  <circle
+                    cx="40" cy="40" r="34" fill="none" stroke="#22c55e" strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray={`${(NEXT_RACE.poleConversion / 100) * 213.6} 213.6`}
+                  />
+                </svg>
+                <div className="gauge-value">
+                  <span className="f1-data text-lg font-bold text-[#22c55e]">{NEXT_RACE.poleConversion}%</span>
+                </div>
+              </div>
+              <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
+                High conv.
+              </p>
             </div>
-            <div className="text-center">
-              <p className="f1-data-lg text-[#f59e0b]">{NEXT_RACE.scRate}%</p>
-              <p className="f1-label-xs">SC Rate</p>
-            </div>
-            <div className="text-center">
-              <p className="f1-data-lg text-[#22c55e]">{NEXT_RACE.poleConversion}%</p>
-              <p className="f1-label-xs">Pole Conv.</p>
+          </div>
+
+          {/* Grid impact */}
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3">
+            <p className="f1-label-xs mb-2">{t("nextRace.gridImpact")}</p>
+            <div className="space-y-2">
+              {GRID_VS_FINISH.slice(0, 5).map(d => {
+                const arrow = d.delta > 0 ? "\u25B2" : d.delta < 0 ? "\u25BC" : "\u2014";
+                return (
+                  <div key={d.code} className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="f1-team-bar h-4" style={{ backgroundColor: d.color }} />
+                      <span className="f1-label-xs">{d.code}</span>
+                    </div>
+                    <span className="f1-data text-xs font-semibold" style={{ color: d.delta > 0 ? "#22c55e" : d.delta < 0 ? "#ef4444" : "var(--text-dim)" }}>
+                      {arrow} {d.delta > 0 ? "+" : ""}{d.delta.toFixed(1)} pos
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Market Overview ──────────────────────────────────────────── */}
-      <div>
-        <div className="mb-3 flex items-center gap-2">
-          <div className="f1-accent-bar" />
-          <span className="f1-heading text-white">{t("nextRace.marketOverview")}</span>
-          <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
-            Polymarket
-          </span>
-        </div>
-        {raceMarkets.length > 0 ? (
+      {/* ═══ ROW 2: Odds Movement (full width) ═══════════════════════ */}
+      {wdcDrivers.length > 0 && (
+        <OddsMovementChart
+          drivers={wdcDrivers}
+          title={t("nextRace.oddsMovement")}
+          subtitle="WDC odds movement heading into the race weekend"
+        />
+      )}
+
+      {/* ═══ ROW 3: Market Overview (collapsed when empty) ═══════════ */}
+      {raceMarkets.length > 0 ? (
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <div className="f1-accent-bar" />
+            <span className="f1-heading text-white">{t("nextRace.marketOverview")}</span>
+            <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
+              Polymarket
+            </span>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {raceMarkets.map((market) => {
               const outcomes = parseMarketOutcomes(market);
@@ -485,157 +603,25 @@ function NextRaceBriefingTab({
               );
             })}
           </div>
-        ) : (
-          <div className="f1-surface p-10 text-center">
-            {/* Empty state icon */}
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="mx-auto mb-4 opacity-30">
-              <rect x="4" y="20" width="8" height="24" rx="2" fill="#E10600" />
-              <rect x="16" y="12" width="8" height="32" rx="2" fill="#E10600" />
-              <rect x="28" y="16" width="8" height="28" rx="2" fill="#E10600" />
-              <rect x="40" y="8" width="4" height="36" rx="2" fill="#E10600" />
-              <path d="M4 4L44 4" stroke="#333" strokeWidth="1" strokeDasharray="4 4" />
-            </svg>
-            <p className="f1-heading text-white mb-2">No Active Markets</p>
-            <p className="f1-label mb-4">{t("nextRace.noMarketsFound")}</p>
-            <p className="f1-label-xs" style={{ color: "var(--text-dim)" }}>
-              Markets typically open 5-7 days before race weekend
-            </p>
-            <Link
-              href="/markets"
-              className="inline-block mt-4 f1-label-xs rounded-full border border-[#E10600]/30 bg-[#E10600]/10 px-4 py-2 !text-[#E10600] hover:bg-[#E10600]/20 f1-transition"
-            >
-              View All Markets &rarr;
-            </Link>
+        </div>
+      ) : (
+        /* Collapsed inline empty state — no longer wastes a full card */
+        <div className="flex items-center justify-between rounded border border-[#1c1c1c] bg-[#0c0c0c] px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="f1-accent-bar" />
+            <span className="f1-heading text-white">{t("nextRace.marketOverview")}</span>
+            <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">Polymarket</span>
+            <span className="f1-label">{t("nextRace.noMarketsFound")}</span>
+            <span className="f1-label-xs" style={{ color: "var(--text-dim)" }}>&middot; Opens ~5 days before race</span>
           </div>
-        )}
-      </div>
-
-      {/* ── Odds Movement ────────────────────────────────────────────── */}
-      {wdcDrivers.length > 0 && (
-        <OddsMovementChart
-          drivers={wdcDrivers}
-          title={t("nextRace.oddsMovement")}
-          subtitle="WDC odds movement heading into the race weekend"
-        />
+          <Link
+            href="/markets"
+            className="shrink-0 f1-label-xs !text-[#E10600] hover:opacity-70 f1-transition"
+          >
+            All Markets &rarr;
+          </Link>
+        </div>
       )}
-
-      {/* ── Value Detector ───────────────────────────────────────────── */}
-      <div className="f1-surface p-5">
-        <div className="mb-1 flex items-center gap-2">
-          <div className="f1-accent-bar" />
-          <span className="f1-heading text-white">{t("nextRace.valueDetector")}</span>
-          <span className="cursor-help f1-label-xs !text-[var(--text-muted)]" title="Where market odds diverge from performance data">&#9432;</span>
-        </div>
-        <p className="f1-label mb-4">{t("nextRace.whereDataDisagrees")}</p>
-
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedBettingEdge.slice(0, 3).map((d) => {
-            const isValue = d.gap > 0;
-            const signal = Math.abs(d.gap) > 10 ? (isValue ? t("nextRace.potentialValue") : t("nextRace.overvalued")) : t("nextRace.fair");
-            const signalColor = Math.abs(d.gap) > 10 ? (isValue ? "#22c55e" : "#ef4444") : "var(--text-dim)";
-            const arrow = isValue ? "\u25B2" : d.gap < 0 ? "\u25BC" : "\u2014";
-            return (
-              <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
-                <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
-                    <span className="f1-body-sm font-semibold text-white">{d.name}</span>
-                    <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
-                  </div>
-                  {/* Hero edge number */}
-                  <div className="text-center mb-3">
-                    <span className="f1-data text-2xl font-bold" style={{ color: isValue ? "#22c55e" : "#ef4444" }}>
-                      {arrow} {isValue ? "+" : ""}{d.gap.toFixed(1)}%
-                    </span>
-                    <p className="f1-label-xs mt-1">{t("nextRace.edge")}</p>
-                  </div>
-                  {/* Signal badge below */}
-                  <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-3">
-                    <span className="f1-label-xs">{t("nextRace.supportingData")}</span>
-                    <span className="f1-label-xs rounded px-2 py-1" style={{ backgroundColor: `${signalColor}15`, color: signalColor }}>
-                      {signal}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Circuit Intelligence ─────────────────────────────────────── */}
-      <div className="f1-surface p-5">
-        <div className="mb-1 flex items-center gap-2">
-          <div className="f1-accent-bar" />
-          <span className="f1-heading text-white">{t("nextRace.circuitIntel")}</span>
-        </div>
-        <p className="f1-label mb-4">{NEXT_RACE.circuit} &mdash; {t("nextRace.trackStats")}</p>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          {/* Safety car rate — radial gauge */}
-          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 flex flex-col items-center">
-            <p className="f1-label-xs mb-3 self-start">{t("nextRace.safetyCarRate")}</p>
-            <div className="f1-radial-gauge">
-              <svg width="80" height="80" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#161616" strokeWidth="6" />
-                <circle
-                  cx="40" cy="40" r="34" fill="none" stroke="#f59e0b" strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={`${((suzukaSC?.rate ?? NEXT_RACE.scRate) / 100) * 213.6} 213.6`}
-                />
-              </svg>
-              <div className="gauge-value">
-                <span className="f1-data text-lg font-bold text-[#f59e0b]">{suzukaSC?.rate ?? NEXT_RACE.scRate}%</span>
-              </div>
-            </div>
-            <p className="f1-label-xs mt-3" style={{ color: "var(--text-dim)" }}>
-              Rank: {SAFETY_CAR.findIndex(c => c.circuit === "Suzuka") + 1}/{SAFETY_CAR.length} circuits
-            </p>
-          </div>
-
-          {/* Pole conversion — radial gauge */}
-          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 flex flex-col items-center">
-            <p className="f1-label-xs mb-3 self-start">{t("nextRace.poleConversion")}</p>
-            <div className="f1-radial-gauge">
-              <svg width="80" height="80" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#161616" strokeWidth="6" />
-                <circle
-                  cx="40" cy="40" r="34" fill="none" stroke="#22c55e" strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={`${(NEXT_RACE.poleConversion / 100) * 213.6} 213.6`}
-                />
-              </svg>
-              <div className="gauge-value">
-                <span className="f1-data text-lg font-bold text-[#22c55e]">{NEXT_RACE.poleConversion}%</span>
-              </div>
-            </div>
-            <p className="f1-label-xs mt-3" style={{ color: "var(--text-dim)" }}>
-              High conversion circuit
-            </p>
-          </div>
-
-          {/* Grid impact — thicker bars with inline values */}
-          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
-            <p className="f1-label-xs mb-2">{t("nextRace.gridImpact")}</p>
-            <div className="space-y-2.5 mt-3">
-              {GRID_VS_FINISH.slice(0, 4).map(d => {
-                const arrow = d.delta > 0 ? "\u25B2" : d.delta < 0 ? "\u25BC" : "\u2014";
-                return (
-                  <div key={d.code} className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <div className="f1-team-bar h-4" style={{ backgroundColor: d.color }} />
-                      <span className="f1-label-xs">{d.code}</span>
-                    </div>
-                    <span className="f1-data text-xs font-semibold" style={{ color: d.delta > 0 ? "#22c55e" : d.delta < 0 ? "#ef4444" : "var(--text-dim)" }}>
-                      {arrow} {d.delta > 0 ? "+" : ""}{d.delta.toFixed(1)} pos
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

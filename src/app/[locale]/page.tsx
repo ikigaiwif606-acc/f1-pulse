@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { RaceCountdown } from "@/components/races/race-countdown";
 import { OddsSummary } from "@/components/markets/odds-summary";
+import { TopMovers } from "@/components/markets/top-movers";
 import { OnThisDay } from "@/components/shared/on-this-day";
 import { Link } from "@/lib/i18n/navigation";
 import { getHomepageData } from "@/lib/data/home";
@@ -113,38 +114,7 @@ function HomePageContent({ data, news }: { data: HomepageData; news: NewsItem[] 
               </Link>
             </div>
 
-            <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-              {TOP_MOVERS.map((m) => {
-                const change = m.newPct - m.oldPct;
-                const isUp = change > 0;
-
-                return (
-                  <div
-                    key={m.name + m.market}
-                    className="f1-surface p-4 f1-transition hover:border-[rgba(255,255,255,0.12)] group"
-                    style={{ borderLeft: `2px solid ${m.color}` }}
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-[0.625rem] tabular-nums" style={{ color: "var(--text-ghost)" }}>{m.code}</span>
-                          <span className="f1-body-sm font-semibold text-white truncate">{m.name}</span>
-                        </div>
-                        <span className="f1-label-xs" style={{ color: "var(--text-ghost)" }}>{m.market}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-end justify-between">
-                      <span className={`font-mono text-xl tabular-nums font-bold ${isUp ? "text-emerald-400" : "text-rose-500"}`}>
-                        {isUp ? "▲" : "▼"} {isUp ? "+" : ""}{change}%
-                      </span>
-                      <span className="font-mono text-[0.625rem] tabular-nums" style={{ color: "var(--text-ghost)" }}>
-                        {m.oldPct}→{m.newPct}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <TopMovers movers={TOP_MOVERS} />
           </div>
 
           {/* ── LIVE ODDS TRADING BOARD — full width ──────────────── */}

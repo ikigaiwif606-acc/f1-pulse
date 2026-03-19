@@ -4,6 +4,7 @@ import { OddsSummary } from "@/components/markets/odds-summary";
 import { OnThisDay } from "@/components/shared/on-this-day";
 import { Link } from "@/lib/i18n/navigation";
 import { getHomepageData } from "@/lib/data/home";
+import { getNewsData, type NewsItem } from "@/lib/data/news";
 import type { HomepageData } from "@/types";
 
 // ── Top Movers (static enrichment for homepage) ──────────────────────────────
@@ -25,11 +26,21 @@ const LATEST_DEALS = [
 ];
 
 export default async function HomePage() {
-  const data = await getHomepageData();
-  return <HomePageContent data={data} />;
+  const [data, news] = await Promise.all([
+    getHomepageData(),
+    getNewsData().catch(() => [] as NewsItem[]),
+  ]);
+  return <HomePageContent data={data} news={news.slice(0, 4)} />;
 }
 
-function HomePageContent({ data }: { data: HomepageData }) {
+const CATEGORY_COLORS: Record<string, string> = {
+  official: "#E10600",
+  analysis: "#FF8000",
+  tech: "#27F4D2",
+  general: "#3671C6",
+};
+
+function HomePageContent({ data, news }: { data: HomepageData; news: NewsItem[] }) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
 
@@ -229,8 +240,8 @@ function HomePageContent({ data }: { data: HomepageData }) {
             </div>
           </div>
 
-          {/* ── LATEST DEALS — full width (or 6/12) ──────────────── */}
-          <div className="md:col-span-6">
+          {/* ── LATEST DEALS (4/12) ──────────────────────────────── */}
+          <div className="md:col-span-6 lg:col-span-4">
             <div className="f1-surface p-5 h-full">
               <div className="mb-4 flex items-center justify-between">
                 <span className="f1-heading text-white">{t("latestDeals")}</span>
@@ -258,8 +269,44 @@ function HomePageContent({ data }: { data: HomepageData }) {
             </div>
           </div>
 
-          {/* ── ON THIS DAY — right column ────────────────────────── */}
-          <div className="md:col-span-6">
+          {/* ── HEADLINES — compact news widget (4/12) ─────────── */}
+          <div className="md:col-span-6 lg:col-span-4">
+            <div className="f1-surface p-5 h-full">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="f1-heading text-white">Headlines</span>
+                <Link href="/news" className="f1-transition f1-label hover:!text-white">
+                  {tCommon("viewAll")} &rarr;
+                </Link>
+              </div>
+
+              <div className="space-y-1.5">
+                {news.map((item, i) => (
+                  <a
+                    key={item.link + i}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="f1-transition flex items-start gap-3 f1-surface-inner p-3 hover:bg-[rgba(15,15,15,0.8)] group rounded"
+                    style={{ borderLeft: `2px solid ${CATEGORY_COLORS[item.category] || "#666"}` }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <h4 className="f1-body-sm font-semibold text-white group-hover:text-[#E10600] f1-transition line-clamp-2">
+                        {item.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <div className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: item.sourceColor }} />
+                        <span className="f1-label-xs" style={{ color: item.sourceColor }}>{item.source}</span>
+                        <span className="f1-label-xs" style={{ color: "var(--text-ghost)" }}>{item.timeAgo}</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── ON THIS DAY (4/12) ───────────────────────────────── */}
+          <div className="md:col-span-12 lg:col-span-4">
             <OnThisDay />
           </div>
 

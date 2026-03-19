@@ -47,65 +47,75 @@ export function RaceCountdown({ race }: RaceCountdownProps) {
     { value: time.seconds, label: t("seconds") },
   ];
 
+  const sessions = [
+    { label: tRace("fp1"), time: "FRI 03:30", active: false, dot: "bg-[#444]" },
+    { label: tRace("qualifying"), time: "SAT 07:00", active: false, dot: "bg-[#f59e0b]" },
+    { label: tRace("race"), time: "SUN 06:00", active: true, dot: "bg-[#22c55e]" },
+  ];
+
   return (
     <div>
-      {/* Tags */}
-      <div className="mb-2 flex items-center gap-2">
-        <span className="f1-label rounded bg-[#E10600] px-1.5 py-0.5 !text-white">
-          {t("round")} {race.round}
-        </span>
-        {race.isSprint && (
-          <span className="f1-label rounded border border-[#E10600]/30 px-1.5 py-0.5 !text-[#E10600]">
-            {tRace("sprint")}
-          </span>
-        )}
-      </div>
-
-      {/* Race name */}
-      <h2 className="f1-display-lg text-white">{name}</h2>
-      <p className="f1-body-sm mt-0.5" style={{ color: "#555" }}>{circuit}</p>
-
-      {/* Sessions */}
-      <div className="mt-5 flex flex-wrap gap-2">
-        {[
-          { label: tRace("fp1"), time: "FRI 03:30", active: false },
-          { label: tRace("qualifying"), time: "SAT 07:00", active: false },
-          { label: tRace("race"), time: "SUN 06:00", active: true },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className={`f1-transition rounded border px-3 py-2 ${
-              s.active
-                ? "border-[#E10600]/20 bg-[#E10600]/5"
-                : "border-[#1c1c1c] bg-[#0f0f0f]"
-            }`}
-          >
-            <p className={`f1-label-xs ${s.active ? "!text-[#E10600]" : ""}`}>
-              {s.label}
-            </p>
-            <p className={`f1-data mt-0.5 text-xs ${s.active ? "text-white" : "text-[#666]"}`}>
-              {s.time} UTC
-            </p>
+      {/* Race header */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="f1-label rounded bg-[#E10600] px-1.5 py-0.5 !text-white">
+              {t("round")} {race.round}
+            </span>
+            {race.isSprint && (
+              <span className="f1-label rounded border border-[#E10600]/30 px-1.5 py-0.5 !text-[#E10600]">
+                {tRace("sprint")}
+              </span>
+            )}
           </div>
-        ))}
-      </div>
+          <h2 className="f1-display-lg text-white">{name}</h2>
+          <p className="f1-body-sm mt-0.5" style={{ color: "var(--text-dim)" }}>{circuit}</p>
+        </div>
 
-      {/* Countdown */}
-      <div className="mt-6">
-        <p className="f1-label-xs mb-2.5">{t("countdown")}</p>
+        {/* Countdown — massive blocks */}
         <div className="flex gap-2 sm:gap-3">
-          {units.map((unit) => (
+          {units.map((unit, i) => (
             <div key={unit.label} className="text-center">
-              <div className="relative overflow-hidden rounded border border-[#1c1c1c] bg-[#0f0f0f] px-3 py-2.5 sm:px-4 sm:py-3">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.015] to-transparent" />
-                <span className="f1-data-xl relative text-white">
+              <div className="countdown-block">
+                <span className="font-mono text-3xl sm:text-4xl lg:text-5xl font-bold tabular-nums text-white relative">
                   {String(unit.value).padStart(2, "0")}
                 </span>
               </div>
               <p className="f1-label-xs mt-1.5">{unit.label}</p>
+              {/* Colon separator (except last) */}
+              {i < units.length - 1 && (
+                <span className="hidden" aria-hidden="true">:</span>
+              )}
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Session timeline — horizontal */}
+      <div className="session-timeline gap-2 sm:gap-3">
+        {sessions.map((s) => (
+          <div
+            key={s.label}
+            className={`session-card f1-transition rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 ${
+              s.active
+                ? "border-[#E10600]/30 bg-[#E10600]/5"
+                : "border-[rgba(255,255,255,0.06)] bg-[rgba(15,15,15,0.4)]"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`h-2 w-2 rounded-full ${s.dot} ${s.active ? "animate-live" : ""}`} />
+              <p className={`f1-label-xs ${s.active ? "!text-[#E10600]" : ""}`}>
+                {s.label}
+              </p>
+              {s.active && (
+                <span className="f1-label-xs !text-[#E10600] ml-auto">NEXT</span>
+              )}
+            </div>
+            <p className={`font-mono text-xs tabular-nums ${s.active ? "text-white font-bold" : "text-[var(--text-dim)]"}`}>
+              {s.time} UTC
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -235,6 +235,37 @@ function DriversPageContent({ drivers }: { drivers: DriverListItem[] }) {
   );
 }
 
+// Ergast uses IDs like "max_verstappen", profiles use "verstappen".
+// This map normalizes Ergast driverIds → profile IDs.
+const ERGAST_ID_MAP: Record<string, string> = {
+  max_verstappen: "verstappen",
+  de_vries: "de_vries",
+  kevin_magnussen: "magnussen",
+  sergio_perez: "perez",
+  carlos_sainz: "sainz",
+  pierre_gasly: "gasly",
+  esteban_ocon: "ocon",
+  fernando_alonso: "alonso",
+  lance_stroll: "stroll",
+  alexander_albon: "albon",
+  lando_norris: "norris",
+  oscar_piastri: "piastri",
+  george_russell: "russell",
+  lewis_hamilton: "hamilton",
+  charles_leclerc: "leclerc",
+  valtteri_bottas: "bottas",
+  nico_hulkenberg: "hulkenberg",
+  liam_lawson: "lawson",
+  oliver_bearman: "bearman",
+  isack_hadjar: "hadjar",
+  andrea_kimi_antonelli: "antonelli",
+  kimi_antonelli: "antonelli",
+  franco_colapinto: "colapinto",
+  gabriel_bortoleto: "bortoleto",
+  arvid_lindblad: "lindblad",
+};
+
 function getProfile(id: string) {
-  return DRIVER_PROFILE_MAP[id] ?? null;
+  // Try direct match first (fallback data), then Ergast normalization
+  return DRIVER_PROFILE_MAP[id] ?? DRIVER_PROFILE_MAP[ERGAST_ID_MAP[id]] ?? null;
 }

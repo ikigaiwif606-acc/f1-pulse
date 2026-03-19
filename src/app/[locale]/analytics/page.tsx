@@ -333,10 +333,20 @@ function AnalyticsPageContent({
     <div className="min-h-screen bg-[#080808]">
       <div className="mx-auto max-w-7xl px-5 py-8">
         {/* Header */}
-        <div className="mb-6">
-          <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-1">
+            <span className="f1-label !text-[#E10600]">{t("intelligence")}</span>
+            <span className="f1-freshness-badge">
+              <span className="pulse-dot" />
+              Updated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            </span>
+          </div>
           <h1 className="f1-display-lg text-white mt-0.5">{t("title")}</h1>
-          <p className="f1-label mt-1">{t("dataFromRounds", { count: roundsCompleted })} &middot; {t("season2026")}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="f1-freshness-badge">
+              {t("dataFromRounds", { count: roundsCompleted })} &middot; {t("season2026")}
+            </span>
+          </div>
         </div>
 
         {/* ── Tab Switcher ──────────────────────────────────────────────── */}
@@ -411,7 +421,7 @@ function NextRaceBriefingTab({
   suzukaSC: (typeof SAFETY_CAR)[0] | undefined;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* ── Race Header ──────────────────────────────────────────────── */}
       <div className="f1-surface p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -425,7 +435,8 @@ function NextRaceBriefingTab({
             <h2 className="f1-heading text-white text-lg">{NEXT_RACE.name}</h2>
             <p className="f1-label mt-0.5">{NEXT_RACE.circuit}</p>
           </div>
-          <div className="flex gap-4">
+          {/* 2x2 grid on mobile, row on desktop */}
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
             <div className="text-center">
               <p className="f1-data-lg text-white">{NEXT_RACE.laps}</p>
               <p className="f1-label-xs">Laps</p>
@@ -475,8 +486,26 @@ function NextRaceBriefingTab({
             })}
           </div>
         ) : (
-          <div className="f1-surface p-8 text-center">
-            <p className="f1-label">{t("nextRace.noMarketsFound")}</p>
+          <div className="f1-surface p-10 text-center">
+            {/* Empty state icon */}
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="mx-auto mb-4 opacity-30">
+              <rect x="4" y="20" width="8" height="24" rx="2" fill="#E10600" />
+              <rect x="16" y="12" width="8" height="32" rx="2" fill="#E10600" />
+              <rect x="28" y="16" width="8" height="28" rx="2" fill="#E10600" />
+              <rect x="40" y="8" width="4" height="36" rx="2" fill="#E10600" />
+              <path d="M4 4L44 4" stroke="#333" strokeWidth="1" strokeDasharray="4 4" />
+            </svg>
+            <p className="f1-heading text-white mb-2">No Active Markets</p>
+            <p className="f1-label mb-4">{t("nextRace.noMarketsFound")}</p>
+            <p className="f1-label-xs" style={{ color: "var(--text-dim)" }}>
+              Markets typically open 5-7 days before race weekend
+            </p>
+            <Link
+              href="/markets"
+              className="inline-block mt-4 f1-label-xs rounded-full border border-[#E10600]/30 bg-[#E10600]/10 px-4 py-2 !text-[#E10600] hover:bg-[#E10600]/20 f1-transition"
+            >
+              View All Markets &rarr;
+            </Link>
           </div>
         )}
       </div>
@@ -504,23 +533,26 @@ function NextRaceBriefingTab({
             const isValue = d.gap > 0;
             const signal = Math.abs(d.gap) > 10 ? (isValue ? t("nextRace.potentialValue") : t("nextRace.overvalued")) : t("nextRace.fair");
             const signalColor = Math.abs(d.gap) > 10 ? (isValue ? "#22c55e" : "#ef4444") : "var(--text-dim)";
+            const arrow = isValue ? "\u25B2" : d.gap < 0 ? "\u25BC" : "\u2014";
             return (
               <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
                 <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-4">
                     <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
                     <span className="f1-body-sm font-semibold text-white">{d.name}</span>
                     <span className="f1-data text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
                   </div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="f1-label-xs">{t("nextRace.edge")}</span>
-                    <span className="f1-data text-sm font-bold" style={{ color: isValue ? "#22c55e" : "#ef4444" }}>
-                      {isValue ? "+" : ""}{d.gap.toFixed(1)}%
+                  {/* Hero edge number */}
+                  <div className="text-center mb-3">
+                    <span className="f1-data text-2xl font-bold" style={{ color: isValue ? "#22c55e" : "#ef4444" }}>
+                      {arrow} {isValue ? "+" : ""}{d.gap.toFixed(1)}%
                     </span>
+                    <p className="f1-label-xs mt-1">{t("nextRace.edge")}</p>
                   </div>
-                  <div className="flex items-center justify-between text-[0.625rem]">
+                  {/* Signal badge below */}
+                  <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-3">
                     <span className="f1-label-xs">{t("nextRace.supportingData")}</span>
-                    <span className="f1-label-xs rounded px-1.5 py-0.5" style={{ backgroundColor: `${signalColor}15`, color: signalColor }}>
+                    <span className="f1-label-xs rounded px-2 py-1" style={{ backgroundColor: `${signalColor}15`, color: signalColor }}>
                       {signal}
                     </span>
                   </div>
@@ -540,45 +572,66 @@ function NextRaceBriefingTab({
         <p className="f1-label mb-4">{NEXT_RACE.circuit} &mdash; {t("nextRace.trackStats")}</p>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          {/* Safety car rate */}
-          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
-            <p className="f1-label-xs mb-2">{t("nextRace.safetyCarRate")}</p>
-            <p className="f1-data-lg text-[#f59e0b]">{suzukaSC?.rate ?? NEXT_RACE.scRate}%</p>
-            <div className="h-[3px] w-full rounded-full bg-[#161616] mt-2">
-              <div className="h-[3px] rounded-full bg-[#f59e0b]" style={{ width: `${suzukaSC?.rate ?? NEXT_RACE.scRate}%` }} />
+          {/* Safety car rate — radial gauge */}
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 flex flex-col items-center">
+            <p className="f1-label-xs mb-3 self-start">{t("nextRace.safetyCarRate")}</p>
+            <div className="f1-radial-gauge">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#161616" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34" fill="none" stroke="#f59e0b" strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${((suzukaSC?.rate ?? NEXT_RACE.scRate) / 100) * 213.6} 213.6`}
+                />
+              </svg>
+              <div className="gauge-value">
+                <span className="f1-data text-lg font-bold text-[#f59e0b]">{suzukaSC?.rate ?? NEXT_RACE.scRate}%</span>
+              </div>
             </div>
-            <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
+            <p className="f1-label-xs mt-3" style={{ color: "var(--text-dim)" }}>
               Rank: {SAFETY_CAR.findIndex(c => c.circuit === "Suzuka") + 1}/{SAFETY_CAR.length} circuits
             </p>
           </div>
 
-          {/* Pole conversion */}
-          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
-            <p className="f1-label-xs mb-2">{t("nextRace.poleConversion")}</p>
-            <p className="f1-data-lg text-[#22c55e]">{NEXT_RACE.poleConversion}%</p>
-            <div className="h-[3px] w-full rounded-full bg-[#161616] mt-2">
-              <div className="h-[3px] rounded-full bg-[#22c55e]" style={{ width: `${NEXT_RACE.poleConversion}%` }} />
+          {/* Pole conversion — radial gauge */}
+          <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 flex flex-col items-center">
+            <p className="f1-label-xs mb-3 self-start">{t("nextRace.poleConversion")}</p>
+            <div className="f1-radial-gauge">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#161616" strokeWidth="6" />
+                <circle
+                  cx="40" cy="40" r="34" fill="none" stroke="#22c55e" strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(NEXT_RACE.poleConversion / 100) * 213.6} 213.6`}
+                />
+              </svg>
+              <div className="gauge-value">
+                <span className="f1-data text-lg font-bold text-[#22c55e]">{NEXT_RACE.poleConversion}%</span>
+              </div>
             </div>
-            <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
+            <p className="f1-label-xs mt-3" style={{ color: "var(--text-dim)" }}>
               High conversion circuit
             </p>
           </div>
 
-          {/* Grid impact */}
+          {/* Grid impact — thicker bars with inline values */}
           <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4">
             <p className="f1-label-xs mb-2">{t("nextRace.gridImpact")}</p>
-            <div className="space-y-1.5 mt-3">
-              {GRID_VS_FINISH.slice(0, 4).map(d => (
-                <div key={d.code} className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <div className="f1-team-bar h-3" style={{ backgroundColor: d.color }} />
-                    <span className="f1-label-xs">{d.code}</span>
+            <div className="space-y-2.5 mt-3">
+              {GRID_VS_FINISH.slice(0, 4).map(d => {
+                const arrow = d.delta > 0 ? "\u25B2" : d.delta < 0 ? "\u25BC" : "\u2014";
+                return (
+                  <div key={d.code} className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="f1-team-bar h-4" style={{ backgroundColor: d.color }} />
+                      <span className="f1-label-xs">{d.code}</span>
+                    </div>
+                    <span className="f1-data text-xs font-semibold" style={{ color: d.delta > 0 ? "#22c55e" : d.delta < 0 ? "#ef4444" : "var(--text-dim)" }}>
+                      {arrow} {d.delta > 0 ? "+" : ""}{d.delta.toFixed(1)} pos
+                    </span>
                   </div>
-                  <span className="f1-data text-[0.625rem]" style={{ color: d.delta > 0 ? "#22c55e" : d.delta < 0 ? "#ef4444" : "var(--text-dim)" }}>
-                    {d.delta > 0 ? "+" : ""}{d.delta.toFixed(1)} pos
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -610,7 +663,7 @@ function ChampionshipTrackerTab({
   roundsCompleted: number;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* ── WDC Odds Trajectory ──────────────────────────────────────── */}
       {wdcDrivers.length > 0 && (
         <OddsMovementChart
@@ -654,17 +707,17 @@ function ChampionshipTrackerTab({
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
+            <thead className="f1-sticky-thead">
               <tr className="border-b border-[#1c1c1c]">
-                <th className="f1-label-xs text-left py-2 pr-4">Driver</th>
-                <th className="f1-label-xs text-right py-2 px-3">{t("championship.mktOdds")}</th>
-                <th className="f1-label-xs text-right py-2 px-3">{t("championship.ptsShare")}</th>
-                <th className="f1-label-xs text-right py-2 px-3">{t("championship.projected")}</th>
-                <th className="f1-label-xs text-right py-2 pl-3">{t("championship.signal")}</th>
+                <th className="f1-label-xs text-left py-2.5 pr-4">Driver</th>
+                <th className="f1-label-xs text-right py-2.5 px-3">{t("championship.mktOdds")}</th>
+                <th className="f1-label-xs text-right py-2.5 px-3">{t("championship.ptsShare")}</th>
+                <th className="f1-label-xs text-right py-2.5 px-3">{t("championship.projected")}</th>
+                <th className="f1-label-xs text-right py-2.5 pl-3">{t("championship.signal")}</th>
               </tr>
             </thead>
             <tbody>
-              {sortedBettingEdge.map((d) => {
+              {sortedBettingEdge.map((d, idx) => {
                 const isValue = d.gap > 0;
                 const projectedPts = Math.round((d.ptsShare / 100) * 24 * (TOTAL_POINTS / roundsCompleted));
                 const signal = Math.abs(d.gap) > 10
@@ -673,25 +726,26 @@ function ChampionshipTrackerTab({
                 const signalColor = Math.abs(d.gap) > 10
                   ? (isValue ? "#22c55e" : "#ef4444")
                   : "var(--text-dim)";
+                const arrow = isValue ? "\u25B2" : d.gap < 0 ? "\u25BC" : "\u2014";
 
                 return (
-                  <tr key={d.code} className="border-b border-[#0f0f0f] hover:bg-[#111] transition-colors">
-                    <td className="py-2.5 pr-4">
+                  <tr key={d.code} className={`border-b border-[#0f0f0f] hover:bg-[#161616] transition-colors ${idx % 2 === 1 ? "bg-[#0a0a0a]" : ""}`}>
+                    <td className="py-3 pr-4">
                       <Link href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="flex items-center gap-2">
-                        <div className="f1-team-bar h-4" style={{ backgroundColor: d.color }} />
+                        <div className="f1-team-bar-wide h-5" style={{ backgroundColor: d.color }} />
                         <span className="f1-body-sm font-semibold text-white">{d.name}</span>
                         <span className="f1-data text-[0.5625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
                       </Link>
                     </td>
-                    <td className="f1-data text-sm text-right py-2.5 px-3 text-white">{d.odds}%</td>
-                    <td className="f1-data text-sm text-right py-2.5 px-3 text-white">{d.ptsShare}%</td>
-                    <td className="f1-data text-sm text-right py-2.5 px-3" style={{ color: "var(--text-muted)" }}>{projectedPts} pts</td>
-                    <td className="text-right py-2.5 pl-3">
+                    <td className="f1-data text-sm text-right py-3 px-3 text-white">{d.odds}%</td>
+                    <td className="f1-data text-sm text-right py-3 px-3 text-white">{d.ptsShare}%</td>
+                    <td className="f1-data text-sm text-right py-3 px-3" style={{ color: "var(--text-muted)" }}>{projectedPts} pts</td>
+                    <td className="text-right py-3 pl-3">
                       <span
-                        className="f1-label-xs rounded px-1.5 py-0.5"
+                        className="f1-label-xs f1-signal-badge rounded px-2 py-1"
                         style={{ backgroundColor: `${signalColor}15`, color: signalColor }}
                       >
-                        {isValue ? "+" : ""}{d.gap.toFixed(1)}% {signal}
+                        {arrow} {isValue ? "+" : ""}{d.gap.toFixed(1)}% {signal}
                       </span>
                     </td>
                   </tr>
@@ -774,7 +828,7 @@ function DeepAnalyticsTab({
   roundsCompleted: number;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* ── Sub-nav ──────────────────────────────────────────────────── */}
       <nav className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
         {TAB_CATEGORIES.map((tab) => (
@@ -814,8 +868,8 @@ function DeepAnalyticsTab({
                   <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
                   <span className="f1-data w-8 text-[0.625rem]" style={{ color: "var(--text-dim)" }}>{d.code}</span>
                   <div className="flex-1">
-                    <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                      <div className="h-[3px] rounded-full" style={{ width: `${d.pct}%`, backgroundColor: d.color }} />
+                    <div className="h-2 w-full rounded-full bg-[#161616]">
+                      <div className="h-2 rounded-full transition-all" style={{ width: `${d.pct}%`, backgroundColor: d.color }} />
                     </div>
                   </div>
                   <span className={`f1-data text-xs ${i === 0 ? "text-[#E10600]" : "text-[var(--text-muted)]"}`}>{d.gap}</span>
@@ -837,6 +891,7 @@ function DeepAnalyticsTab({
               {GRID_VS_FINISH.map((d) => {
                 const isGain = d.delta > 0;
                 const isLoss = d.delta < 0;
+                const deltaArrow = isGain ? "\u25B2" : isLoss ? "\u25BC" : "\u2014";
                 return (
                   <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="flex items-center gap-3 cursor-pointer hover:bg-[#111] rounded transition-colors -mx-1 px-1">
                     <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
@@ -851,10 +906,10 @@ function DeepAnalyticsTab({
                       <span className="f1-data w-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>P{d.avgFinish.toFixed(1)}</span>
                     </div>
                     <span
-                      className="f1-data w-12 text-right text-xs font-semibold"
+                      className="f1-data w-14 text-right text-xs font-semibold"
                       style={{ color: isGain ? "#22c55e" : isLoss ? "#ef4444" : "var(--text-dim)" }}
                     >
-                      {isGain && "+"}{d.delta.toFixed(1)}
+                      {deltaArrow} {isGain && "+"}{d.delta.toFixed(1)}
                     </span>
                   </Link>
                 );
@@ -891,8 +946,8 @@ function DeepAnalyticsTab({
                   <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
                   <span className="f1-body-sm w-24" style={{ color: "var(--text-muted)" }}>{d.team}</span>
                   <div className="flex-1">
-                    <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                      <div className="h-[3px] rounded-full" style={{ width: `${Math.max(d.rate, 1)}%`, backgroundColor: d.color }} />
+                    <div className="h-2 w-full rounded-full bg-[#161616]">
+                      <div className="h-2 rounded-full transition-all" style={{ width: `${Math.max(d.rate, 1)}%`, backgroundColor: d.color }} />
                     </div>
                   </div>
                   <span className="f1-data w-8 text-right text-xs text-[var(--text-muted)]">{d.rate}%</span>
@@ -921,8 +976,8 @@ function DeepAnalyticsTab({
                   <span className="hidden text-sm sm:block">{c.icon}</span>
                   <span className="f1-body-sm w-24 truncate" style={{ color: "var(--text-muted)" }}>{c.circuit}</span>
                   <div className="flex-1">
-                    <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                      <div className="h-[3px] rounded-full bg-[#f59e0b]" style={{ width: `${c.rate}%` }} />
+                    <div className="h-2 w-full rounded-full bg-[#161616]">
+                      <div className="h-2 rounded-full bg-[#f59e0b] transition-all" style={{ width: `${c.rate}%` }} />
                     </div>
                   </div>
                   <span className="f1-data w-8 text-right text-xs text-[#f59e0b]">{c.rate}%</span>
@@ -999,6 +1054,7 @@ function DeepAnalyticsTab({
             {sortedBettingEdge.map((d) => {
               const isValue = d.gap > 0;
               const label = isValue ? t("valueBet") : t("overvalued");
+              const arrow = isValue ? "\u25B2" : d.gap < 0 ? "\u25BC" : "\u2014";
               return (
                 <Link key={d.code} href={"/drivers/" + (DRIVER_SLUG[d.code] || d.code.toLowerCase())} className="block cursor-pointer">
                   <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-4 transition-colors hover:border-[#333]">
@@ -1013,28 +1069,28 @@ function DeepAnalyticsTab({
                         <span className="f1-label-xs">{t("marketOdds")}</span>
                         <span className="f1-data text-sm text-white">{d.odds}%</span>
                       </div>
-                      <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                        <div className="h-[3px] rounded-full bg-[var(--text-muted)]" style={{ width: `${d.odds}%` }} />
+                      <div className="h-2 w-full rounded-full bg-[#161616]">
+                        <div className="h-2 rounded-full bg-[var(--text-muted)] transition-all" style={{ width: `${d.odds}%` }} />
                       </div>
 
                       <div className="flex items-center justify-between">
                         <span className="f1-label-xs">{t("actualPtsShare")}</span>
                         <span className="f1-data text-sm text-white">{d.ptsShare}%</span>
                       </div>
-                      <div className="h-[3px] w-full rounded-full bg-[#161616]">
-                        <div className="h-[3px] rounded-full" style={{ width: `${d.ptsShare}%`, backgroundColor: d.color }} />
+                      <div className="h-2 w-full rounded-full bg-[#161616]">
+                        <div className="h-2 rounded-full transition-all" style={{ width: `${d.ptsShare}%`, backgroundColor: d.color }} />
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between border-t border-[#1c1c1c] pt-2">
                       <span
-                        className="f1-data text-xs font-bold"
+                        className="f1-data text-sm font-bold"
                         style={{ color: isValue ? "#22c55e" : "#ef4444" }}
                       >
-                        {isValue ? "+" : ""}{d.gap.toFixed(1)}%
+                        {arrow} {isValue ? "+" : ""}{d.gap.toFixed(1)}%
                       </span>
                       <span
-                        className="f1-label-xs rounded px-1.5 py-0.5"
+                        className="f1-label-xs rounded px-2 py-1"
                         style={{
                           backgroundColor: isValue ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
                           color: isValue ? "#22c55e" : "#ef4444",
@@ -1104,7 +1160,7 @@ function DeepAnalyticsTab({
                         <span className="f1-label-xs">{t("qualifying")}</span>
                         <span className="f1-data text-[0.5625rem] text-[var(--text-dim)]">{b.qualiH2H[0]}-{b.qualiH2H[1]}</span>
                       </div>
-                      <div className="flex h-[4px] w-full overflow-hidden rounded-full">
+                      <div className="flex h-1.5 w-full overflow-hidden rounded-full">
                         <div className="h-full" style={{ width: `${qualiPct1}%`, backgroundColor: b.color }} />
                         <div className="h-full" style={{ width: `${100 - qualiPct1}%`, backgroundColor: "#1c1c1c" }} />
                       </div>
@@ -1116,7 +1172,7 @@ function DeepAnalyticsTab({
                         <span className="f1-label-xs">{t("raceH2H")}</span>
                         <span className="f1-data text-[0.5625rem] text-[var(--text-dim)]">{b.raceH2H[0]}-{b.raceH2H[1]}</span>
                       </div>
-                      <div className="flex h-[4px] w-full overflow-hidden rounded-full">
+                      <div className="flex h-1.5 w-full overflow-hidden rounded-full">
                         <div className="h-full" style={{ width: `${racePct1}%`, backgroundColor: b.color }} />
                         <div className="h-full" style={{ width: `${100 - racePct1}%`, backgroundColor: "#1c1c1c" }} />
                       </div>

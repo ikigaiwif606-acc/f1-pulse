@@ -14,20 +14,23 @@ export function TabSwitcher({ tabs }: { tabs: Tab[] }) {
 
   return (
     <>
-      <nav className="sticky top-12 z-40 bg-[#080808]/95 backdrop-blur-xl border-b border-[#1c1c1c] mb-6 -mx-5 px-5">
-        <div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide">
+      <nav className="sticky top-12 z-40 bg-[#080808]/95 backdrop-blur-xl border-b border-[#1c1c1c] mb-8 -mx-5 px-5">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
           {tabs.map((tab, i) => (
             <button
               key={tab.id}
               onClick={() => setActive(i)}
-              className={`shrink-0 rounded-full px-4 py-1.5 f1-label f1-transition ${
+              className={`relative shrink-0 px-4 py-3 f1-label f1-transition ${
                 active === i
-                  ? "bg-[#E10600] !text-white border border-[#E10600]"
-                  : "border border-[#1c1c1c] bg-[#0c0c0c] hover:!text-white hover:border-[#333] hover:bg-[#161616]"
+                  ? "!text-white"
+                  : "hover:!text-white hover:bg-[#161616]"
               }`}
             >
               <span className="mr-1.5">{tab.icon}</span>
               {tab.label}
+              {active === i && (
+                <span className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#E10600] rounded-t" />
+              )}
             </button>
           ))}
         </div>

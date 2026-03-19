@@ -44,10 +44,10 @@ export function MarketCard({
             <span className="f1-body-sm flex-1 truncate" style={{ color: "var(--text-muted)" }}>
               {o.outcome}
             </span>
-            <div className="w-16">
-              <div className="h-[3px] w-full rounded-full bg-[#161616]">
+            <div className="w-20">
+              <div className="h-2 w-full rounded-full bg-[#161616]">
                 <div
-                  className="h-[3px] rounded-full bg-[#E10600]"
+                  className="h-2 rounded-full bg-[#E10600]"
                   style={{ width: `${o.price * 100}%` }}
                 />
               </div>

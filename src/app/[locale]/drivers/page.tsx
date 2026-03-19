@@ -146,45 +146,82 @@ function DriversPageContent({ drivers }: { drivers: DriverListItem[] }) {
                           </span>
                         </div>
 
-                        {/* Bio Metadata Row */}
+                        {/* Bio + Financial Row */}
                         {p && (
-                          <div className="flex items-center gap-4 mb-3">
+                          <div className="flex items-center gap-3 flex-wrap mb-4">
+                            <span className="f1-data text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 rounded-full px-3 py-1">
+                              {formatSalary(p.salaryMillionsUSD)}
+                            </span>
+                            <div className="flex items-center gap-3">
+                              <div>
+                                <span className="f1-label-xs text-zinc-500 block">AGE</span>
+                                <span className="f1-data text-zinc-300">{age}</span>
+                              </div>
+                              <div>
+                                <span className="f1-label-xs text-zinc-500 block">HT</span>
+                                <span className="f1-data text-zinc-300">{p.heightCm}cm</span>
+                              </div>
+                              <div>
+                                <span className="f1-label-xs text-zinc-500 block">WT</span>
+                                <span className="f1-data text-zinc-300">{p.weightKg}kg</span>
+                              </div>
+                            </div>
+                            {p.championships > 0 && (
+                              <span className="f1-label-xs rounded-full bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 px-2 py-0.5">
+                                {p.championships}x WDC
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* ── Season Performance Grid ─────────── */}
+                        {p && (
+                          <div className="bg-zinc-950/60 rounded-lg p-3 border border-zinc-800/40 mb-3 grid grid-cols-4 gap-3">
                             <div>
-                              <span className="f1-label-xs text-zinc-500 block">AGE</span>
-                              <span className="f1-data text-zinc-300">{age}</span>
+                              <span className="f1-label-xs text-zinc-500 block">AVG GRID</span>
+                              <span className="f1-data text-zinc-300">P{p.avgGrid.toFixed(1)}</span>
                             </div>
                             <div>
-                              <span className="f1-label-xs text-zinc-500 block">HT</span>
-                              <span className="f1-data text-zinc-300">{p.heightCm}cm</span>
+                              <span className="f1-label-xs text-zinc-500 block">AVG FIN</span>
+                              <span className="f1-data text-zinc-300">P{p.avgFinish.toFixed(1)}</span>
                             </div>
                             <div>
-                              <span className="f1-label-xs text-zinc-500 block">WT</span>
-                              <span className="f1-data text-zinc-300">{p.weightKg}kg</span>
+                              <span className="f1-label-xs text-zinc-500 block">BEST</span>
+                              <span className="f1-data text-zinc-300">P{p.bestFinish}</span>
+                            </div>
+                            <div>
+                              <span className="f1-label-xs text-zinc-500 block">H2H</span>
+                              <span className={`f1-data ${p.h2hRace > p.racesCompleted / 2 ? "text-emerald-400" : p.h2hRace < p.racesCompleted / 2 ? "text-rose-500" : "text-zinc-300"}`}>
+                                {p.h2hRace}-{p.racesCompleted - p.h2hRace}
+                              </span>
                             </div>
                           </div>
                         )}
 
-                        {/* Financial Highlight */}
-                        {p && (
-                          <span className="f1-data text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 rounded-full px-3 py-1 mt-3 inline-block">
-                            {formatSalary(p.salaryMillionsUSD)}
-                          </span>
-                        )}
-
-                        {/* ── Bento Micro-Grid: Stats ─────────── */}
-                        <div className="bg-zinc-950/80 rounded-xl p-4 border border-zinc-800/60 mt-6 grid grid-cols-4 gap-4 divide-x divide-zinc-800/50">
+                        {/* ── Primary Stats Micro-Grid ────────── */}
+                        <div className="bg-zinc-950/80 rounded-xl p-4 border border-zinc-800/60 grid grid-cols-4 gap-4 divide-x divide-zinc-800/50">
                           {[
                             { label: "PTS", value: d.pts },
                             { label: "WIN", value: d.wins },
                             { label: "POD", value: d.podiums },
-                            { label: "POL", value: d.poles },
+                            { label: "DNF", value: p?.dnfs ?? 0 },
                           ].map((s) => (
                             <div key={s.label} className="text-center">
                               <span className="f1-label-xs text-zinc-500 text-center block">{s.label}</span>
-                              <span className="f1-data-xl text-white text-center block mt-1">{s.value}</span>
+                              <span className={`f1-data-xl text-center block mt-1 ${s.label === "DNF" && s.value > 0 ? "text-rose-500" : "text-white"}`}>{s.value}</span>
                             </div>
                           ))}
                         </div>
+
+                        {/* ── Career Stats (compact) ──────────── */}
+                        {p && (p.careerWins > 0 || p.careerPodiums > 0) && (
+                          <div className="mt-3 flex items-center gap-3 flex-wrap">
+                            <span className="f1-label-xs text-zinc-600">CAREER:</span>
+                            {p.careerWins > 0 && <span className="f1-data text-[0.625rem] text-zinc-500">{p.careerWins} wins</span>}
+                            {p.careerPoles > 0 && <span className="f1-data text-[0.625rem] text-zinc-500">{p.careerPoles} poles</span>}
+                            {p.careerPodiums > 0 && <span className="f1-data text-[0.625rem] text-zinc-500">{p.careerPodiums} podiums</span>}
+                          </div>
+                        )}
                       </div>
                     </Link>
                   );

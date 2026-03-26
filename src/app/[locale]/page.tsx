@@ -18,22 +18,22 @@ function HomePageContent({ data, news }: { data: HomepageData; news: NewsItem[] 
   const { nextRace, standings, recent, maxPts } = data;
 
   return (
-    <div className="min-h-screen bg-[#080808]">
-      {/* Section 1: Hero — Next Race Countdown */}
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary, #07070c)" }}>
+      {/* Section 1: Hero */}
       <HeroNextRace race={nextRace} />
 
-      {/* Section 2: Market Overview — Integrated Odds Table */}
-      <div className="mx-auto max-w-7xl px-5 py-8">
+      {/* Section 2: Market Overview */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px", marginBottom: "80px" }}>
         <MarketOverview />
       </div>
 
-      {/* Section 3: Season Snapshot — Standings vs Market */}
-      <div className="mx-auto max-w-7xl px-5 pb-8">
+      {/* Section 3: Season Snapshot */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px", marginBottom: "80px" }}>
         <SeasonSnapshot standings={standings} recent={recent} maxPts={maxPts} />
       </div>
 
-      {/* Section 4: News — Featured Headlines */}
-      <div className="mx-auto max-w-7xl px-5 pb-12">
+      {/* Section 4: News */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px", marginBottom: "80px" }}>
         <NewsSection news={news} />
       </div>
     </div>

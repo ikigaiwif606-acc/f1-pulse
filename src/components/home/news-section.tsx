@@ -1,81 +1,83 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { Link } from "@/lib/i18n/navigation";
 import type { NewsItem } from "@/lib/data/news";
 
 interface NewsSectionProps {
   news: NewsItem[];
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  official: "#E10600",
-  analysis: "#FF8000",
-  tech: "#27F4D2",
-  general: "#3671C6",
-};
+// Emoji placeholders for news thumbnails
+const THUMB_EMOJIS = ["\u{1F3CE}\uFE0F", "\u{1F5FE}", "\u{1F3C1}", "\u{1F3C6}", "\u{1F3F3}\uFE0F"];
 
 export function NewsSection({ news }: NewsSectionProps) {
-  const tCommon = useTranslations("common");
-
   if (!news.length) return null;
 
-  // Show max 3 news items
   const items = news.slice(0, 3);
 
   return (
-    <section className="animate-fade-up stagger-3">
-      <div className="mb-4 flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <div className="f1-accent-bar" />
-          <span className="f1-heading text-white">Headlines</span>
+    <section className="section-animate">
+      <div className="flex items-baseline justify-between" style={{ marginBottom: "20px" }}>
+        <div style={{ fontFamily: "var(--font-oswald), sans-serif", fontSize: "22px", fontWeight: 700, letterSpacing: "0.5px", color: "var(--text-primary, #eeeef0)" }}>
+          Headlines
         </div>
-        <Link href="/news" className="f1-transition f1-label hover:!text-white">
+        <a href="/en/news" style={{ fontSize: "13px", color: "var(--text-secondary, #8b8b9e)", textDecoration: "none", fontWeight: 500 }}>
           More News &rarr;
-        </Link>
+        </a>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: "20px" }}>
         {items.map((item, i) => (
           <a
             key={item.link + i}
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="f1-surface f1-transition group overflow-hidden hover:border-[rgba(255,255,255,0.12)]"
+            className="news-card-hover"
+            style={{
+              background: "var(--bg-secondary, #0e0e18)",
+              border: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
+              borderRadius: "12px",
+              overflow: "hidden",
+              transition: "all 0.25s ease",
+              cursor: "pointer",
+              textDecoration: "none",
+              color: "inherit",
+              display: "block",
+            }}
           >
-            {/* Thumbnail placeholder — colored band */}
-            <div
-              className="h-28 sm:h-32 relative overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg, ${CATEGORY_COLORS[item.category] || "#3671C6"}15, ${CATEGORY_COLORS[item.category] || "#3671C6"}05)`,
-              }}
-            >
-              <div className="absolute inset-0 bg-grid opacity-30" />
-              <div className="absolute bottom-3 left-4">
-                <span
-                  className="f1-label-xs rounded px-1.5 py-0.5"
-                  style={{
-                    color: CATEGORY_COLORS[item.category] || "#3671C6",
-                    backgroundColor: `${CATEGORY_COLORS[item.category] || "#3671C6"}20`,
-                  }}
-                >
-                  {item.category}
-                </span>
+            {/* Thumbnail placeholder */}
+            <div style={{ width: "100%", height: "160px", position: "relative", overflow: "hidden" }}>
+              <div className="news-thumb-zoom" style={{
+                width: "100%", height: "100%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "40px",
+                background: `linear-gradient(135deg, var(--bg-tertiary, #161625), var(--bg-hover, #1c1c30))`,
+                transition: "transform 0.4s ease",
+              }}>
+                {THUMB_EMOJIS[i % THUMB_EMOJIS.length]}
               </div>
-              {/* Hover zoom effect on the pattern */}
-              <div className="absolute inset-0 f1-transition group-hover:scale-[1.03]" />
             </div>
 
-            <div className="p-4">
-              <h4 className="f1-body font-semibold text-white group-hover:text-[#E10600] f1-transition line-clamp-2 mb-3">
+            {/* Body */}
+            <div style={{ padding: "16px 18px 18px" }}>
+              <div style={{
+                fontSize: "14px", fontWeight: 600,
+                lineHeight: 1.5, color: "var(--text-primary, #eeeef0)",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical" as const,
+                overflow: "hidden",
+                marginBottom: "8px",
+              }}>
                 {item.title}
-              </h4>
-              <div className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: item.sourceColor }} />
-                <span className="f1-label-xs" style={{ color: item.sourceColor }}>{item.source}</span>
-                <span className="f1-label-xs !text-[var(--text-ghost)]">&middot;</span>
-                <span className="f1-label-xs !text-[var(--text-ghost)]">{item.timeAgo}</span>
+              </div>
+              <div style={{
+                fontSize: "11px",
+                color: "var(--text-muted, #4e4e62)",
+                fontFamily: "var(--font-mono), monospace",
+                letterSpacing: "0.3px",
+              }}>
+                {item.source} &middot; {item.timeAgo}
               </div>
             </div>
           </a>

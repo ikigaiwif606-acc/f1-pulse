@@ -36,84 +36,107 @@ export function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#080808]/95 backdrop-blur-xl">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#E10600] to-transparent" />
-
-      <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-5">
-        <Link href="/" className="flex items-baseline gap-1">
-          <span className="f1-display" style={{ fontSize: "1.25rem", letterSpacing: "-0.03em", color: "#E10600" }}>
-            F1
-          </span>
-          <span className="f1-display" style={{ fontSize: "1.25rem", letterSpacing: "-0.03em", color: "#ededed" }}>
-            PULSE
+    <header className="sticky top-0 z-50" style={{ background: "rgba(7,7,12,0.82)", backdropFilter: "blur(20px) saturate(1.4)" }}>
+      <div className="mx-auto flex items-center justify-between px-5 sm:px-10" style={{ height: "56px" }}>
+        {/* Logo with red dot */}
+        <Link href="/" className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-[#E10600]" style={{ boxShadow: "0 0 10px #E10600, 0 0 20px rgba(225,6,0,0.3)" }} />
+          <span className="f1-display" style={{ fontSize: "18px", letterSpacing: "2px", color: "var(--text-primary, #eeeef0)" }}>
+            F1 PULSE
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 md:flex">
+        {/* Nav links */}
+        <nav className="hidden items-center md:flex" style={{ gap: "32px" }}>
           {primaryNav.map((item) => (
             <Link
               key={item.key}
               href={item.href}
-              className={`f1-transition relative px-3 py-1.5 f1-label ${
-                isActive(item.href) ? "!text-white" : "!text-[#666] hover:!text-white"
-              }`}
-              style={{ fontSize: "0.6875rem" }}
+              className="relative py-4"
+              style={{
+                fontFamily: "var(--font-oswald), sans-serif",
+                fontSize: "13px",
+                fontWeight: 500,
+                letterSpacing: "1.2px",
+                textTransform: "uppercase" as const,
+                color: isActive(item.href) ? "var(--text-primary, #eeeef0)" : "var(--text-secondary, #8b8b9e)",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
             >
               {t(item.key)}
               {isActive(item.href) && (
-                <span className="absolute bottom-0 left-1/2 h-px w-4 -translate-x-1/2 bg-[#E10600]" />
+                <span className="absolute left-0 right-0" style={{ bottom: "0", height: "2px", background: "#E10600" }} />
               )}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        {/* Right side */}
+        <div className="flex items-center gap-4">
+          {/* Live badge */}
+          <div className="hidden sm:flex items-center gap-1.5" style={{ fontFamily: "var(--font-mono), monospace", fontSize: "11px", letterSpacing: "1px", color: "var(--text-muted, #4e4e62)" }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--text-muted, #4e4e62)" }} />
+            OFF-SEASON
+          </div>
+
           {/* Locale switcher */}
           <button
             onClick={switchLocale}
-            className="f1-transition f1-label rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2.5 py-1 hover:border-[#E10600]/30 hover:!text-white"
-            style={{ fontSize: "0.5625rem" }}
+            style={{
+              fontFamily: "var(--font-oswald), sans-serif",
+              fontSize: "12px",
+              letterSpacing: "1px",
+              color: "var(--text-muted, #4e4e62)",
+              padding: "4px 10px",
+              border: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
+              borderRadius: "4px",
+              background: "transparent",
+              cursor: "pointer",
+              transition: "all 0.2s",
+            }}
           >
-            {locale === "en" ? "\u4E2D\u6587" : "ENG"}
+            {locale === "en" ? "\u4E2D / EN" : "EN / \u4E2D"}
           </button>
-
-          {/* Live indicator */}
-          <div className="hidden sm:flex items-center gap-1.5 rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2 py-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#666]" />
-            <span className="f1-label-xs !text-[#666]">Live</span>
-          </div>
 
           {/* Mobile menu toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="f1-transition flex h-10 w-10 items-center justify-center rounded hover:bg-[#161616] md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded md:hidden"
             aria-label="Toggle menu"
+            style={{ transition: "background 0.2s" }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               {mobileOpen ? (
                 <path d="M4 4L12 12M12 4L4 12" stroke="#E10600" strokeWidth="1.5" strokeLinecap="round" />
               ) : (
-                <path d="M2 4H14M2 8H14M2 12H14" stroke="#ededed" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M2 4H14M2 8H14M2 12H14" stroke="#eeeef0" strokeWidth="1.5" strokeLinecap="round" />
               )}
             </svg>
           </button>
         </div>
       </div>
 
+      {/* Mobile menu */}
       {mobileOpen && (
-        <nav className="border-t border-[#1c1c1c] bg-[#080808] px-5 py-3 md:hidden animate-fade-up" style={{ animationDuration: "0.25s" }}>
+        <nav className="px-5 py-3 md:hidden animate-fade-up" style={{ borderTop: "1px solid var(--border-subtle)", background: "var(--bg-primary, #07070c)", animationDuration: "0.25s" }}>
           <div className="flex flex-col gap-0.5">
             {primaryNav.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`f1-transition rounded px-3 py-3 f1-label ${
-                  isActive(item.href)
-                    ? "bg-[#E10600]/10 !text-[#E10600]"
-                    : "!text-[#666] hover:!text-white"
-                }`}
-                style={{ fontSize: "0.6875rem" }}
+                className="rounded px-3 py-3"
+                style={{
+                  fontFamily: "var(--font-oswald), sans-serif",
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  letterSpacing: "1.2px",
+                  textTransform: "uppercase" as const,
+                  color: isActive(item.href) ? "#E10600" : "var(--text-muted, #4e4e62)",
+                  background: isActive(item.href) ? "rgba(225,6,0,0.06)" : "transparent",
+                  textDecoration: "none",
+                }}
               >
                 {t(item.key)}
               </Link>
@@ -122,7 +145,7 @@ export function Header() {
         </nav>
       )}
 
-      <div className="h-px w-full bg-[#1c1c1c]" />
+      <div className="h-px w-full" style={{ background: "var(--border-subtle, rgba(255,255,255,0.05))" }} />
     </header>
   );
 }

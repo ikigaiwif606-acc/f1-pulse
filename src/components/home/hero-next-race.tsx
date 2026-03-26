@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useMarkets } from "@/lib/hooks/use-markets";
-import { Link } from "@/lib/i18n/navigation";
 
 interface HeroNextRaceProps {
   race: {
@@ -45,34 +44,6 @@ const RACE_FLAGS: Record<string, string> = {
   "Abu Dhabi": "\u{1F1E6}\u{1F1EA}",
 };
 
-// Country-inspired gradient accents
-const RACE_ACCENT: Record<string, string> = {
-  Japanese: "#BC002D",
-  Australian: "#012169",
-  Chinese: "#DE2910",
-  Bahrain: "#CE1126",
-  "Saudi Arabian": "#006C35",
-  Miami: "#FF6B35",
-  Canadian: "#FF0000",
-  Monaco: "#CE1126",
-  Spanish: "#F1BF00",
-  Austrian: "#ED2939",
-  British: "#012169",
-  Belgian: "#FDDA24",
-  Hungarian: "#477050",
-  Dutch: "#FF6600",
-  Italian: "#008C45",
-  Madrid: "#F1BF00",
-  Azerbaijan: "#00B5E2",
-  Singapore: "#EF3340",
-  "United States": "#3C3B6E",
-  "Mexico City": "#006847",
-  Brazilian: "#009B3A",
-  "Las Vegas": "#B8860B",
-  Qatar: "#8D1B3D",
-  "Abu Dhabi": "#000000",
-};
-
 function getTimeLeft(target: string) {
   const diff = new Date(target).getTime() - Date.now();
   if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -91,36 +62,19 @@ function getRaceKeyword(name: string): string {
   return "";
 }
 
-function CountdownDigit({ value, label }: { value: number; label: string }) {
-  const [prev, setPrev] = useState(value);
-  const [flipping, setFlipping] = useState(false);
-
-  useEffect(() => {
-    if (value !== prev) {
-      setFlipping(true);
-      const t = setTimeout(() => {
-        setPrev(value);
-        setFlipping(false);
-      }, 200);
-      return () => clearTimeout(t);
-    }
-  }, [value, prev]);
-
-  return (
-    <div className="text-center">
-      <div className="countdown-block-hero">
-        <span
-          className={`font-mono text-4xl sm:text-5xl lg:text-[4rem] font-bold tabular-nums text-white relative transition-opacity duration-200 ${
-            flipping ? "opacity-40" : "opacity-100"
-          }`}
-        >
-          {String(value).padStart(2, "0")}
-        </span>
-      </div>
-      <p className="f1-label-xs mt-2">{label}</p>
-    </div>
-  );
-}
+// Team color mapping for market preview
+const TEAM_DOT_COLORS: Record<string, string> = {
+  RUS: "var(--team-mercedes)",
+  ANT: "var(--team-mercedes)",
+  LEC: "var(--team-ferrari)",
+  HAM: "var(--team-ferrari)",
+  NOR: "var(--team-mclaren)",
+  PIA: "var(--team-mclaren)",
+  VER: "var(--team-redbull)",
+  HAD: "var(--team-redbull)",
+  BEA: "var(--team-haas)",
+  ALO: "var(--team-aston-martin)",
+};
 
 export function HeroNextRace({ race }: HeroNextRaceProps) {
   const t = useTranslations("home");
@@ -138,11 +92,10 @@ export function HeroNextRace({ race }: HeroNextRaceProps) {
   const circuit = locale === "zh" ? race.circuitZh : race.circuit;
   const keyword = getRaceKeyword(race.name);
   const flag = RACE_FLAGS[keyword] || "";
-  const accent = RACE_ACCENT[keyword] || "#E10600";
 
-  // Get race winner top 3 from market data
+  // Get race winner top 4 from market data
   const raceWinnerMarket = markets.raceWinner?.[0];
-  const top3 = raceWinnerMarket?.outcomes?.slice(0, 3) || [];
+  const top4 = raceWinnerMarket?.outcomes?.slice(0, 4) || [];
 
   const units = [
     { value: time.days, label: t("days") },
@@ -152,103 +105,198 @@ export function HeroNextRace({ race }: HeroNextRaceProps) {
   ];
 
   const sessions = [
-    { label: "FP1", time: "FRI 03:30", day: tRace("fp1") },
-    { label: "QUAL", time: "SAT 07:00", day: tRace("qualifying") },
-    { label: "RACE", time: "SUN 06:00", day: tRace("race") },
+    { label: "FP1", time: "FRI 03:30 UTC", isNext: false },
+    { label: "QUAL", time: "SAT 07:00 UTC", isNext: false },
+    { label: "RACE", time: "SUN 06:00 UTC", isNext: true },
   ];
 
   return (
-    <section className="relative overflow-hidden" style={{ minHeight: "55vh" }}>
-      {/* Dynamic gradient background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 0%, ${accent}15 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 100%, #E1060010 0%, transparent 50%),
-            linear-gradient(to bottom, #0a0a0f, #080808)
-          `,
-        }}
-      />
-      {/* Geometric grid pattern */}
-      <div className="absolute inset-0 bg-grid opacity-50" />
-      {/* Top glow */}
-      <div
-        className="absolute -top-32 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full blur-[120px]"
-        style={{ background: `${accent}20` }}
-      />
+    <section className="hero-section relative overflow-hidden flex items-center justify-center" style={{ minHeight: "75vh", padding: "80px 40px 60px" }}>
+      {/* Background layers */}
+      <div className="absolute inset-0" style={{
+        background: `
+          radial-gradient(ellipse 80% 60% at 60% 40%, rgba(225,6,0,0.06) 0%, transparent 70%),
+          radial-gradient(ellipse 50% 50% at 20% 80%, rgba(39,244,210,0.04) 0%, transparent 60%),
+          linear-gradient(180deg, var(--bg-primary, #07070c) 0%, #0a0a14 100%)
+        `,
+      }} />
+      {/* Grid pattern with mask */}
+      <div className="absolute inset-0" style={{
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)",
+        backgroundSize: "80px 80px",
+        maskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%)",
+        WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%)",
+      }} />
+      {/* Diagonal track line */}
+      <div className="absolute left-[-10%] w-[120%] z-0" style={{
+        top: "50%",
+        height: "2px",
+        background: "linear-gradient(90deg, transparent 0%, rgba(225,6,0,0.15) 30%, rgba(225,6,0,0.3) 50%, rgba(225,6,0,0.15) 70%, transparent 100%)",
+        transform: "rotate(-3deg)",
+      }} />
 
-      <div className="relative mx-auto max-w-7xl px-5 flex flex-col justify-center" style={{ minHeight: "55vh", paddingTop: "3rem", paddingBottom: "3rem" }}>
-        {/* Round badge */}
-        <div className="mb-6 flex items-center gap-3 animate-fade-up">
-          <span className="f1-label rounded bg-[#E10600] px-2 py-1 !text-white !text-[0.6875rem]">
-            {t("round")} {race.round}
-          </span>
-          <span className="f1-label !text-[var(--text-ghost)]">{t("nextRace")}</span>
-          {race.isSprint && (
-            <span className="f1-label rounded border border-[#E10600]/30 px-2 py-1 !text-[#E10600]">
-              {tRace("sprint")}
-            </span>
-          )}
+      {/* Content — centered */}
+      <div className="relative z-10 text-center" style={{ maxWidth: "800px", animation: "heroFadeIn 0.8s ease-out" }}>
+        {/* Round label */}
+        <div style={{
+          fontFamily: "var(--font-mono), monospace",
+          fontSize: "12px",
+          fontWeight: 500,
+          color: "#E10600",
+          letterSpacing: "3px",
+          textTransform: "uppercase" as const,
+          marginBottom: "16px",
+        }}>
+          Round {race.round} &middot; {t("nextRace")}
         </div>
 
-        {/* Race name */}
-        <div className="mb-8 animate-fade-up stagger-1">
-          <h1 className="f1-display-xl text-white mb-2">
-            {flag && <span className="mr-3">{flag}</span>}
-            {name}
-          </h1>
-          <p className="f1-body text-[var(--text-dim)]">{circuit}</p>
-        </div>
+        {/* Flag — large */}
+        {flag && (
+          <div style={{ fontSize: "56px", marginBottom: "12px", filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.4))" }}>
+            {flag}
+          </div>
+        )}
 
-        {/* Countdown */}
-        <div className="flex gap-3 sm:gap-4 mb-8 animate-fade-up stagger-2">
+        {/* Race name — gradient text */}
+        <h1 style={{
+          fontFamily: "var(--font-oswald), sans-serif",
+          fontSize: "clamp(32px, 5vw, 48px)",
+          fontWeight: 700,
+          letterSpacing: "-0.5px",
+          marginBottom: "6px",
+          background: "linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.6) 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          lineHeight: 1.1,
+        }}>
+          {name}
+        </h1>
+
+        {/* Venue */}
+        <p style={{
+          fontSize: "15px",
+          color: "var(--text-secondary, #8b8b9e)",
+          fontWeight: 400,
+          letterSpacing: "0.5px",
+          marginBottom: "40px",
+        }}>
+          {circuit}
+        </p>
+
+        {/* Countdown — centered */}
+        <div className="flex items-center justify-center" style={{ gap: "8px", marginBottom: "36px" }}>
           {units.map((unit, i) => (
-            <div key={unit.label} className="flex items-center gap-3 sm:gap-4">
-              <CountdownDigit value={unit.value} label={unit.label} />
+            <div key={unit.label} className="flex items-center" style={{ gap: "8px" }}>
+              <div className="countdown-unit-hero text-center">
+                <span style={{
+                  fontFamily: "var(--font-mono), monospace",
+                  fontSize: "clamp(36px, 5vw, 52px)",
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  color: "var(--text-primary, #eeeef0)",
+                }}>
+                  {String(unit.value).padStart(2, "0")}
+                </span>
+                <span className="block" style={{
+                  fontFamily: "var(--font-oswald), sans-serif",
+                  fontSize: "10px",
+                  fontWeight: 500,
+                  color: "var(--text-muted, #4e4e62)",
+                  textTransform: "uppercase" as const,
+                  letterSpacing: "2px",
+                  marginTop: "8px",
+                }}>
+                  {unit.label}
+                </span>
+              </div>
               {i < units.length - 1 && (
-                <span className="font-mono text-2xl sm:text-3xl text-[var(--text-ghost)] font-light -mt-6">:</span>
+                <span className="countdown-sep-blink" style={{
+                  fontFamily: "var(--font-mono), monospace",
+                  fontSize: "36px",
+                  color: "var(--text-muted, #4e4e62)",
+                  paddingBottom: "18px",
+                }}>
+                  :
+                </span>
               )}
             </div>
           ))}
         </div>
 
-        {/* Session badges */}
-        <div className="flex flex-wrap gap-2 sm:gap-3 mb-8 animate-fade-up stagger-3">
+        {/* Session badges — centered */}
+        <div className="flex justify-center flex-wrap" style={{ gap: "12px", marginBottom: "32px" }}>
           {sessions.map((s) => (
             <div
               key={s.label}
-              className="flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.08)] bg-[rgba(15,15,15,0.5)] backdrop-blur-sm px-3 py-2 sm:px-4 sm:py-2.5"
+              className="flex items-center"
+              style={{
+                gap: "8px",
+                padding: "8px 16px",
+                background: s.isNext ? "rgba(225,6,0,0.06)" : "var(--bg-secondary, #0e0e18)",
+                border: `1px solid ${s.isNext ? "rgba(225,6,0,0.3)" : "var(--border-subtle, rgba(255,255,255,0.05))"}`,
+                borderRadius: "8px",
+                fontSize: "12px",
+                color: "var(--text-secondary, #8b8b9e)",
+                fontFamily: "var(--font-mono), monospace",
+                letterSpacing: "0.5px",
+              }}
             >
-              <span className="f1-label-xs !text-[var(--text-dim)]">{s.label}</span>
-              <span className="font-mono text-xs tabular-nums text-white">{s.time} UTC</span>
+              <span style={{
+                fontFamily: "var(--font-oswald), sans-serif",
+                fontWeight: 600,
+                color: s.isNext ? "#E10600" : "var(--text-primary, #eeeef0)",
+                fontSize: "11px",
+                letterSpacing: "1px",
+                textTransform: "uppercase" as const,
+              }}>
+                {s.label}
+              </span>
+              {s.time}
             </div>
           ))}
         </div>
 
-        {/* Market prediction top 3 */}
-        {top3.length > 0 && (
-          <div className="animate-fade-up stagger-4">
-            <Link
-              href="/markets"
-              className="inline-flex items-center gap-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(15,15,15,0.4)] backdrop-blur-sm px-4 py-3 f1-transition hover:border-[rgba(255,255,255,0.12)] group"
-            >
-              <span className="f1-label-xs !text-[var(--text-ghost)]">
-                {locale === "zh" ? "市场预测" : "Market Prediction"}
-              </span>
-              <div className="flex items-center gap-4">
-                {top3.map((o) => (
-                  <div key={o.name} className="flex items-center gap-1.5">
-                    <div className="h-2 w-0.5 rounded-full" style={{ backgroundColor: o.color }} />
-                    <span className="f1-body-sm text-white">{o.name.split(" ").pop()}</span>
-                    <span className="font-mono text-xs tabular-nums font-bold" style={{ color: o.color }}>
-                      {Math.round(o.price * 100)}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <span className="f1-label-xs !text-[var(--text-ghost)] group-hover:!text-white f1-transition">&rarr;</span>
-            </Link>
+        {/* Market prediction — centered box */}
+        {top4.length > 0 && (
+          <div>
+            <div style={{
+              fontFamily: "var(--font-oswald), sans-serif",
+              fontSize: "10px",
+              letterSpacing: "2px",
+              color: "var(--text-muted, #4e4e62)",
+              textTransform: "uppercase" as const,
+              marginBottom: "12px",
+            }}>
+              Race Win Probability
+            </div>
+            <div className="inline-flex flex-wrap justify-center" style={{
+              gap: "24px",
+              padding: "16px 24px",
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
+              borderRadius: "10px",
+            }}>
+              {top4.map((o) => (
+                <div key={o.name} className="flex items-center" style={{ gap: "10px", fontSize: "14px", color: "var(--text-secondary, #8b8b9e)" }}>
+                  <div style={{
+                    width: "4px",
+                    height: "20px",
+                    borderRadius: "2px",
+                    background: TEAM_DOT_COLORS[o.code] || o.color,
+                  }} />
+                  <span style={{ fontWeight: 600, color: "var(--text-primary, #eeeef0)" }}>
+                    {o.name.split(" ").pop()}
+                  </span>
+                  <span style={{
+                    fontFamily: "var(--font-mono), monospace",
+                    fontSize: "13px",
+                    color: "var(--accent-green, #00d26a)",
+                  }}>
+                    {Math.round(o.price * 100)}%
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

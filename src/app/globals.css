@@ -91,12 +91,21 @@
 }
 
 .dark {
-  --background: #080808;
-  --foreground: #ededed;
-  --card: #0f0f0f;
-  --card-foreground: #ededed;
-  --popover: #0f0f0f;
-  --popover-foreground: #ededed;
+  --bg-primary: #07070c;
+  --bg-secondary: #0e0e18;
+  --bg-tertiary: #161625;
+  --bg-hover: #1c1c30;
+  --border-subtle: rgba(255,255,255,0.05);
+  --border-default: rgba(255,255,255,0.09);
+  --text-primary: #eeeef0;
+  --text-secondary: #8b8b9e;
+
+  --background: #07070c;
+  --foreground: #eeeef0;
+  --card: #0e0e18;
+  --card-foreground: #eeeef0;
+  --popover: #0e0e18;
+  --popover-foreground: #eeeef0;
   --primary: #E10600;
   --primary-foreground: #ffffff;
   --secondary: #161616;
@@ -714,4 +723,78 @@
 }
 .value-pill:hover {
   box-shadow: 0 0 16px rgba(34, 197, 94, 0.2), 0 0 4px rgba(34, 197, 94, 0.3);
+}
+
+/* ── Mockup-aligned: Hero fade-in ─────────────────────── */
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Countdown unit (hero) ────────────────────────────── */
+.countdown-unit-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-secondary, #0e0e18);
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  border-radius: 12px;
+  padding: 16px 20px 12px;
+  min-width: 90px;
+  position: relative;
+  overflow: hidden;
+}
+.countdown-unit-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(225,6,0,0.3), transparent);
+}
+@media (max-width: 640px) {
+  .countdown-unit-hero {
+    min-width: 68px;
+    padding: 12px 14px 10px;
+  }
+}
+
+/* ── Blinking countdown separator ─────────────────────── */
+@keyframes sepBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+.countdown-sep-blink {
+  animation: sepBlink 2s ease-in-out infinite;
+}
+
+/* ── Section stagger animation ────────────────────────── */
+.section-animate {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: sectionIn 0.7s ease-out forwards;
+}
+.section-animate:nth-child(1) { animation-delay: 0s; }
+.section-animate:nth-child(2) { animation-delay: 0.1s; }
+.section-animate:nth-child(3) { animation-delay: 0.2s; }
+.section-animate:nth-child(4) { animation-delay: 0.3s; }
+@keyframes sectionIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── News card hover ──────────────────────────────────── */
+.news-card-hover:hover {
+  border-color: var(--border-default, rgba(255,255,255,0.09)) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+.news-card-hover:hover .news-thumb-zoom {
+  transform: scale(1.04);
+}
+
+/* ── Responsive: mobile market table + hero ───────────── */
+@media (max-width: 900px) {
+  .hero-section {
+    min-height: 65vh !important;
+    padding: 70px 20px 40px !important;
+  }
 }

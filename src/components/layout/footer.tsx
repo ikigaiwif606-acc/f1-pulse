@@ -1,9 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 
 export function Footer() {
   const t = useTranslations("footer");
+  const tNav = useTranslations("nav");
 
   return (
     <footer className="border-t border-[#1c1c1c] bg-[#080808]">
@@ -16,6 +18,22 @@ export function Footer() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-live" />
               <span className="f1-label-xs !text-emerald-500">Live</span>
             </div>
+          </div>
+
+          {/* Footer nav links */}
+          <div className="flex items-center gap-4">
+            <Link href="/news" className="f1-label-xs !text-[var(--text-ghost)] hover:!text-white f1-transition">
+              {tNav("news")}
+            </Link>
+            <Link href="/sponsorships" className="f1-label-xs !text-[var(--text-ghost)] hover:!text-white f1-transition">
+              {tNav("sponsorships")}
+            </Link>
+            <Link href="/replay" className="f1-label-xs !text-[var(--text-ghost)] hover:!text-white f1-transition">
+              {tNav("replay")}
+            </Link>
+            <Link href="/teams" className="f1-label-xs !text-[var(--text-ghost)] hover:!text-white f1-transition">
+              {tNav("teams")}
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">

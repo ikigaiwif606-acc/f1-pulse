@@ -1,26 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/lib/i18n/navigation";
 import { useLocale } from "next-intl";
 
 const primaryNav = [
   { key: "races", href: "/races" },
-  { key: "drivers", href: "/drivers" },
-  { key: "teams", href: "/teams" },
   { key: "markets", href: "/markets" },
+  { key: "standings", href: "/drivers" },
   { key: "analytics", href: "/analytics" },
-  { key: "replay", href: "/replay" },
 ] as const;
-
-const moreNav = [
-  { key: "news", href: "/news" },
-  { key: "sponsorships", href: "/sponsorships" },
-  { key: "stocks", href: "/stocks" },
-] as const;
-
-const allNav = [...primaryNav, ...moreNav];
 
 export function Header() {
   const t = useTranslations("nav");
@@ -28,8 +18,6 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
 
   function switchLocale() {
     const next = locale === "en" ? "zh" : "en";
@@ -39,27 +27,12 @@ export function Header() {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + "/");
 
-  const isMoreActive = moreNav.some((item) => isActive(item.href));
-
-  // Close dropdown on click outside or Escape key
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-        setMoreOpen(false);
-      }
-    }
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMoreOpen(false);
-        setMobileOpen(false);
-      }
+      if (e.key === "Escape") setMobileOpen(false);
     }
-    document.addEventListener("mousedown", handleClick);
     document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return (
@@ -92,56 +65,25 @@ export function Header() {
               )}
             </Link>
           ))}
-
-          {/* More dropdown */}
-          <div ref={moreRef} className="relative">
-            <button
-              onClick={() => setMoreOpen(!moreOpen)}
-              aria-expanded={moreOpen}
-              aria-haspopup="true"
-              className={`f1-transition relative flex items-center gap-1 px-3 py-1.5 f1-label ${
-                isMoreActive ? "!text-white" : "!text-[#666] hover:!text-white"
-              }`}
-              style={{ fontSize: "0.6875rem" }}
-            >
-              {t("more")}
-              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" className={`f1-transition ${moreOpen ? "rotate-180" : ""}`}>
-                <path d="M2 3L4 5L6 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-              {isMoreActive && (
-                <span className="absolute bottom-0 left-1/2 h-px w-4 -translate-x-1/2 bg-[#E10600]" />
-              )}
-            </button>
-
-            {moreOpen && (
-              <div className="absolute right-0 top-full mt-1 w-40 rounded border border-[#1c1c1c] bg-[#0f0f0f] py-1 shadow-xl shadow-black/50 animate-fade-up" style={{ animationDuration: "0.2s" }}>
-                {moreNav.map((item) => (
-                  <Link
-                    key={item.key}
-                    href={item.href}
-                    onClick={() => setMoreOpen(false)}
-                    className={`f1-transition block px-3 py-2 f1-label ${
-                      isActive(item.href) ? "!text-[#E10600] bg-[#E10600]/5" : "!text-[#888] hover:!text-white hover:bg-[#161616]"
-                    }`}
-                    style={{ fontSize: "0.6875rem" }}
-                  >
-                    {t(item.key)}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Locale switcher */}
           <button
             onClick={switchLocale}
             className="f1-transition f1-label rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2.5 py-1 hover:border-[#E10600]/30 hover:!text-white"
             style={{ fontSize: "0.5625rem" }}
           >
-            {locale === "en" ? "中文" : "ENG"}
+            {locale === "en" ? "\u4E2D\u6587" : "ENG"}
           </button>
 
+          {/* Live indicator */}
+          <div className="hidden sm:flex items-center gap-1.5 rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#666]" />
+            <span className="f1-label-xs !text-[#666]">Live</span>
+          </div>
+
+          {/* Mobile menu toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="f1-transition flex h-10 w-10 items-center justify-center rounded hover:bg-[#161616] md:hidden"
@@ -161,7 +103,7 @@ export function Header() {
       {mobileOpen && (
         <nav className="border-t border-[#1c1c1c] bg-[#080808] px-5 py-3 md:hidden animate-fade-up" style={{ animationDuration: "0.25s" }}>
           <div className="flex flex-col gap-0.5">
-            {allNav.map((item) => (
+            {primaryNav.map((item) => (
               <Link
                 key={item.key}
                 href={item.href}

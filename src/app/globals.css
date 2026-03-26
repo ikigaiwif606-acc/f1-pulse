@@ -115,6 +115,24 @@
   --text-dim: #888;       /* replaces inline #555/#444 — 5.0:1 */
   --text-subtle: #777;    /* replaces inline #333 — 3.9:1 */
   --text-ghost: #666;     /* replaces inline #222 — 3.1:1 */
+
+  /* Accent colors — market movement */
+  --accent-green: #00d26a;
+  --accent-red: #ff4757;
+  --accent-neutral: #6c6c7a;
+
+  /* Team colors */
+  --team-mercedes: #27F4D2;
+  --team-ferrari: #E8002D;
+  --team-mclaren: #FF8000;
+  --team-redbull: #3671C6;
+  --team-aston-martin: #229971;
+  --team-alpine: #FF87BC;
+  --team-williams: #64C4FF;
+  --team-haas: #B6BABD;
+  --team-kick-sauber: #52E252;
+  --team-racing-bulls: #6692FF;
+
   --chart-1: #E10600;
   --chart-2: #27F4D2;
   --chart-3: #FF8000;
@@ -589,6 +607,38 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), transparent);
+  pointer-events: none;
+}
+
+/* Hero countdown block — larger, more dramatic */
+.countdown-block-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 15, 15, 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  min-width: 5rem;
+  text-align: center;
+}
+@media (min-width: 640px) {
+  .countdown-block-hero {
+    padding: 1.25rem 2rem;
+    min-width: 6.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .countdown-block-hero {
+    padding: 1.5rem 2.5rem;
+    min-width: 7.5rem;
+  }
+}
+.countdown-block-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03), transparent);
   pointer-events: none;
 }
 

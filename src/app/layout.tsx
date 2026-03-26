@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const chakraPetch = Chakra_Petch({
+const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body
-        className={`${plusJakarta.variable} ${chakraPetch.variable} ${jetbrainsMono.variable} antialiased dark`}
+        className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable} antialiased dark`}
       >
         {children}
       </body>

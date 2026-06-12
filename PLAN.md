@@ -1,5 +1,11 @@
 # F1 Pulse — Full Redesign Plan (2026-06-12)
 
+> **Status: SHIPPED 2026-06-12** — commits `c9a612a` (phases 0–3) and `729cd99`
+> (⌘K palette, live deep-analytics stats, Jolpica pagination fix, OpenF1 key
+> support), both deployed to production and verified live.
+> Remaining ideas: OpenF1 API key in Vercel env to enable live timing;
+> dynamize the tire-strategy card (needs OpenF1 stints data).
+
 Goal: turn F1 Pulse into a live "trading terminal for F1" — correct data first, then a dense,
 animated, odds-driven UI. Keep the existing brand DNA: dark broadcast theme, Oswald/Inter/
 JetBrains Mono (deliberately chosen in commit 62c82ec), team colors, `f1-*` utility classes.

@@ -75,10 +75,19 @@ export function MarketsContent() {
                         className="f1-transition flex items-center gap-3 f1-surface-inner p-2.5 hover:bg-[#0d0d0d]"
                       >
                         <div className="f1-team-bar h-5" style={{ backgroundColor: o.color }} />
-                        <span className="f1-data w-8 text-[0.625rem]" style={{ color: "#444" }}>
+                        <span className="f1-data w-8 text-[0.625rem]" style={{ color: "var(--text-dim, #888)" }}>
                           {o.code}
                         </span>
                         <span className="f1-body-sm flex-1 font-semibold text-white">{o.name}</span>
+
+                        {o.change24h !== undefined && Math.abs(o.change24h) >= 0.0005 && (
+                          <span
+                            className="f1-data hidden text-xs sm:block"
+                            style={{ color: o.change24h > 0 ? "var(--accent-green, #00d26a)" : "var(--accent-red, #ff4757)" }}
+                          >
+                            {o.change24h > 0 ? "▲" : "▼"} {Math.abs(o.change24h * 100).toFixed(1)}
+                          </span>
+                        )}
 
                         <div className="hidden w-32 sm:block">
                           <div className="h-[3px] w-full rounded-full bg-[#161616]">
@@ -91,7 +100,7 @@ export function MarketsContent() {
 
                         <div className="w-14 rounded border border-[#1c1c1c] bg-[#0f0f0f] py-1 text-center">
                           <span className="f1-data text-sm text-white">
-                            {(o.price * 100).toFixed(0)}
+                            {(o.price * 100).toFixed(o.price < 0.1 ? 1 : 0)}
                           </span>
                           <span className="f1-label-xs ml-px">%</span>
                         </div>
@@ -100,11 +109,11 @@ export function MarketsContent() {
                   </div>
 
                   <div className="mt-3 flex items-center justify-between border-t border-[#131313] pt-3">
-                    <span className="f1-label-xs" style={{ color: "#2a2a2a" }}>
+                    <span className="f1-label-xs" style={{ color: "var(--text-dim, #888)" }}>
                       {t("lastUpdated")}: {isLoading ? t("refreshing") : t("justNow")}
                     </span>
                     <a
-                      href="https://polymarket.com/sports/f1/props"
+                      href={market.url || "https://polymarket.com/sports/f1/props"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="f1-transition f1-label !text-[#E10600] hover:opacity-70"

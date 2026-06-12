@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/navigation";
 import type { NewsItem } from "@/lib/data/news";
 
 interface NewsSectionProps {
@@ -10,6 +12,8 @@ interface NewsSectionProps {
 const THUMB_EMOJIS = ["\u{1F3CE}\uFE0F", "\u{1F5FE}", "\u{1F3C1}", "\u{1F3C6}", "\u{1F3F3}\uFE0F"];
 
 export function NewsSection({ news }: NewsSectionProps) {
+  const t = useTranslations("news");
+  const tCommon = useTranslations("common");
   if (!news.length) return null;
 
   const items = news.slice(0, 3);
@@ -18,11 +22,11 @@ export function NewsSection({ news }: NewsSectionProps) {
     <section className="section-animate">
       <div className="flex items-baseline justify-between" style={{ marginBottom: "20px" }}>
         <div style={{ fontFamily: "var(--font-oswald), sans-serif", fontSize: "22px", fontWeight: 700, letterSpacing: "0.5px", color: "var(--text-primary, #eeeef0)" }}>
-          Headlines
+          {t("latestHeadlines")}
         </div>
-        <a href="/en/news" style={{ fontSize: "13px", color: "var(--text-secondary, #8b8b9e)", textDecoration: "none", fontWeight: 500 }}>
-          More News &rarr;
-        </a>
+        <Link href="/news" style={{ fontSize: "13px", color: "var(--text-secondary, #8b8b9e)", textDecoration: "none", fontWeight: 500 }}>
+          {tCommon("viewAll")} &rarr;
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ gap: "20px" }}>

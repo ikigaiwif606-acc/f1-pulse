@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useMarkets, useChampionshipOdds } from "@/lib/hooks/use-markets";
+import { Link } from "@/lib/i18n/navigation";
+import { useMarkets } from "@/lib/hooks/use-markets";
+import type { MarketOutcomeItem } from "@/types";
 
-// Driver code → team mapping
+// Driver code → team mapping (2026 grid)
 const DRIVER_TEAM: Record<string, string> = {
   RUS: "Mercedes", ANT: "Mercedes",
   LEC: "Ferrari", HAM: "Ferrari",
@@ -19,26 +21,12 @@ const DRIVER_TEAM: Record<string, string> = {
   BOT: "Cadillac", PER: "Cadillac",
 };
 
-const TEAM_COLORS: Record<string, string> = {
-  Mercedes: "var(--team-mercedes)", Ferrari: "var(--team-ferrari)",
-  McLaren: "var(--team-mclaren)", "Red Bull": "var(--team-redbull)",
-  "Aston Martin": "var(--team-aston-martin)", Alpine: "var(--team-alpine)",
-  Williams: "var(--team-williams)", Haas: "var(--team-haas)",
-  RB: "var(--team-racing-bulls)", Audi: "#E10600",
-  Cadillac: "#2D826D",
-};
-
-// Generate 7-day sparkline data
-function generateSparkline(current: number, change: number): number[] {
-  const points = 7;
-  const data: number[] = [];
-  const base = current - change;
-  for (let i = 0; i < points; i++) {
-    const progress = i / (points - 1);
-    const noise = Math.sin(i * 2.5) * 0.02;
-    data.push(base + change * progress + noise);
-  }
-  return data;
+/** Real 7-day trend from the live snapshot: price 7d ago → 24h ago → now. */
+function trendPoints(o: MarketOutcomeItem): number[] | null {
+  if (o.change7d === undefined && o.change24h === undefined) return null;
+  const now = o.price;
+  const points = [now - (o.change7d ?? 0), now - (o.change24h ?? 0), now];
+  return points;
 }
 
 function Sparkline({ data, color }: { data: number[]; color: string }) {
@@ -56,13 +44,12 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
     })
     .join(" ");
 
-  const lastX = pad + ((data.length - 1) / (data.length - 1)) * (w - pad * 2);
   const lastY = pad + (1 - (data[data.length - 1] - min) / range) * (h - pad * 2);
 
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
       <polyline fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={points} />
-      <circle cx={lastX} cy={lastY} r="2.5" fill={color} />
+      <circle cx={w - pad} cy={lastY} r="2.5" fill={color} />
     </svg>
   );
 }
@@ -71,62 +58,49 @@ type TabKey = "championship" | "nextRace" | "constructors";
 
 export function MarketOverview() {
   const t = useTranslations("markets");
-  const tCommon = useTranslations("common");
+  const tHome = useTranslations("home");
   const { markets, isLoading } = useMarkets();
-  const { odds: championshipOdds } = useChampionshipOdds();
   const [activeTab, setActiveTab] = useState<TabKey>("championship");
   const [expanded, setExpanded] = useState(false);
 
+  const wdcMarket = markets.championship?.find((m) => m.question.toLowerCase().includes("driver"));
+  const wccMarket = markets.championship?.find((m) => m.question.toLowerCase().includes("constructor"));
+  const raceMarket = markets.raceWinner?.find((m) => m.question.toLowerCase().includes("driver winner")) || markets.raceWinner?.[0];
+
   const tabs: { key: TabKey; label: string }[] = [
     { key: "championship", label: "WDC" },
-    { key: "nextRace", label: "Race Winner" },
-    { key: "constructors", label: "Constructors" },
+    { key: "nextRace", label: t("raceWinner") },
+    { key: "constructors", label: t("championship") },
   ];
 
-  // Get data for active tab
-  let activeData: { name: string; code: string; price: number; color: string; change: number; team: string }[] = [];
-
-  if (activeTab === "championship") {
-    activeData = championshipOdds.map((o) => ({
-      name: o.name, code: o.code, price: o.odds, color: o.color,
-      change: o.change, team: DRIVER_TEAM[o.code] || "",
-    }));
-  } else if (activeTab === "nextRace") {
-    const raceMarket = markets.raceWinner?.[0];
-    activeData = (raceMarket?.outcomes || []).map((o) => ({
-      name: o.name, code: o.code, price: o.price, color: o.color,
-      change: 0, team: DRIVER_TEAM[o.code] || "",
-    }));
-  } else {
-    const constructorMarket = markets.championship?.find((m) => m.question.toLowerCase().includes("constructor"));
-    activeData = (constructorMarket?.outcomes || []).map((o) => ({
-      name: o.name, code: o.code, price: o.price,
-      color: o.color, change: 0, team: "",
-    }));
-  }
+  const activeMarket =
+    activeTab === "championship" ? wdcMarket : activeTab === "nextRace" ? raceMarket : wccMarket;
+  const activeData = activeMarket?.outcomes || [];
+  const tradeUrl = activeMarket?.url || "https://polymarket.com/sports/f1/props";
+  const totalVolume = wdcMarket?.volume || activeMarket?.volume || "";
 
   const displayData = expanded ? activeData : activeData.slice(0, 5);
   const hasMore = activeData.length > 5;
 
   return (
     <section className="section-animate">
-      {/* Section header — outside the table card */}
+      {/* Section header */}
       <div className="flex items-baseline justify-between" style={{ marginBottom: "20px" }}>
         <div>
-          <div style={{ fontFamily: "var(--font-oswald), sans-serif", fontSize: "22px", fontWeight: 700, letterSpacing: "0.5px", color: "var(--text-primary, #eeeef0)" }}>
-            Prediction Markets
+          <div className="f1-display-lg" style={{ fontSize: "22px", color: "var(--text-primary, #eeeef0)" }}>
+            {tHome("predictionMarkets")}
           </div>
-          <div className="flex items-center" style={{ gap: "8px", marginTop: "4px", fontSize: "12px", color: "var(--text-muted, #4e4e62)", fontFamily: "var(--font-mono), monospace", letterSpacing: "0.5px" }}>
-            <span className="inline-flex items-center" style={{ gap: "5px", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", color: "var(--accent-green, #00d26a)", fontFamily: "var(--font-mono), monospace" }}>
+          <div className="flex items-center f1-data" style={{ gap: "8px", marginTop: "6px", fontSize: "12px", color: "var(--text-dim, #888)", letterSpacing: "0.5px" }}>
+            <span className="inline-flex items-center" style={{ gap: "5px", fontSize: "10px", letterSpacing: "1px", textTransform: "uppercase", color: "var(--accent-green, #00d26a)" }}>
               <span className="inline-block h-1.5 w-1.5 rounded-full animate-live" style={{ background: "var(--accent-green, #00d26a)" }} />
-              LIVE
+              {t("liveOdds")}
             </span>
-            <span>&middot; Updated every 60s &middot; Vol <span style={{ color: "var(--text-secondary, #8b8b9e)", fontWeight: 600 }}>$63.8M</span></span>
+            <span>· {t("updatedEvery60s")} · {t("totalVol")} <span style={{ color: "var(--text-secondary, #8b8b9e)", fontWeight: 600 }}>{totalVolume}</span></span>
           </div>
         </div>
-        <a href="/en/markets" style={{ fontSize: "13px", color: "var(--text-secondary, #8b8b9e)", textDecoration: "none", fontWeight: 500 }}>
-          All Markets &rarr;
-        </a>
+        <Link href="/markets" style={{ fontSize: "13px", color: "var(--text-secondary, #8b8b9e)", textDecoration: "none", fontWeight: 500 }}>
+          {tHome("allMarkets")} →
+        </Link>
       </div>
 
       {/* Tabs */}
@@ -136,15 +110,14 @@ export function MarketOverview() {
             <button
               key={tab.key}
               onClick={() => { setActiveTab(tab.key); setExpanded(false); }}
+              className="f1-heading"
               style={{
-                fontFamily: "var(--font-oswald), sans-serif",
                 fontSize: "12px",
                 fontWeight: 500,
                 letterSpacing: "0.8px",
-                textTransform: "uppercase",
                 padding: "7px 16px",
                 borderRadius: "6px",
-                color: activeTab === tab.key ? "var(--text-primary, #eeeef0)" : "var(--text-muted, #4e4e62)",
+                color: activeTab === tab.key ? "var(--text-primary, #eeeef0)" : "var(--text-dim, #888)",
                 background: activeTab === tab.key ? "var(--bg-tertiary, #161625)" : "transparent",
                 boxShadow: activeTab === tab.key ? "0 1px 4px rgba(0,0,0,0.3)" : "none",
                 border: "none",
@@ -156,29 +129,28 @@ export function MarketOverview() {
             </button>
           ))}
         </div>
+        {activeTab === "nextRace" && raceMarket && (
+          <span className="f1-label" style={{ color: "var(--text-dim, #888)" }}>{raceMarket.question}</span>
+        )}
       </div>
 
       {/* Table card */}
       <div style={{ background: "var(--bg-secondary, #0e0e18)", border: "1px solid var(--border-subtle, rgba(255,255,255,0.05))", borderRadius: "12px", overflow: "hidden" }}>
         {/* Column headers */}
-        <div className="hidden lg:grid items-center" style={{
-          gridTemplateColumns: "36px 3px 200px 130px 100px 100px 90px 100px",
+        <div className="hidden lg:grid items-center f1-heading" style={{
+          gridTemplateColumns: "36px 3px minmax(200px, 1fr) 150px 90px 100px 100px",
           padding: "12px 20px",
           borderBottom: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
-          fontFamily: "var(--font-oswald), sans-serif",
           fontSize: "10px",
-          fontWeight: 600,
-          color: "var(--text-muted, #4e4e62)",
+          color: "var(--text-dim, #888)",
           letterSpacing: "1.5px",
-          textTransform: "uppercase" as const,
         }}>
           <span>#</span>
           <span></span>
-          <span style={{ paddingLeft: "12px" }}>Driver</span>
-          <span>Win Prob</span>
-          <span>24H</span>
-          <span>7D Trend</span>
-          <span></span>
+          <span style={{ paddingLeft: "12px" }}>{activeTab === "constructors" ? t("championship") : "Driver"}</span>
+          <span>{t("odds")}</span>
+          <span>{t("h24")}</span>
+          <span>{t("d7Trend")}</span>
           <span></span>
         </div>
 
@@ -193,42 +165,35 @@ export function MarketOverview() {
         ) : (
           displayData.map((entry, i) => {
             const pct = entry.price * 100;
-            const changePct = entry.change * 100;
-            const teamColor = TEAM_COLORS[entry.team] || entry.color;
-            const sparkData = generateSparkline(entry.price, entry.change);
-            const isUp = entry.change > 0;
-            const isDown = entry.change < 0;
+            const change = entry.change24h ?? 0;
+            const changePct = change * 100;
+            const isUp = change > 0.0005;
+            const isDown = change < -0.0005;
+            const trend = trendPoints(entry);
+            const trendUp = trend ? trend[trend.length - 1] >= trend[0] : false;
 
             return (
               <div
                 key={entry.code + entry.name}
                 className="lg:grid flex items-center"
                 style={{
-                  gridTemplateColumns: "36px 3px 200px 130px 100px 100px 90px 100px",
+                  gridTemplateColumns: "36px 3px minmax(200px, 1fr) 150px 90px 100px 100px",
                   padding: "14px 20px",
                   borderBottom: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
                   transition: "background 0.15s",
-                  cursor: "pointer",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-hover, #1c1c30)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "")}
               >
-                {/* Rank */}
-                <span style={{ fontFamily: "var(--font-mono), monospace", fontSize: "13px", color: "var(--text-muted, #4e4e62)", fontWeight: 600 }}>
-                  {i + 1}
-                </span>
+                <span className="f1-data" style={{ fontSize: "13px", color: "var(--text-dim, #888)" }}>{i + 1}</span>
+                <div style={{ width: "3px", height: "24px", borderRadius: "2px", background: entry.color }} />
 
-                {/* Team bar */}
-                <div style={{ width: "3px", height: "24px", borderRadius: "2px", background: teamColor, transition: "height 0.2s" }} />
-
-                {/* Driver cell */}
                 <div className="flex items-center" style={{ gap: "10px", paddingLeft: "12px", flex: 1, minWidth: 0 }}>
-                  <div style={{
+                  <div className="f1-heading" style={{
                     width: "32px", height: "32px", borderRadius: "8px",
                     background: "var(--bg-tertiary, #161625)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontFamily: "var(--font-oswald), sans-serif",
-                    fontSize: "11px", fontWeight: 700,
+                    fontSize: "11px",
                     color: "var(--text-secondary, #8b8b9e)",
                     letterSpacing: "0.5px", flexShrink: 0,
                   }}>
@@ -236,57 +201,51 @@ export function MarketOverview() {
                   </div>
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary, #eeeef0)" }}>{entry.name}</div>
-                    {entry.team && <div style={{ fontSize: "11px", color: "var(--text-muted, #4e4e62)", marginTop: "1px" }}>{entry.team}</div>}
+                    {DRIVER_TEAM[entry.code] && <div style={{ fontSize: "11px", color: "var(--text-dim, #888)", marginTop: "1px" }}>{DRIVER_TEAM[entry.code]}</div>}
                   </div>
                 </div>
 
                 {/* Probability */}
                 <div className="hidden lg:flex items-center" style={{ gap: "10px" }}>
-                  <span style={{ fontFamily: "var(--font-mono), monospace", fontSize: "14px", fontWeight: 600, minWidth: "38px", color: "var(--text-primary, #eeeef0)" }}>
-                    {pct.toFixed(0)}%
+                  <span className="f1-data" style={{ fontSize: "14px", minWidth: "44px", color: "var(--text-primary, #eeeef0)" }}>
+                    {pct.toFixed(pct < 10 ? 1 : 0)}%
                   </span>
                   <div style={{ flex: 1, height: "6px", borderRadius: "3px", background: "var(--bg-primary, #07070c)", overflow: "hidden", maxWidth: "70px" }}>
-                    <div style={{ height: "100%", borderRadius: "3px", width: `${pct}%`, background: teamColor, transition: "width 0.6s ease" }} />
+                    <div style={{ height: "100%", borderRadius: "3px", width: `${pct}%`, background: entry.color, transition: "width 0.6s ease" }} />
                   </div>
                 </div>
 
-                {/* Mobile: just show percentage */}
+                {/* Mobile: percentage */}
                 <div className="lg:hidden ml-auto mr-2">
-                  <span style={{ fontFamily: "var(--font-mono), monospace", fontSize: "14px", fontWeight: 600, color: "var(--text-primary, #eeeef0)" }}>
-                    {pct.toFixed(0)}%
-                  </span>
+                  <span className="f1-data" style={{ fontSize: "14px", color: "var(--text-primary, #eeeef0)" }}>{pct.toFixed(0)}%</span>
                 </div>
 
-                {/* 24H Change */}
-                <div className="hidden lg:block" style={{
-                  fontFamily: "var(--font-mono), monospace",
-                  fontSize: "13px", fontWeight: 500,
-                  color: isUp ? "var(--accent-green, #00d26a)" : isDown ? "var(--accent-red, #ff4757)" : "var(--accent-neutral, #5a5a6e)",
+                {/* 24H change */}
+                <div className="hidden lg:block f1-data" style={{
+                  fontSize: "13px",
+                  color: isUp ? "var(--accent-green, #00d26a)" : isDown ? "var(--accent-red, #ff4757)" : "var(--text-subtle, #777)",
                 }}>
-                  {entry.change === 0 ? "\u2014" : `${isUp ? "\u25B2" : "\u25BC"} ${isUp ? "+" : "-"}${Math.abs(changePct).toFixed(1)}%`}
+                  {!isUp && !isDown ? "—" : `${isUp ? "▲" : "▼"} ${Math.abs(changePct).toFixed(1)}%`}
                 </div>
 
-                {/* Sparkline */}
+                {/* 7D trend — real data */}
                 <div className="hidden lg:flex items-center">
-                  <Sparkline
-                    data={sparkData}
-                    color={isUp ? "var(--accent-green, #00d26a)" : isDown ? "var(--accent-red, #ff4757)" : "var(--accent-neutral, #5a5a6e)"}
-                  />
+                  {trend ? (
+                    <Sparkline data={trend} color={trendUp ? "var(--accent-green, #00d26a)" : "var(--accent-red, #ff4757)"} />
+                  ) : (
+                    <span className="f1-data" style={{ fontSize: "13px", color: "var(--text-subtle, #777)" }}>—</span>
+                  )}
                 </div>
 
-                {/* Spacer */}
-                <span className="hidden lg:block" />
-
-                {/* Trade button — ghost style */}
+                {/* Trade */}
                 <a
-                  href="https://polymarket.com/sports/f1/props"
+                  href={tradeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden lg:block"
+                  className="hidden lg:block f1-heading"
                   style={{
-                    fontFamily: "var(--font-oswald), sans-serif",
-                    fontSize: "11px", fontWeight: 600,
-                    letterSpacing: "1px", textTransform: "uppercase",
+                    fontSize: "11px",
+                    letterSpacing: "1px",
                     padding: "6px 14px", borderRadius: "6px",
                     border: "1px solid var(--border-default, rgba(255,255,255,0.09))",
                     background: "transparent",
@@ -306,7 +265,7 @@ export function MarketOverview() {
                     e.currentTarget.style.background = "transparent";
                   }}
                 >
-                  Trade
+                  {t("betOn")}
                 </a>
               </div>
             );
@@ -318,7 +277,7 @@ export function MarketOverview() {
           padding: "12px 20px",
           textAlign: "center",
           fontSize: "12px",
-          color: "var(--text-muted, #4e4e62)",
+          color: "var(--text-dim, #888)",
           borderTop: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
         }}>
           {hasMore ? (
@@ -326,7 +285,7 @@ export function MarketOverview() {
               onClick={() => setExpanded(!expanded)}
               style={{ color: "var(--text-secondary, #8b8b9e)", background: "none", border: "none", cursor: "pointer", fontWeight: 500, fontSize: "12px" }}
             >
-              {expanded ? "Show less" : `View all ${activeData.length} ${activeTab === "constructors" ? "teams" : "drivers"} \u2192`}
+              {expanded ? t("showLess") : `${t("viewAllOutcomes")} (${activeData.length}) →`}
             </button>
           ) : (
             <span>{t("lastUpdated")}: {isLoading ? t("refreshing") : t("justNow")}</span>

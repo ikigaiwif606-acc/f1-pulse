@@ -5,12 +5,13 @@ import type { MarketsData, ChampionshipOddsItem } from "@/types";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
+// Last-resort snapshot (June 2026) — replaced by live SWR data within seconds
 const FALLBACK_CHAMPIONSHIP_ODDS: ChampionshipOddsItem[] = [
-  { name: "George Russell", code: "RUS", odds: 0.57, volume: "$18.2M", change: +0.05, color: "#27F4D2" },
-  { name: "Kimi Antonelli", code: "ANT", odds: 0.15, volume: "$8.4M", change: +0.03, color: "#27F4D2" },
-  { name: "Charles Leclerc", code: "LEC", odds: 0.10, volume: "$6.1M", change: -0.02, color: "#E80020" },
-  { name: "Lando Norris", code: "NOR", odds: 0.08, volume: "$5.7M", change: +0.01, color: "#FF8000" },
-  { name: "Max Verstappen", code: "VER", odds: 0.05, volume: "$4.9M", change: -0.04, color: "#3671C6" },
+  { name: "Kimi Antonelli", code: "ANT", odds: 0.70, volume: "$171M", change: 0, color: "#27F4D2" },
+  { name: "George Russell", code: "RUS", odds: 0.14, volume: "$171M", change: 0, color: "#27F4D2" },
+  { name: "Lewis Hamilton", code: "HAM", odds: 0.03, volume: "$171M", change: 0, color: "#E80020" },
+  { name: "Max Verstappen", code: "VER", odds: 0.03, volume: "$171M", change: 0, color: "#3671C6" },
+  { name: "Charles Leclerc", code: "LEC", odds: 0.02, volume: "$171M", change: 0, color: "#E80020" },
 ];
 
 const FALLBACK_MARKETS: MarketsData = {

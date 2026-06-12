@@ -24,6 +24,9 @@ export interface GammaMarket {
   bestAsk: number;
   spread: number;
   lastTradePrice: number;
+  oneDayPriceChange?: number;
+  oneWeekPriceChange?: number;
+  oneMonthPriceChange?: number;
   openInterest: number;
   image: string;
   icon: string;
@@ -89,6 +92,32 @@ async function fetchClob<T>(path: string, params?: Record<string, string>): Prom
 
 // ── Gamma API (Market Discovery) ────────────────────────────────────────────
 
+// Numeric tag id for "Formula 1" — the `tag=` slug param is silently ignored
+// by Gamma and returns unrelated markets, so always query by tag_id.
+export const F1_TAG_ID = "435";
+
+export interface GammaEvent {
+  id: string;
+  title: string;
+  slug: string;
+  volume: number | string;
+  endDate: string;
+  closed: boolean;
+  active: boolean;
+  markets: GammaMarket[];
+}
+
+/** F1 events (grouped markets) sorted by volume — the primary market feed. */
+export async function getF1Events(limit = 40): Promise<GammaEvent[]> {
+  return fetchGamma<GammaEvent[]>("/events", {
+    tag_id: F1_TAG_ID,
+    closed: "false",
+    limit: String(limit),
+    order: "volume",
+    ascending: "false",
+  });
+}
+
 export async function getF1Markets(params?: {
   closed?: boolean;
   limit?: number;
@@ -96,7 +125,7 @@ export async function getF1Markets(params?: {
   ascending?: boolean;
 }): Promise<GammaMarket[]> {
   return fetchGamma<GammaMarket[]>("/markets", {
-    tag: "formula1",
+    tag_id: F1_TAG_ID,
     closed: String(params?.closed ?? false),
     limit: String(params?.limit ?? 100),
     ...(params?.order && { order: params.order }),

@@ -179,11 +179,22 @@ export interface ChampionshipOddsItem {
   color: string;
 }
 
+export interface MarketOutcomeItem {
+  name: string;
+  code: string;
+  price: number;
+  color: string;
+  tokenId?: string;
+  change24h?: number;
+  change7d?: number;
+}
+
 export interface MarketListItem {
   question: string;
   volume: string;
   endDate: string;
-  outcomes: { name: string; code: string; price: number; color: string }[];
+  url?: string; // polymarket.com event URL
+  outcomes: MarketOutcomeItem[];
 }
 
 export interface MarketsData {
@@ -201,9 +212,15 @@ export interface HomepageData {
     date: string;
     round: number;
     isSprint: boolean;
+    slug: string;
+    flag: string;
+    sessions: { type: string; iso: string }[];
   };
+  seasonStatus: "live" | "raceWeekend" | "midSeason" | "offSeason";
+  liveSession: string | null;
+  seasonProgress: { completed: number; total: number };
   standings: { pos: number; id: string; name: string; code: string; pts: number; color: string }[];
-  recent: { round: number; slug: string; name: string; code: string; color: string }[];
+  recent: { round: number; slug: string; name: string; winner: string; code: string; color: string }[];
   maxPts: number;
 }
 

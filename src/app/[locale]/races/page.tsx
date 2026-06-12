@@ -6,7 +6,7 @@ import type { RaceListItem } from "@/types";
 const FLAGS: Record<string, string> = {
   Australian: "\u{1F1E6}\u{1F1FA}", Chinese: "\u{1F1E8}\u{1F1F3}", Japanese: "\u{1F1EF}\u{1F1F5}",
   Bahrain: "\u{1F1E7}\u{1F1ED}", Saudi: "\u{1F1F8}\u{1F1E6}", Miami: "\u{1F1FA}\u{1F1F8}",
-  Canadian: "\u{1F1E8}\u{1F1E6}", Monaco: "\u{1F1F2}\u{1F1E8}", Spanish: "\u{1F1EA}\u{1F1F8}",
+  Canadian: "\u{1F1E8}\u{1F1E6}", Monaco: "\u{1F1F2}\u{1F1E8}", Spanish: "\u{1F1EA}\u{1F1F8}", Barcelona: "\u{1F1EA}\u{1F1F8}",
   Austrian: "\u{1F1E6}\u{1F1F9}", British: "\u{1F1EC}\u{1F1E7}", Belgian: "\u{1F1E7}\u{1F1EA}",
   Hungarian: "\u{1F1ED}\u{1F1FA}", Dutch: "\u{1F1F3}\u{1F1F1}", Italian: "\u{1F1EE}\u{1F1F9}",
   Madrid: "\u{1F1EA}\u{1F1F8}", Azerbaijan: "\u{1F1E6}\u{1F1FF}", Singapore: "\u{1F1F8}\u{1F1EC}",

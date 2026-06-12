@@ -103,6 +103,46 @@ export function getTeamColor(teamName: string): string {
   return "#666";
 }
 
+// 2026 grid — driver last name → team color (for market outcomes named after drivers)
+const DRIVER_TEAM_COLOR: Record<string, string> = {
+  russell: "#27F4D2",
+  antonelli: "#27F4D2",
+  hamilton: "#E80020",
+  leclerc: "#E80020",
+  norris: "#FF8000",
+  piastri: "#FF8000",
+  verstappen: "#3671C6",
+  hadjar: "#3671C6",
+  lawson: "#6692FF",
+  lindblad: "#6692FF",
+  alonso: "#229971",
+  stroll: "#229971",
+  gasly: "#0093CC",
+  colapinto: "#0093CC",
+  albon: "#1868DB",
+  sainz: "#1868DB",
+  ocon: "#B6BABD",
+  bearman: "#B6BABD",
+  hulkenberg: "#00594F",
+  bortoleto: "#00594F",
+  perez: "#C0C0C0",
+  bottas: "#C0C0C0",
+};
+
+/** Resolve a color for a market outcome name — driver last name first, then team name. */
+export function getOutcomeColor(name: string): string {
+  const last = name.trim().split(/\s+/).pop()?.toLowerCase().replace(/[^a-zé]/g, "") || "";
+  const normalized = last.replace("é", "e").replace(/jr$/, "");
+  if (DRIVER_TEAM_COLOR[normalized]) return DRIVER_TEAM_COLOR[normalized];
+  // "Carlos Sainz Jr." → try the word before "Jr."
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    const second = parts[parts.length - 2]?.toLowerCase().replace(/[^a-z]/g, "") || "";
+    if (DRIVER_TEAM_COLOR[second]) return DRIVER_TEAM_COLOR[second];
+  }
+  return getTeamColor(name);
+}
+
 /** Get driver code from last name */
 export function getDriverCode(lastName: string): string {
   const key = lastName.toLowerCase().replace(/\s+/g, "");
@@ -242,6 +282,85 @@ export function transformErgastConstructorStandings(data: any): import("@/types"
   } catch {
     return [];
   }
+}
+
+/**
+ * Transform Polymarket Gamma EVENTS into categorized markets.
+ * Each event (e.g. "F1 Drivers' Champion") groups one binary market per
+ * driver/team; the Yes price of each sub-market is that outcome's probability.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function transformPolymarketEvents(events: any[]): import("@/types").MarketsData {
+  const result: import("@/types").MarketsData = {
+    championship: [],
+    raceWinner: [],
+    props: [],
+  };
+  if (!events || !Array.isArray(events)) return result;
+
+  for (const event of events) {
+    const title: string = event.title || "";
+    const tLower = title.toLowerCase();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subMarkets: any[] = Array.isArray(event.markets) ? event.markets : [];
+    if (!title || subMarkets.length === 0) continue;
+
+    const outcomes = subMarkets
+      .filter((m) => m.active !== false && m.closed !== true)
+      .map((m) => {
+        let yesPrice = 0;
+        let tokenId = "";
+        try {
+          const prices = JSON.parse(m.outcomePrices || "[]");
+          yesPrice = parseFloat(prices[0] || "0");
+          const tokens = JSON.parse(m.clobTokenIds || "[]");
+          tokenId = tokens[0] || "";
+        } catch {
+          yesPrice = typeof m.lastTradePrice === "number" ? m.lastTradePrice : 0;
+        }
+        const name: string = m.groupItemTitle || m.question || "";
+        return {
+          name,
+          code: getDriverCode(name.split(/\s+/).pop() || name),
+          price: yesPrice,
+          color: getOutcomeColor(name),
+          tokenId,
+          change24h: typeof m.oneDayPriceChange === "number" ? m.oneDayPriceChange : undefined,
+          change7d: typeof m.oneWeekPriceChange === "number" ? m.oneWeekPriceChange : undefined,
+        };
+      })
+      .filter((o) => o.name)
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 10);
+
+    if (outcomes.length === 0) continue;
+
+    const volumeNum = parseFloat(String(event.volume || 0));
+    const item: import("@/types").MarketListItem = {
+      question: title,
+      volume:
+        volumeNum >= 1e6 ? `$${(volumeNum / 1e6).toFixed(1)}M` : `$${Math.round(volumeNum / 1e3)}K`,
+      endDate: event.endDate
+        ? new Date(event.endDate).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "",
+      url: event.slug ? `https://polymarket.com/event/${event.slug}` : undefined,
+      outcomes,
+    };
+
+    if (tLower.includes("champion")) {
+      result.championship.push(item);
+    } else if (tLower.includes("driver winner") || tLower.includes("constructor scores 1st")) {
+      result.raceWinner.push(item);
+    } else {
+      result.props.push(item);
+    }
+  }
+
+  return result;
 }
 
 /**

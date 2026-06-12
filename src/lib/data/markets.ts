@@ -1,5 +1,5 @@
-import { searchMarkets } from "@/lib/api/polymarket";
-import { transformPolymarketResults } from "./transformers";
+import { getF1Events } from "@/lib/api/polymarket";
+import { transformPolymarketEvents } from "./transformers";
 import type { MarketsData, ChampionshipOddsItem } from "@/types";
 
 // ── Fallback data (synced with polymarket.com/sports/f1/props) ──
@@ -134,9 +134,8 @@ const FALLBACK_CHAMPIONSHIP_ODDS: ChampionshipOddsItem[] = [
 
 export async function getMarkets(category?: string): Promise<MarketsData> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const raw = (await searchMarkets("f1", 50)) as any[];
-    const markets = transformPolymarketResults(raw);
+    const events = await getF1Events(40);
+    const markets = transformPolymarketEvents(events);
 
     // Only return non-empty results
     if (
@@ -162,7 +161,7 @@ export async function getChampionshipOdds(): Promise<ChampionshipOddsItem[]> {
   try {
     const markets = await getMarkets("championship");
     const championshipMarket = markets.championship.find((m) =>
-      m.question.toLowerCase().includes("drivers")
+      m.question.toLowerCase().includes("driver")
     );
 
     if (championshipMarket && championshipMarket.outcomes.length > 0) {
@@ -170,8 +169,8 @@ export async function getChampionshipOdds(): Promise<ChampionshipOddsItem[]> {
         name: o.name,
         code: o.code,
         odds: o.price,
-        volume: "",
-        change: 0, // Can't derive change from a single snapshot
+        volume: championshipMarket.volume,
+        change: o.change24h ?? 0,
         color: o.color,
       }));
     }

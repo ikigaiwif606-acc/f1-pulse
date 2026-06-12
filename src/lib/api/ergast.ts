@@ -1,9 +1,10 @@
 // Jolpica — community successor to the deprecated Ergast API (same schema)
 const BASE_URL = "https://api.jolpi.ca/ergast/f1";
 
-async function fetchErgast<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}.json`, {
-    next: { revalidate: 3600 },
+async function fetchErgast<T>(path: string, opts?: { revalidate?: number; limit?: number }): Promise<T> {
+  const query = opts?.limit ? `?limit=${opts.limit}` : "";
+  const res = await fetch(`${BASE_URL}${path}.json${query}`, {
+    next: { revalidate: opts?.revalidate ?? 3600 },
     signal: AbortSignal.timeout(8000), // 8s timeout to prevent hanging
   });
   if (!res.ok) throw new Error(`Ergast ${path}: ${res.status}`);
@@ -39,7 +40,17 @@ export async function getDriverInfo(driverId: string) {
 }
 
 export async function getSeasonSchedule(season: number) {
-  return fetchErgast(`/${season}`);
+  return fetchErgast(`/${season}`, { limit: 50 });
+}
+
+/** Winner of every completed round in a season (one result per race). */
+export async function getSeasonWinners(season: number) {
+  return fetchErgast(`/${season}/results/1`, { revalidate: 900, limit: 50 });
+}
+
+/** All race results for a season — used for points-progression charts. */
+export async function getSeasonResultsFull(season: number) {
+  return fetchErgast(`/${season}/results`, { revalidate: 1800, limit: 1000 });
 }
 
 export async function getRoundResults(season: number, round: number) {

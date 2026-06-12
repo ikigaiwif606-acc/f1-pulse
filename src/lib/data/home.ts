@@ -1,10 +1,11 @@
-import { getRacesList } from "./races";
+import { getSeasonContext } from "./season";
 import { getDriversList } from "./drivers";
 import type { HomepageData } from "@/types";
 
 // ── Chinese translations for race names ────────────────────────
 const RACE_NAME_ZH: Record<string, string> = {
   "Australian Grand Prix": "澳大利亚大奖赛",
+  "Barcelona Grand Prix": "巴塞罗那大奖赛",
   "Chinese Grand Prix": "中国大奖赛",
   "Japanese Grand Prix": "日本大奖赛",
   "Bahrain Grand Prix": "巴林大奖赛",
@@ -94,7 +95,13 @@ const FALLBACK: HomepageData = {
     date: "2026-03-29T05:00:00Z",
     round: 3,
     isSprint: false,
+    slug: "japanese-gp",
+    flag: "🇯🇵",
+    sessions: [],
   },
+  seasonStatus: "midSeason",
+  liveSession: null,
+  seasonProgress: { completed: 2, total: 22 },
   standings: [
     { pos: 1, id: "russell", name: "George Russell", code: "RUS", pts: 51, color: "#27F4D2" },
     { pos: 2, id: "antonelli", name: "Andrea Kimi Antonelli", code: "ANT", pts: 47, color: "#27F4D2" },
@@ -103,65 +110,70 @@ const FALLBACK: HomepageData = {
     { pos: 5, id: "bearman", name: "Oliver Bearman", code: "BEA", pts: 17, color: "#B6BABD" },
   ],
   recent: [
-    { round: 2, slug: "chinese-gp", name: "Chinese GP", code: "ANT", color: "#27F4D2" },
-    { round: 1, slug: "australian-gp", name: "Australian GP", code: "RUS", color: "#27F4D2" },
+    { round: 2, slug: "chinese-gp", name: "Chinese GP", winner: "Antonelli", code: "ANT", color: "#27F4D2" },
+    { round: 1, slug: "australian-gp", name: "Australian GP", winner: "Russell", code: "RUS", color: "#27F4D2" },
   ],
   maxPts: 51,
 };
 
 export async function getHomepageData(): Promise<HomepageData> {
   try {
-    const [races, drivers] = await Promise.all([getRacesList(), getDriversList()]);
+    const [ctx, drivers] = await Promise.all([getSeasonContext(), getDriversList()]);
 
-    // Find next upcoming race
-    const nextRace = races.find((r) => r.next) || races.find((r) => !r.completed);
-    // Find completed races (most recent first) for "recent results"
-    const completedRaces = races.filter((r) => r.completed).reverse().slice(0, 3);
+    const nextRace = ctx?.nextRace || null;
+    const completedRaces = (ctx?.races || []).filter((r) => r.completed).reverse().slice(0, 3);
 
     // Top 5 drivers for standings widget
     const top5 = drivers.slice(0, 5);
     const maxPts = top5[0]?.pts || 1;
 
-    // If we have meaningful data, use it
-    if (top5.length > 0 || nextRace) {
-      return {
-        nextRace: nextRace
-          ? {
-              name: nextRace.name,
-              nameZh: RACE_NAME_ZH[nextRace.name] || nextRace.name,
-              circuit: CIRCUIT_FULL_NAME[nextRace.circuit] || nextRace.circuit,
-              circuitZh: CIRCUIT_ZH[nextRace.circuit] || nextRace.circuit,
-              date: nextRace.isoDate || FALLBACK.nextRace.date,
-              round: nextRace.round,
-              isSprint: !!nextRace.sprint,
-            }
-          : FALLBACK.nextRace,
-        standings:
-          top5.length > 0
-            ? top5.map((d) => ({
-                pos: d.pos,
-                id: d.id,
-                name: d.name,
-                code: d.code,
-                pts: d.pts,
-                color: d.color,
-              }))
-            : FALLBACK.standings,
-        recent:
-          completedRaces.length > 0
-            ? completedRaces.map((r) => ({
-                round: r.round,
-                slug: r.slug,
-                name: r.name.replace("Grand Prix", "GP"),
-                code: r.code || "",
-                color: r.color || "#666",
-              }))
-            : FALLBACK.recent,
-        maxPts,
-      };
-    }
+    if (!ctx && top5.length === 0) return FALLBACK;
 
-    return FALLBACK;
+    return {
+      nextRace: nextRace
+        ? {
+            name: nextRace.name,
+            nameZh: RACE_NAME_ZH[nextRace.name] || nextRace.name,
+            circuit: CIRCUIT_FULL_NAME[nextRace.circuit] || nextRace.circuitFull,
+            circuitZh: CIRCUIT_ZH[nextRace.circuit] || nextRace.circuitFull,
+            date: nextRace.isoDate || FALLBACK.nextRace.date,
+            round: nextRace.round,
+            isSprint: nextRace.sprint,
+            slug: nextRace.slug,
+            flag: nextRace.flag,
+            sessions: nextRace.sessions,
+          }
+        : FALLBACK.nextRace,
+      seasonStatus: ctx?.status || "midSeason",
+      liveSession: ctx?.liveSession || null,
+      seasonProgress: {
+        completed: ctx?.completedCount ?? FALLBACK.seasonProgress.completed,
+        total: ctx?.totalRounds ?? FALLBACK.seasonProgress.total,
+      },
+      standings:
+        top5.length > 0
+          ? top5.map((d) => ({
+              pos: d.pos,
+              id: d.id,
+              name: d.name,
+              code: d.code,
+              pts: d.pts,
+              color: d.color,
+            }))
+          : FALLBACK.standings,
+      recent:
+        completedRaces.length > 0
+          ? completedRaces.map((r) => ({
+              round: r.round,
+              slug: r.slug,
+              name: r.name.replace("Grand Prix", "GP"),
+              winner: r.winner || "",
+              code: r.code || "",
+              color: r.color || "#666",
+            }))
+          : FALLBACK.recent,
+      maxPts,
+    };
   } catch {
     return FALLBACK;
   }

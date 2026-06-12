@@ -1,17 +1,20 @@
 import { useTranslations } from "next-intl";
+
+type TFn = ReturnType<typeof useTranslations>;
 import { getQualifyingResults } from "@/lib/api/ergast";
 import { getTeamColor } from "@/lib/data/transformers";
 import { PointsProgressionChart } from "@/components/charts/points-chart";
 import { LapComparisonChart } from "@/components/charts/lap-comparison";
 import { Link } from "@/lib/i18n/navigation";
 import {
-  getF1Markets,
-  filterMarketsForRace,
-  findChampionshipMarkets,
+  getF1Events,
   parseMarketOutcomes,
   formatVolume,
   type GammaMarket,
+  type GammaEvent,
 } from "@/lib/api/polymarket";
+import { getSeasonContext } from "@/lib/data/season";
+import { getDriversList } from "@/lib/data/drivers";
 import { OddsMovementChart } from "@/components/analytics/odds-movement-chart";
 import { MarketCard } from "@/components/analytics/market-card";
 import { LiquidityBadge } from "@/components/analytics/liquidity-badge";
@@ -159,10 +162,11 @@ const DRIVER_COLORS: Record<string, string> = {
   "Bottas": "#C0C0C0", "Perez": "#C0C0C0",
 };
 
-// ── Next race static data ───────────────────────────────────────────────────
+// ── Next race fallback (used only if the season context is unavailable) ─────
 const NEXT_RACE = {
   name: "Japanese Grand Prix",
   circuit: "Suzuka International Racing Course",
+  short: "Suzuka",
   round: 3,
   country: "\u{1F1EF}\u{1F1F5}",
   laps: 53,
@@ -170,6 +174,65 @@ const NEXT_RACE = {
   scRate: 35,
   poleConversion: 72,
 };
+type NextRaceHeader = typeof NEXT_RACE;
+
+// Per-circuit reference stats, keyed by the season context's short circuit name.
+// laps/length are factual; SC rate and pole-win conversion are editorial estimates.
+const CIRCUIT_STATS: Record<string, { laps: number; length: string; scRate: number; poleConversion: number }> = {
+  Melbourne: { laps: 58, length: "5.278 km", scRate: 55, poleConversion: 48 },
+  Shanghai: { laps: 56, length: "5.451 km", scRate: 45, poleConversion: 58 },
+  Suzuka: { laps: 53, length: "5.807 km", scRate: 35, poleConversion: 72 },
+  Sakhir: { laps: 57, length: "5.412 km", scRate: 45, poleConversion: 55 },
+  Jeddah: { laps: 50, length: "6.174 km", scRate: 65, poleConversion: 50 },
+  Miami: { laps: 57, length: "5.412 km", scRate: 50, poleConversion: 45 },
+  Montreal: { laps: 70, length: "4.361 km", scRate: 65, poleConversion: 45 },
+  "Monte Carlo": { laps: 78, length: "3.337 km", scRate: 60, poleConversion: 90 },
+  Catalunya: { laps: 66, length: "4.657 km", scRate: 30, poleConversion: 65 },
+  Spielberg: { laps: 71, length: "4.318 km", scRate: 35, poleConversion: 50 },
+  Silverstone: { laps: 52, length: "5.891 km", scRate: 40, poleConversion: 52 },
+  "Spa-Francorchamps": { laps: 44, length: "7.004 km", scRate: 50, poleConversion: 45 },
+  Hungaroring: { laps: 70, length: "4.381 km", scRate: 30, poleConversion: 68 },
+  Zandvoort: { laps: 72, length: "4.259 km", scRate: 40, poleConversion: 70 },
+  Monza: { laps: 53, length: "5.793 km", scRate: 35, poleConversion: 55 },
+  Madring: { laps: 57, length: "5.474 km", scRate: 50, poleConversion: 60 },
+  Baku: { laps: 51, length: "6.003 km", scRate: 70, poleConversion: 35 },
+  Singapore: { laps: 62, length: "4.940 km", scRate: 75, poleConversion: 55 },
+  Austin: { laps: 56, length: "5.513 km", scRate: 45, poleConversion: 50 },
+  "Mexico City": { laps: 71, length: "4.304 km", scRate: 40, poleConversion: 60 },
+  Interlagos: { laps: 71, length: "4.309 km", scRate: 55, poleConversion: 45 },
+  "Las Vegas": { laps: 50, length: "6.201 km", scRate: 60, poleConversion: 40 },
+  Lusail: { laps: 57, length: "5.419 km", scRate: 35, poleConversion: 55 },
+  "Yas Marina Circuit": { laps: 58, length: "5.281 km", scRate: 30, poleConversion: 60 },
+};
+
+/**
+ * Aggregate a Polymarket EVENT (one binary market per driver/team) into a
+ * GammaMarket-shaped object whose outcomes are the drivers/teams themselves,
+ * so parseMarketOutcomes & co. keep working downstream.
+ */
+function eventAsMarket(e: GammaEvent | null | undefined): GammaMarket | null {
+  if (!e) return null;
+  const subs = (e.markets || []).filter((m) => !m.closed);
+  if (subs.length === 0) return null;
+  const num = (v: unknown) => parseFloat(String(v ?? 0)) || 0;
+  const firstOf = (json: string | undefined) => {
+    try { return JSON.parse(json || "[]")[0] ?? ""; } catch { return ""; }
+  };
+  const sorted = [...subs].sort((a, b) => num(firstOf(b.outcomePrices)) - num(firstOf(a.outcomePrices)));
+  return {
+    ...sorted[0],
+    question: e.title,
+    slug: e.slug,
+    volume: num(e.volume),
+    volume24hr: sorted.reduce((s, m) => s + num(m.volume24hr), 0),
+    openInterest: sorted.reduce((s, m) => s + num(m.openInterest), 0),
+    spread: sorted.reduce((s, m) => s + num(m.spread), 0) / sorted.length,
+    endDate: e.endDate,
+    outcomes: JSON.stringify(sorted.map((m) => m.groupItemTitle || m.question)),
+    outcomePrices: JSON.stringify(sorted.map((m) => String(firstOf(m.outcomePrices) || "0"))),
+    clobTokenIds: JSON.stringify(sorted.map((m) => firstOf(m.clobTokenIds))),
+  } as GammaMarket;
+}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type QualifyingEntry = { name: string; code: string; gap: string; color: string; pct: number };
@@ -236,13 +299,41 @@ async function getQualifyingData(): Promise<QualifyingEntry[]> {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default async function AnalyticsPage() {
-  const [qualifying, markets] = await Promise.all([
+  const [qualifying, events, ctx, drivers] = await Promise.all([
     getQualifyingData(),
-    getF1Markets({ closed: false, limit: 100, order: "volume24hr", ascending: false }).catch(() => [] as GammaMarket[]),
+    getF1Events(40).catch(() => [] as GammaEvent[]),
+    getSeasonContext().catch(() => null),
+    getDriversList().catch(() => []),
   ]);
 
-  const { wdc, wcc } = findChampionshipMarkets(markets);
-  const raceMarkets = filterMarketsForRace(markets, NEXT_RACE.name);
+  // Live next-race header (falls back to the static constant)
+  const nextRace: NextRaceHeader = ctx?.nextRace
+    ? {
+        name: ctx.nextRace.name,
+        circuit: ctx.nextRace.circuitFull,
+        short: ctx.nextRace.circuit,
+        round: ctx.nextRace.round,
+        country: ctx.nextRace.flag,
+        ...(CIRCUIT_STATS[ctx.nextRace.circuit] || { laps: 0, length: "", scRate: 45, poleConversion: 55 }),
+      }
+    : NEXT_RACE;
+  const roundsCompleted = ctx?.completedCount ?? 2;
+
+  const lower = (s: string) => s.toLowerCase();
+  const wdcEvent = events.find((e) => lower(e.title).includes("driver") && lower(e.title).includes("champion"));
+  const wccEvent = events.find((e) => lower(e.title).includes("constructor") && lower(e.title).includes("champion"));
+  const wdc = eventAsMarket(wdcEvent);
+  const wcc = eventAsMarket(wccEvent);
+
+  // Match this weekend's events — Polymarket may name the GP after the circuit
+  // (e.g. "Catalunya Grand Prix" for Jolpica's "Barcelona Grand Prix")
+  const raceKeys = [nextRace.name, ctx?.nextRace?.circuit || ""]
+    .map((s) => lower(s).replace(" grand prix", "").trim())
+    .filter(Boolean);
+  const raceMarkets = events
+    .filter((e) => raceKeys.some((k) => lower(e.title).includes(k)))
+    .map(eventAsMarket)
+    .filter((m): m is GammaMarket => m !== null);
 
   // Parse WDC outcomes for odds charts
   const wdcOutcomes = wdc ? parseMarketOutcomes(wdc) : [];
@@ -275,15 +366,38 @@ export default async function AnalyticsPage() {
       tokenId: o.tokenId,
     }));
 
+  // Live "value detector": market odds vs actual points share
+  const totalPoints = drivers.reduce((s, d) => s + d.pts, 0) || TOTAL_POINTS;
+  const driverByLastName = new Map(drivers.map((d) => [d.name.split(" ").pop()?.toLowerCase() || "", d]));
+  const liveBettingEdge = wdcOutcomes
+    .filter((o) => o.price > 0.01)
+    .sort((a, b) => b.price - a.price)
+    .slice(0, 6)
+    .map((o) => {
+      const lastName = o.outcome.split(" ").pop() || o.outcome;
+      const d = driverByLastName.get(lastName.toLowerCase());
+      return {
+        name: lastName,
+        code: d?.code || lastName.slice(0, 3).toUpperCase(),
+        color: d?.color || DRIVER_COLORS[o.outcome] || DRIVER_COLORS[lastName] || "#666",
+        odds: Math.round(o.price * 100),
+        pts: d?.pts ?? 0,
+      };
+    });
+  const bettingEdge = liveBettingEdge.length >= 3 ? liveBettingEdge : BETTING_EDGE;
+
   return (
     <AnalyticsPageContent
       qualifying={qualifying}
-      markets={markets}
       raceMarkets={raceMarkets}
       wdc={wdc}
       wcc={wcc}
       wdcDrivers={topWdcDrivers}
       wccTeams={topWccTeams}
+      nextRace={nextRace}
+      roundsCompleted={roundsCompleted}
+      totalPoints={totalPoints}
+      bettingEdge={bettingEdge}
     />
   );
 }
@@ -294,40 +408,44 @@ export default async function AnalyticsPage() {
 
 interface ContentProps {
   qualifying: QualifyingEntry[];
-  markets: GammaMarket[];
   raceMarkets: GammaMarket[];
   wdc: GammaMarket | null;
   wcc: GammaMarket | null;
   wdcDrivers: { name: string; code: string; color: string; tokenId: string }[];
   wccTeams: { name: string; code: string; color: string; tokenId: string }[];
+  nextRace: NextRaceHeader;
+  roundsCompleted: number;
+  totalPoints: number;
+  bettingEdge: { name: string; code: string; color: string; odds: number; pts: number }[];
 }
 
 function AnalyticsPageContent({
   qualifying,
-  markets,
   raceMarkets,
   wdc,
   wcc,
   wdcDrivers,
   wccTeams,
+  nextRace,
+  roundsCompleted,
+  totalPoints,
+  bettingEdge,
 }: ContentProps) {
   const t = useTranslations("analytics");
 
-  const roundsCompleted = TEAMMATE_BATTLES.length > 0
-    ? TEAMMATE_BATTLES[0].qualiH2H[0] + TEAMMATE_BATTLES[0].qualiH2H[1]
-    : 0;
-
   // Sort betting edge by absolute gap (biggest mispricing first)
-  const sortedBettingEdge = [...BETTING_EDGE]
+  const sortedBettingEdge = [...bettingEdge]
     .map((d) => {
-      const ptsShare = parseFloat(((d.pts / TOTAL_POINTS) * 100).toFixed(1));
+      const ptsShare = parseFloat(((d.pts / (totalPoints || 1)) * 100).toFixed(1));
       const gap = ptsShare - d.odds;
       return { ...d, ptsShare, gap };
     })
     .sort((a, b) => Math.abs(b.gap) - Math.abs(a.gap));
 
   // Suzuka safety car data
-  const suzukaSC = SAFETY_CAR.find(c => c.circuit === "Suzuka");
+  const suzukaSC = SAFETY_CAR.find(
+    (c) => nextRace.short === c.circuit || nextRace.short.includes(c.circuit) || c.circuit.includes(nextRace.short)
+  );
 
   return (
     <div className="min-h-screen bg-[#080808]">
@@ -349,20 +467,20 @@ function AnalyticsPageContent({
           {/* Row 2: Race context bar — compact, ambient */}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded border border-[#1c1c1c] bg-[#0c0c0c] px-4 py-2.5">
             <div className="flex items-center gap-2">
-              <span className="text-lg">{NEXT_RACE.country}</span>
-              <span className="f1-heading text-white">{NEXT_RACE.name}</span>
+              <span className="text-lg">{nextRace.country}</span>
+              <span className="f1-heading text-white">{nextRace.name}</span>
               <span className="f1-label-xs rounded border border-[#1c1c1c] bg-[#0a0a0a] px-1.5 py-0.5">
-                R{NEXT_RACE.round}
+                R{nextRace.round}
               </span>
             </div>
             <span className="hidden sm:block text-[#1c1c1c]">|</span>
-            <span className="f1-label">{NEXT_RACE.circuit}</span>
+            <span className="f1-label">{nextRace.circuit}</span>
             <span className="hidden sm:block text-[#1c1c1c]">|</span>
             <div className="flex items-center gap-3">
-              <span className="f1-data text-xs text-white">{NEXT_RACE.laps} <span className="f1-label-xs">Laps</span></span>
-              <span className="f1-data text-xs text-white">{NEXT_RACE.length}</span>
-              <span className="f1-data text-xs text-[#f59e0b]">{NEXT_RACE.scRate}% <span className="f1-label-xs">SC</span></span>
-              <span className="f1-data text-xs text-[#22c55e]">{NEXT_RACE.poleConversion}% <span className="f1-label-xs">Pole</span></span>
+              <span className="f1-data text-xs text-white">{nextRace.laps} <span className="f1-label-xs">Laps</span></span>
+              <span className="f1-data text-xs text-white">{nextRace.length}</span>
+              <span className="f1-data text-xs text-[#f59e0b]">{nextRace.scRate}% <span className="f1-label-xs">SC</span></span>
+              <span className="f1-data text-xs text-[#22c55e]">{nextRace.poleConversion}% <span className="f1-label-xs">Pole</span></span>
             </div>
             <span className="hidden sm:block text-[#1c1c1c]">|</span>
             <span className="f1-freshness-badge">
@@ -385,6 +503,7 @@ function AnalyticsPageContent({
                   wdcDrivers={wdcDrivers}
                   sortedBettingEdge={sortedBettingEdge}
                   suzukaSC={suzukaSC}
+                  nextRace={nextRace}
                 />
               ),
             },
@@ -401,6 +520,7 @@ function AnalyticsPageContent({
                   wccTeams={wccTeams}
                   sortedBettingEdge={sortedBettingEdge}
                   roundsCompleted={roundsCompleted}
+                  totalPoints={totalPoints}
                 />
               ),
             },
@@ -435,12 +555,14 @@ function NextRaceBriefingTab({
   wdcDrivers,
   sortedBettingEdge,
   suzukaSC,
+  nextRace,
 }: {
-  t: any;
+  t: TFn;
   raceMarkets: GammaMarket[];
   wdcDrivers: { name: string; code: string; color: string; tokenId: string }[];
   sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
   suzukaSC: (typeof SAFETY_CAR)[0] | undefined;
+  nextRace: NextRaceHeader;
 }) {
   return (
     <div className="space-y-6">
@@ -496,7 +618,7 @@ function NextRaceBriefingTab({
             <div className="f1-accent-bar" />
             <span className="f1-heading text-white">{t("nextRace.circuitIntel")}</span>
           </div>
-          <p className="f1-label mb-4">{NEXT_RACE.circuit}</p>
+          <p className="f1-label mb-4">{nextRace.circuit}</p>
 
           {/* Gauges row */}
           <div className="grid grid-cols-2 gap-3 mb-4">
@@ -509,15 +631,15 @@ function NextRaceBriefingTab({
                   <circle
                     cx="40" cy="40" r="34" fill="none" stroke="#f59e0b" strokeWidth="6"
                     strokeLinecap="round"
-                    strokeDasharray={`${((suzukaSC?.rate ?? NEXT_RACE.scRate) / 100) * 213.6} 213.6`}
+                    strokeDasharray={`${((suzukaSC?.rate ?? nextRace.scRate) / 100) * 213.6} 213.6`}
                   />
                 </svg>
                 <div className="gauge-value">
-                  <span className="f1-data text-lg font-bold text-[#f59e0b]">{suzukaSC?.rate ?? NEXT_RACE.scRate}%</span>
+                  <span className="f1-data text-lg font-bold text-[#f59e0b]">{suzukaSC?.rate ?? nextRace.scRate}%</span>
                 </div>
               </div>
               <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
-                #{SAFETY_CAR.findIndex(c => c.circuit === "Suzuka") + 1}/{SAFETY_CAR.length}
+                {suzukaSC ? `#${SAFETY_CAR.indexOf(suzukaSC) + 1}/${SAFETY_CAR.length}` : "est."}
               </p>
             </div>
 
@@ -530,11 +652,11 @@ function NextRaceBriefingTab({
                   <circle
                     cx="40" cy="40" r="34" fill="none" stroke="#22c55e" strokeWidth="6"
                     strokeLinecap="round"
-                    strokeDasharray={`${(NEXT_RACE.poleConversion / 100) * 213.6} 213.6`}
+                    strokeDasharray={`${(nextRace.poleConversion / 100) * 213.6} 213.6`}
                   />
                 </svg>
                 <div className="gauge-value">
-                  <span className="f1-data text-lg font-bold text-[#22c55e]">{NEXT_RACE.poleConversion}%</span>
+                  <span className="f1-data text-lg font-bold text-[#22c55e]">{nextRace.poleConversion}%</span>
                 </div>
               </div>
               <p className="f1-label-xs mt-2" style={{ color: "var(--text-dim)" }}>
@@ -639,14 +761,16 @@ function ChampionshipTrackerTab({
   wccTeams,
   sortedBettingEdge,
   roundsCompleted,
+  totalPoints,
 }: {
-  t: any;
+  t: TFn;
   wdc: GammaMarket | null;
   wcc: GammaMarket | null;
   wdcDrivers: { name: string; code: string; color: string; tokenId: string }[];
   wccTeams: { name: string; code: string; color: string; tokenId: string }[];
   sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
   roundsCompleted: number;
+  totalPoints: number;
 }) {
   return (
     <div className="space-y-8">
@@ -705,7 +829,7 @@ function ChampionshipTrackerTab({
             <tbody>
               {sortedBettingEdge.map((d, idx) => {
                 const isValue = d.gap > 0;
-                const projectedPts = Math.round((d.ptsShare / 100) * 24 * (TOTAL_POINTS / roundsCompleted));
+                const projectedPts = Math.round((d.ptsShare / 100) * 24 * (totalPoints / Math.max(roundsCompleted, 1)));
                 const signal = Math.abs(d.gap) > 10
                   ? (isValue ? t("valueBet") : t("overvalued"))
                   : "Fair";
@@ -808,7 +932,7 @@ function DeepAnalyticsTab({
   sortedBettingEdge,
   roundsCompleted,
 }: {
-  t: any;
+  t: TFn;
   qualifying: QualifyingEntry[];
   sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
   roundsCompleted: number;
@@ -831,7 +955,7 @@ function DeepAnalyticsTab({
       {/* ═══ PERFORMANCE ═══════════════════════════════════════════════ */}
       <div>
         <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
-          <span className="text-[#E10600]">//</span> {t("deep.performance")}
+          <span className="text-[#E10600]">{"//"}</span> {t("deep.performance")}
         </h3>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -913,7 +1037,7 @@ function DeepAnalyticsTab({
       {/* ═══ RELIABILITY ═══════════════════════════════════════════════ */}
       <div>
         <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
-          <span className="text-[#E10600]">//</span> {t("deep.reliability")}
+          <span className="text-[#E10600]">{"//"}</span> {t("deep.reliability")}
         </h3>
 
         <div id="reliability" className="grid gap-4 md:grid-cols-2" style={{ scrollMarginTop: "4rem" }}>
@@ -977,7 +1101,7 @@ function DeepAnalyticsTab({
       {/* ═══ STRATEGY ═════════════════════════════════════════════════ */}
       <div>
         <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
-          <span className="text-[#E10600]">//</span> {t("deep.strategy")}
+          <span className="text-[#E10600]">{"//"}</span> {t("deep.strategy")}
         </h3>
 
         <div id="strategy" className="f1-surface p-5" style={{ scrollMarginTop: "4rem" }}>
@@ -1096,7 +1220,7 @@ function DeepAnalyticsTab({
       {/* ═══ HEAD-TO-HEAD ═════════════════════════════════════════════ */}
       <div>
         <h3 className="f1-heading text-white mb-3 flex items-center gap-2">
-          <span className="text-[#E10600]">//</span> {t("deep.headToHead")}
+          <span className="text-[#E10600]">{"//"}</span> {t("deep.headToHead")}
         </h3>
 
         {/* ── Points Progression Chart ───────────────────────────────── */}

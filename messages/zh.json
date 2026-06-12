@@ -5,7 +5,10 @@
     "loading": "加载中...",
     "error": "出了点问题",
     "viewAll": "查看全部",
-    "learnMore": "了解更多"
+    "learnMore": "了解更多",
+    "live": "直播中",
+    "raceWeekend": "比赛周末",
+    "offSeason": "休赛期"
   },
   "nav": {
     "home": "首页",
@@ -38,7 +41,16 @@
     "season2026": "2026赛季",
     "round": "第{round}站",
     "sprint": "冲刺赛",
-    "nearest": "临近日期"
+    "nearest": "临近日期",
+    "wdcTicker": "车手总冠军赔率",
+    "winProbability": "正赛夺冠概率",
+    "wdcProbability": "总冠军概率",
+    "tradeOnPolymarket": "去 Polymarket 交易",
+    "viewMarkets": "全部市场",
+    "upNext": "即将开始",
+    "predictionMarkets": "预测市场",
+    "allMarkets": "全部市场",
+    "fullStandings": "完整积分榜"
   },
   "race": {
     "circuit": "赛道",
@@ -192,7 +204,11 @@
     "liveOdds": "实时赔率",
     "updatedEvery60s": "每60秒更新",
     "totalVol": "总交易量",
-    "ends": "截止"
+    "ends": "截止",
+    "h24": "24小时",
+    "d7Trend": "7日趋势",
+    "showLess": "收起",
+    "viewAllOutcomes": "查看全部"
   },
   "analytics": {
     "title": "数据分析实验室",
@@ -351,5 +367,19 @@
   "footer": {
     "disclaimer": "F1 Pulse 仅展示预测市场数据，不构成投资建议。请自行研究后做出决策。",
     "poweredBy": "数据来源：OpenF1 & Polymarket"
+  },
+  "standings": {
+    "title": "积分榜",
+    "drivers": "车手积分榜",
+    "constructors": "车队积分榜",
+    "driver": "车手",
+    "team": "车队",
+    "points": "积分",
+    "wins": "胜场",
+    "gap": "差距",
+    "pointsProgression": "积分走势",
+    "racePointsNote": "仅正赛积分（不含冲刺赛）",
+    "afterRound": "第 {round} 轮后",
+    "fullCalendar": "完整赛历"
   }
 }

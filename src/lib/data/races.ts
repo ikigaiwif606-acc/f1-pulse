@@ -1,5 +1,4 @@
-import { getSessions } from "@/lib/api/openf1";
-import { transformOpenF1Sessions } from "./transformers";
+import { getSeasonContext } from "./season";
 import type { RaceListItem } from "@/types";
 
 // ── Fallback data (2026 season — full 24-race calendar) ────────
@@ -31,16 +30,11 @@ const FALLBACK_RACES: RaceListItem[] = [
 ];
 
 export async function getRacesList(): Promise<RaceListItem[]> {
-  try {
-    // Try 2026 season — if the API has real data, use it; otherwise fallback
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sessions = (await getSessions({ year: "2026" })) as any[];
-    const races = transformOpenF1Sessions(sessions);
-    if (races.length > 0) return races;
-    return FALLBACK_RACES;
-  } catch {
-    return FALLBACK_RACES;
-  }
+  // Jolpica-first (OpenF1 now requires auth and 401s for anonymous calls).
+  // The static calendar is a last resort if Jolpica itself is down.
+  const ctx = await getSeasonContext();
+  if (ctx && ctx.races.length > 0) return ctx.races;
+  return FALLBACK_RACES;
 }
 
 export async function getRaceDetail(slug: string): Promise<RaceListItem | null> {

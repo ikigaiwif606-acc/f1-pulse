@@ -791,10 +791,174 @@
   transform: scale(1.04);
 }
 
-/* ── Responsive: mobile market table + hero ───────────── */
+/* ── Responsive: mobile hero padding ──────────────────── */
 @media (max-width: 900px) {
   .hero-section {
-    min-height: 65vh !important;
-    padding: 70px 20px 40px !important;
+    padding: 32px 20px 40px !important;
   }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Trading-terminal layer — ticker, live states, odds motion
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Odds ticker strip (under header) ─────────────────── */
+.ticker-strip {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  background: rgba(10, 10, 16, 0.9);
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+.ticker-strip::before,
+.ticker-strip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker-strip::before {
+  left: 0;
+  background: linear-gradient(90deg, #07070c, transparent);
+}
+.ticker-strip::after {
+  right: 0;
+  background: linear-gradient(270deg, #07070c, transparent);
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  white-space: nowrap;
+  animation: ticker-scroll 45s linear infinite;
+  will-change: transform;
+}
+.ticker-strip:hover .ticker-track {
+  animation-play-state: paused;
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ── Live session chip ─────────────────────────────────── */
+.live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #E10600;
+  border-radius: 9999px;
+  padding: 0.25rem 0.7rem;
+  box-shadow: 0 0 16px rgba(225, 6, 0, 0.5), 0 0 40px rgba(225, 6, 0, 0.2);
+}
+.live-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: live-pulse 1.2s ease-in-out infinite;
+}
+
+/* ── Odds flash on change (trading-terminal style) ─────── */
+@keyframes flash-up {
+  0% { background: rgba(0, 210, 106, 0.25); }
+  100% { background: transparent; }
+}
+@keyframes flash-down {
+  0% { background: rgba(255, 71, 87, 0.25); }
+  100% { background: transparent; }
+}
+.flash-up { animation: flash-up 1.2s ease-out; }
+.flash-down { animation: flash-down 1.2s ease-out; }
+
+/* ── Win-probability bars (hero) ───────────────────────── */
+.prob-bar-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.prob-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  transform-origin: left;
+  animation: prob-grow 0.9s var(--ease) both;
+}
+@keyframes prob-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ── EKG pulse divider (brand motif) ───────────────────── */
+.pulse-line {
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  animation: pulse-draw 2.4s var(--ease) forwards infinite;
+}
+@keyframes pulse-draw {
+  0% { stroke-dashoffset: 320; opacity: 0; }
+  15% { opacity: 1; }
+  60% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* ── Standings gap bars ────────────────────────────────── */
+.gap-bar {
+  height: 4px;
+  border-radius: 2px;
+  transform-origin: left;
+  animation: prob-grow 0.8s var(--ease) both;
+}
+
+/* ── Mobile bottom tab bar ─────────────────────────────── */
+.mobile-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  background: rgba(7, 7, 12, 0.92);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (min-width: 768px) {
+  .mobile-tabbar { display: none; }
+}
+/* Keep content clear of the tab bar on mobile */
+@media (max-width: 767px) {
+  .has-tabbar-padding { padding-bottom: 64px; }
+}
+
+/* ── Reduced motion ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track,
+  .animate-live,
+  .countdown-sep-blink,
+  .live-chip .dot,
+  .pulse-line {
+    animation: none !important;
+  }
+  .prob-bar-fill,
+  .gap-bar,
+  .section-animate,
+  .animate-fade-up {
+    animation-duration: 0.01s !important;
+  }
+  html { scroll-behavior: auto; }
 }

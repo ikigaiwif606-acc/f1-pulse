@@ -8,7 +8,8 @@
     "learnMore": "Learn More",
     "live": "LIVE",
     "raceWeekend": "RACE WEEKEND",
-    "offSeason": "OFF-SEASON"
+    "offSeason": "OFF-SEASON",
+    "search": "Search"
   },
   "nav": {
     "home": "Home",
@@ -381,5 +382,12 @@
     "racePointsNote": "Race points only (sprints excluded)",
     "afterRound": "After round {round}",
     "fullCalendar": "Full calendar"
+  },
+  "palette": {
+    "placeholder": "Search drivers, teams, races…",
+    "empty": "No results",
+    "pages": "Pages",
+    "navigate": "navigate",
+    "select": "open"
   }
 }

@@ -1,11 +1,19 @@
 const BASE_URL = "https://api.openf1.org/v1";
 
+// OpenF1 requires authentication since 2026 — anonymous calls return 401.
+// Set OPENF1_API_KEY (Vercel env + .env.local) to re-enable live session data;
+// without it every caller falls through to its Jolpica-based fallback.
 async function fetchOpenF1<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
   const url = new URL(`${BASE_URL}${endpoint}`);
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
-  const res = await fetch(url.toString(), { next: { revalidate: 300 } });
+  const apiKey = process.env.OPENF1_API_KEY;
+  const res = await fetch(url.toString(), {
+    next: { revalidate: 300 },
+    signal: AbortSignal.timeout(8000),
+    ...(apiKey && { headers: { Authorization: `Bearer ${apiKey}` } }),
+  });
   if (!res.ok) throw new Error(`OpenF1 ${endpoint}: ${res.status}`);
   return res.json();
 }

@@ -8,7 +8,8 @@
     "learnMore": "了解更多",
     "live": "直播中",
     "raceWeekend": "比赛周末",
-    "offSeason": "休赛期"
+    "offSeason": "休赛期",
+    "search": "搜索"
   },
   "nav": {
     "home": "首页",
@@ -381,5 +382,12 @@
     "racePointsNote": "仅正赛积分（不含冲刺赛）",
     "afterRound": "第 {round} 轮后",
     "fullCalendar": "完整赛历"
+  },
+  "palette": {
+    "placeholder": "搜索车手、车队、比赛…",
+    "empty": "无结果",
+    "pages": "页面",
+    "navigate": "导航",
+    "select": "打开"
   }
 }

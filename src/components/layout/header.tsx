@@ -135,6 +135,27 @@ export function Header({ season }: { season?: SeasonBadge }) {
         <div className="flex items-center gap-4">
           {statusBadge()}
 
+          {/* Command palette trigger */}
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("f1pulse:palette"))}
+            className="hidden items-center gap-2 sm:flex f1-transition"
+            aria-label={tc("search")}
+            style={{
+              padding: "5px 10px",
+              border: "1px solid var(--border-subtle, rgba(255,255,255,0.05))",
+              borderRadius: "6px",
+              background: "transparent",
+              cursor: "pointer",
+              color: "var(--text-dim, #888)",
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+              <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <kbd className="f1-data" style={{ fontSize: "10px", letterSpacing: "0.5px" }}>⌘K</kbd>
+          </button>
+
           {/* Locale switcher */}
           <button
             onClick={switchLocale}

@@ -14,6 +14,7 @@ import {
   type GammaEvent,
 } from "@/lib/api/polymarket";
 import { getSeasonContext } from "@/lib/data/season";
+import { getSeasonStats, type SeasonStats } from "@/lib/data/season-stats";
 import { getDriversList } from "@/lib/data/drivers";
 import { OddsMovementChart } from "@/components/analytics/odds-movement-chart";
 import { MarketCard } from "@/components/analytics/market-card";
@@ -299,12 +300,25 @@ async function getQualifyingData(): Promise<QualifyingEntry[]> {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default async function AnalyticsPage() {
-  const [qualifying, events, ctx, drivers] = await Promise.all([
+  const [qualifying, events, ctx, drivers, seasonStats] = await Promise.all([
     getQualifyingData(),
     getF1Events(40).catch(() => [] as GammaEvent[]),
     getSeasonContext().catch(() => null),
     getDriversList().catch(() => []),
+    getSeasonStats().catch(() => null),
   ]);
+
+  // Teammate battles show official championship points (incl. sprints) when available
+  const ptsByCode = new Map(drivers.map((d) => [d.code, d.pts]));
+  const liveStats: SeasonStats | null = seasonStats
+    ? {
+        ...seasonStats,
+        battles: seasonStats.battles.map((b) => ({
+          ...b,
+          pts: [ptsByCode.get(b.c1) ?? b.pts[0], ptsByCode.get(b.c2) ?? b.pts[1]] as [number, number],
+        })),
+      }
+    : null;
 
   // Live next-race header (falls back to the static constant)
   const nextRace: NextRaceHeader = ctx?.nextRace
@@ -398,6 +412,7 @@ export default async function AnalyticsPage() {
       roundsCompleted={roundsCompleted}
       totalPoints={totalPoints}
       bettingEdge={bettingEdge}
+      stats={liveStats}
     />
   );
 }
@@ -417,6 +432,7 @@ interface ContentProps {
   roundsCompleted: number;
   totalPoints: number;
   bettingEdge: { name: string; code: string; color: string; odds: number; pts: number }[];
+  stats: SeasonStats | null;
 }
 
 function AnalyticsPageContent({
@@ -430,8 +446,14 @@ function AnalyticsPageContent({
   roundsCompleted,
   totalPoints,
   bettingEdge,
+  stats,
 }: ContentProps) {
   const t = useTranslations("analytics");
+
+  // Live tables with editorial fallbacks
+  const battles = stats?.battles?.length ? stats.battles : (TEAMMATE_BATTLES as SeasonStats["battles"]);
+  const dnfRates = stats?.dnf?.length ? stats.dnf : DNF;
+  const gridVsFinish = stats?.gridFinish?.length ? stats.gridFinish : GRID_VS_FINISH;
 
   // Sort betting edge by absolute gap (biggest mispricing first)
   const sortedBettingEdge = [...bettingEdge]
@@ -504,6 +526,7 @@ function AnalyticsPageContent({
                   sortedBettingEdge={sortedBettingEdge}
                   suzukaSC={suzukaSC}
                   nextRace={nextRace}
+                  gridVsFinish={gridVsFinish}
                 />
               ),
             },
@@ -534,6 +557,9 @@ function AnalyticsPageContent({
                   qualifying={qualifying}
                   sortedBettingEdge={sortedBettingEdge}
                   roundsCompleted={roundsCompleted}
+                  battles={battles}
+                  dnfRates={dnfRates}
+                  gridVsFinish={gridVsFinish}
                 />
               ),
             },
@@ -556,6 +582,7 @@ function NextRaceBriefingTab({
   sortedBettingEdge,
   suzukaSC,
   nextRace,
+  gridVsFinish,
 }: {
   t: TFn;
   raceMarkets: GammaMarket[];
@@ -563,6 +590,7 @@ function NextRaceBriefingTab({
   sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
   suzukaSC: (typeof SAFETY_CAR)[0] | undefined;
   nextRace: NextRaceHeader;
+  gridVsFinish: SeasonStats["gridFinish"];
 }) {
   return (
     <div className="space-y-6">
@@ -669,7 +697,7 @@ function NextRaceBriefingTab({
           <div className="rounded border border-[#1c1c1c] bg-[#0c0c0c] p-3">
             <p className="f1-label-xs mb-2">{t("nextRace.gridImpact")}</p>
             <div className="space-y-2">
-              {GRID_VS_FINISH.slice(0, 5).map(d => {
+              {gridVsFinish.slice(0, 5).map(d => {
                 const arrow = d.delta > 0 ? "\u25B2" : d.delta < 0 ? "\u25BC" : "\u2014";
                 return (
                   <div key={d.code} className="flex items-center justify-between">
@@ -931,11 +959,17 @@ function DeepAnalyticsTab({
   qualifying,
   sortedBettingEdge,
   roundsCompleted,
+  battles,
+  dnfRates,
+  gridVsFinish,
 }: {
   t: TFn;
   qualifying: QualifyingEntry[];
   sortedBettingEdge: { name: string; code: string; color: string; odds: number; pts: number; ptsShare: number; gap: number }[];
   roundsCompleted: number;
+  battles: SeasonStats["battles"];
+  dnfRates: SeasonStats["dnf"];
+  gridVsFinish: SeasonStats["gridFinish"];
 }) {
   return (
     <div className="space-y-8">
@@ -998,7 +1032,7 @@ function DeepAnalyticsTab({
             <p className="f1-label mb-4">{t("gridVsFinishDesc")}</p>
 
             <div className="space-y-2">
-              {GRID_VS_FINISH.map((d) => {
+              {gridVsFinish.map((d) => {
                 const isGain = d.delta > 0;
                 const isLoss = d.delta < 0;
                 const deltaArrow = isGain ? "\u25B2" : isLoss ? "\u25BC" : "\u2014";
@@ -1051,7 +1085,7 @@ function DeepAnalyticsTab({
             <p className="f1-label mb-4">{t("dnfRateDesc")}</p>
 
             <div className="space-y-2">
-              {DNF.map((d) => (
+              {dnfRates.map((d) => (
                 <div key={d.team} className="flex items-center gap-3">
                   <div className="f1-team-bar h-5" style={{ backgroundColor: d.color }} />
                   <span className="f1-body-sm w-24" style={{ color: "var(--text-muted)" }}>{d.team}</span>
@@ -1237,7 +1271,7 @@ function DeepAnalyticsTab({
             <p className="f1-label mb-4">{t("teammateBattlesDesc")}</p>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {TEAMMATE_BATTLES.map((b) => {
+              {battles.map((b) => {
                 const qualiTotal = b.qualiH2H[0] + b.qualiH2H[1];
                 const raceTotal = b.raceH2H[0] + b.raceH2H[1];
                 const qualiPct1 = qualiTotal > 0 ? (b.qualiH2H[0] / qualiTotal) * 100 : 50;

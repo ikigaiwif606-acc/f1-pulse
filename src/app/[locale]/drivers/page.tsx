@@ -120,7 +120,7 @@ function DriversPageContent({ drivers }: { drivers: DriverListItem[] }) {
                       {/* ── Watermark Race Number ─────────────── */}
                       <span
                         className="absolute right-[-5%] bottom-[-10%] text-[12rem] font-black italic text-zinc-800/20 z-0 pointer-events-none select-none"
-                        style={{ fontFamily: "var(--font-oswald), system-ui", lineHeight: 1 }}
+                        style={{ fontFamily: "var(--font-barlow), system-ui", lineHeight: 1 }}
                         aria-hidden="true"
                       >
                         {d.number}

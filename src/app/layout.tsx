@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Oswald, JetBrains_Mono } from "next/font/google";
+import { Inter, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,10 +7,11 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const oswald = Oswald({
-  variable: "--font-oswald",
+// Pit Wall display face — condensed industrial, motorsport signage
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -33,7 +34,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable} antialiased dark`}
+        className={`${inter.variable} ${barlowCondensed.variable} ${jetbrainsMono.variable} antialiased dark`}
       >
         {children}
       </body>

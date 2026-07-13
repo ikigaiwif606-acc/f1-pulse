@@ -161,7 +161,7 @@ export function Header({ season }: { season?: SeasonBadge }) {
             onClick={switchLocale}
             className="f1-transition"
             style={{
-              fontFamily: "var(--font-oswald), sans-serif",
+              fontFamily: "var(--font-barlow), sans-serif",
               fontSize: "12px",
               letterSpacing: "1px",
               color: "var(--text-dim, #888)",

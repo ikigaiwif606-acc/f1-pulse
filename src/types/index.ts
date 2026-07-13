@@ -219,7 +219,7 @@ export interface HomepageData {
   seasonStatus: "live" | "raceWeekend" | "midSeason" | "offSeason";
   liveSession: string | null;
   seasonProgress: { completed: number; total: number };
-  standings: { pos: number; id: string; name: string; code: string; pts: number; color: string }[];
+  standings: { pos: number; id: string; name: string; code: string; pts: number; wins: number; color: string }[];
   recent: { round: number; slug: string; name: string; winner: string; code: string; color: string }[];
   maxPts: number;
 }

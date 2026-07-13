@@ -30,37 +30,43 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [cursor, setCursor] = useState(0);
+  const openRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // State resets happen in the open/close helpers (not effects) so opening
+  // always starts from a clean slate without cascading renders.
+  const openPalette = useCallback(() => {
+    openRef.current = true;
+    setQuery("");
+    setCursor(0);
+    setOpen(true);
+    // Focus after the overlay mounts
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }, []);
+
+  const closePalette = useCallback(() => {
+    openRef.current = false;
+    setOpen(false);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setOpen((o) => !o);
+        if (openRef.current) closePalette();
+        else openPalette();
       } else if (e.key === "Escape") {
-        setOpen(false);
+        closePalette();
       }
     }
-    function onOpen() {
-      setOpen(true);
-    }
     window.addEventListener("keydown", onKey);
-    window.addEventListener("f1pulse:palette", onOpen);
+    window.addEventListener("f1pulse:palette", openPalette);
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("f1pulse:palette", onOpen);
+      window.removeEventListener("f1pulse:palette", openPalette);
     };
-  }, []);
-
-  useEffect(() => {
-    if (open) {
-      setQuery("");
-      setCursor(0);
-      // Focus after the overlay mounts
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
-  }, [open]);
+  }, [openPalette, closePalette]);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -74,10 +80,10 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
 
   const go = useCallback(
     (item: PaletteItem) => {
-      setOpen(false);
+      closePalette();
       router.push(item.href as "/");
     },
-    [router]
+    [router, closePalette]
   );
 
   function onInputKey(e: React.KeyboardEvent) {
@@ -92,10 +98,6 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
       go(results[cursor]);
     }
   }
-
-  useEffect(() => {
-    setCursor(0);
-  }, [query]);
 
   useEffect(() => {
     listRef.current
@@ -118,7 +120,7 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
     <div
       className="fixed inset-0 z-[100] flex items-start justify-center px-4"
       style={{ background: "rgba(4,4,8,0.7)", backdropFilter: "blur(6px)", paddingTop: "12vh" }}
-      onClick={() => setOpen(false)}
+      onClick={closePalette}
       role="dialog"
       aria-modal="true"
       aria-label={t("placeholder")}
@@ -142,7 +144,10 @@ export function CommandPalette({ items }: { items: PaletteItem[] }) {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setCursor(0);
+            }}
             onKeyDown={onInputKey}
             placeholder={t("placeholder")}
             className="f1-body flex-1 bg-transparent outline-none"

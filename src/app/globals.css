@@ -8,7 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
-  --font-display: var(--font-oswald);
+  --font-display: var(--font-barlow);
   --font-mono: var(--font-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -130,6 +130,16 @@
   --accent-red: #ff4757;
   --accent-neutral: #6c6c7a;
 
+  /* ── Pit Wall: FIA timing semantics — fixed meanings ──
+     purple = session best / leader / market favourite
+     green  = improving / price rising
+     yellow = caution / drifting / stale data
+     red    = LIVE only, never decorative */
+  --timing-purple: #B78CFF;
+  --timing-green: #3DDC97;
+  --timing-yellow: #FFC838;
+  --timing-red: #FF3B57;
+
   /* Team colors */
   --team-mercedes: #27F4D2;
   --team-ferrari: #E8002D;
@@ -172,19 +182,19 @@
     scroll-behavior: smooth;
   }
 
-  /* Selection */
+  /* Selection — timing purple (session best) */
   ::selection {
-    background-color: #E10600;
-    color: white;
+    background-color: #B78CFF;
+    color: #0A0C11;
   }
 }
 
 /* ── Typography Scale ─────────────────────────────────── */
 /*
- * Inspired by landonorris.com — tight tracking on display,
- * fluid scaling, disciplined hierarchy.
+ * Pit Wall type system — the screen a race engineer and a
+ * trader would share.
  *
- * Display:  Oswald — headlines, page titles
+ * Display:  Barlow Condensed — headlines, page titles (motorsport signage)
  * Body:     Inter — paragraphs, UI text
  * Mono:     JetBrains Mono — data, numbers, timing
  * Label:    Inter uppercase — eyebrows, captions, metadata
@@ -192,30 +202,30 @@
 
 /* Display — page titles */
 .f1-display {
-  font-family: var(--font-oswald), system-ui, sans-serif;
+  font-family: var(--font-barlow), system-ui, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
   line-height: 0.9;
 }
 .f1-display-xl {
-  font-family: var(--font-oswald), system-ui, sans-serif;
+  font-family: var(--font-barlow), system-ui, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.01em;
   line-height: 0.85;
   font-size: clamp(2rem, 5vw, 3.5rem);
 }
 .f1-display-lg {
-  font-family: var(--font-oswald), system-ui, sans-serif;
+  font-family: var(--font-barlow), system-ui, sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
   line-height: 0.9;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
 }
 .f1-display-md {
-  font-family: var(--font-oswald), system-ui, sans-serif;
+  font-family: var(--font-barlow), system-ui, sans-serif;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: -0.01em;
@@ -225,7 +235,7 @@
 
 /* Headings — section titles */
 .f1-heading {
-  font-family: var(--font-oswald), system-ui, sans-serif;
+  font-family: var(--font-barlow), system-ui, sans-serif;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -429,7 +439,7 @@
 
 /* ── Accessibility — Focus States ────────────────────── */
 *:focus-visible {
-  outline: 2px solid #E10600 !important;
+  outline: 2px solid #B78CFF !important;
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -945,12 +955,213 @@
   .has-tabbar-padding { padding-bottom: 64px; }
 }
 
+/* ══════════════════════════════════════════════════════════
+   Pit Wall layer — bilingual signage, AS-OF badges, timing tower
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Bilingual eyebrow — EN/中文 paired like FIA event signage ── */
+.pw-eyebrow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #8b8b9e);
+  font-variant-numeric: tabular-nums;
+}
+.pw-eyebrow::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  background: var(--timing-purple, #B78CFF);
+  align-self: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(183, 140, 255, 0.45);
+}
+.pw-eyebrow b {
+  color: var(--text-primary, #eeeef0);
+  font-weight: 600;
+}
+.pw-eyebrow .pw-echo {
+  letter-spacing: 0.3em;
+  color: var(--text-subtle, #777);
+  font-weight: 400;
+}
+
+/* ── AS-OF badge — staleness is first-class UI (rule R-01) ── */
+.pw-asof {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim, #888);
+  border: 1px solid var(--border-default, rgba(255,255,255,0.09));
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pw-asof .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--timing-green, #3DDC97);
+  animation: live-pulse 2s var(--ease) infinite;
+  box-shadow: 0 0 6px rgba(61, 220, 151, 0.5);
+}
+.pw-asof.stale {
+  color: var(--timing-yellow, #FFC838);
+  border-color: rgba(255, 200, 56, 0.3);
+}
+.pw-asof.stale .dot {
+  background: var(--timing-yellow, #FFC838);
+  animation: none;
+  box-shadow: none;
+}
+
+/* ── Speed skew — display type leans into the corner ── */
+.pw-skew {
+  transform: skewX(-6deg);
+}
+
+/* ── Countdown cell — mono timing block ── */
+.pw-cd-cell {
+  flex: 1;
+  min-width: 68px;
+  background: var(--bg-secondary, #0e0e18);
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  border-radius: 4px;
+  padding: 14px 4px 10px;
+  text-align: center;
+}
+
+/* ── Circuit name — outline stroke ── */
+.pw-outline {
+  -webkit-text-stroke: 1px var(--text-subtle, #777);
+  color: transparent;
+  letter-spacing: 0.04em;
+}
+
+/* ── Timing tower ── */
+.pw-tower-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  border-radius: 6px;
+  background: var(--bg-secondary, #0e0e18);
+}
+.pw-tower {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+  font-variant-numeric: tabular-nums;
+}
+.pw-tower th {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-subtle, #777);
+  text-align: right;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  white-space: nowrap;
+}
+.pw-tower th:first-child,
+.pw-tower th:nth-child(2) {
+  text-align: left;
+}
+.pw-tower td {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  text-align: right;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+  white-space: nowrap;
+}
+.pw-tower td:first-child,
+.pw-tower td:nth-child(2) {
+  text-align: left;
+}
+.pw-tower tbody tr {
+  transition: background var(--duration) var(--ease);
+}
+.pw-tower tbody tr:hover {
+  background: var(--bg-hover, #1c1c30);
+}
+.pw-tower tbody tr:last-child td {
+  border-bottom: 0;
+}
+.pw-pos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  background: var(--bg-tertiary, #161625);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary, #eeeef0);
+}
+tr.pw-p1 .pw-pos {
+  background: var(--timing-purple, #B78CFF);
+  color: #0A0C11;
+}
+tr.pw-p1 .pw-mkt {
+  color: var(--timing-purple, #B78CFF);
+}
+.pw-edge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  border-radius: 3px;
+  padding: 3px 7px;
+}
+.pw-edge.up {
+  background: rgba(61, 220, 151, 0.12);
+  color: var(--timing-green, #3DDC97);
+}
+.pw-edge.dn {
+  background: rgba(255, 200, 56, 0.12);
+  color: var(--timing-yellow, #FFC838);
+}
+.pw-edge.flat {
+  color: var(--text-subtle, #777);
+}
+.pw-tower-note {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle, #777);
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.05));
+}
+.pw-tower-note em {
+  color: var(--timing-green, #3DDC97);
+  font-style: normal;
+}
+.pw-tower-note i {
+  color: var(--timing-yellow, #FFC838);
+  font-style: normal;
+}
+
 /* ── Reduced motion ────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .ticker-track,
   .animate-live,
   .countdown-sep-blink,
   .live-chip .dot,
+  .pw-asof .dot,
   .pulse-line {
     animation: none !important;
   }

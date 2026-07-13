@@ -9,7 +9,9 @@
     "live": "直播中",
     "raceWeekend": "比赛周末",
     "offSeason": "休赛期",
-    "search": "搜索"
+    "search": "搜索",
+    "dataLive": "实时",
+    "dataStale": "数据延迟"
   },
   "nav": {
     "home": "首页",
@@ -40,7 +42,7 @@
     "onThisDay": "历史上的今天",
     "liveDashboard": "实时仪表板",
     "season2026": "2026赛季",
-    "round": "第{round}站",
+    "round": "第{round}/{total}站",
     "sprint": "冲刺赛",
     "nearest": "临近日期",
     "wdcTicker": "车手总冠军赔率",
@@ -51,7 +53,12 @@
     "upNext": "即将开始",
     "predictionMarkets": "预测市场",
     "allMarkets": "全部市场",
-    "fullStandings": "完整积分榜"
+    "fullStandings": "完整积分榜",
+    "theMarket": "市场行情",
+    "timingTower": "计时塔",
+    "edgeNote": "差值 = 积分排名与市场排名之差",
+    "edgeUp": "资金看好",
+    "edgeDown": "资金看淡"
   },
   "race": {
     "circuit": "赛道",
@@ -381,7 +388,9 @@
     "pointsProgression": "积分走势",
     "racePointsNote": "仅正赛积分（不含冲刺赛）",
     "afterRound": "第 {round} 轮后",
-    "fullCalendar": "完整赛历"
+    "fullCalendar": "完整赛历",
+    "market": "市场",
+    "edge": "差值"
   },
   "palette": {
     "placeholder": "搜索车手、车队、比赛…",

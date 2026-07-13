@@ -9,7 +9,9 @@
     "live": "LIVE",
     "raceWeekend": "RACE WEEKEND",
     "offSeason": "OFF-SEASON",
-    "search": "Search"
+    "search": "Search",
+    "dataLive": "Live",
+    "dataStale": "Stale data"
   },
   "nav": {
     "home": "Home",
@@ -40,7 +42,7 @@
     "onThisDay": "On This Day",
     "liveDashboard": "Live Dashboard",
     "season2026": "2026 Season",
-    "round": "Round",
+    "round": "Round {round}/{total}",
     "sprint": "Sprint",
     "nearest": "Nearest",
     "wdcTicker": "WDC ODDS",
@@ -51,7 +53,12 @@
     "upNext": "Up next",
     "predictionMarkets": "Prediction Markets",
     "allMarkets": "All Markets",
-    "fullStandings": "Full standings"
+    "fullStandings": "Full standings",
+    "theMarket": "The Market",
+    "timingTower": "Timing Tower",
+    "edgeNote": "Edge = points rank vs market rank",
+    "edgeUp": "the money rates them higher",
+    "edgeDown": "the money is fading them"
   },
   "race": {
     "circuit": "Circuit",
@@ -82,7 +89,7 @@
     "raceStart": "Race Start",
     "completed": "Completed",
     "upcoming": "Upcoming",
-    "round": "Round",
+    "round": "Round {round}",
     "season": "Season",
     "lastWinners": "Last {count} Winners",
     "trackLength": "Track Length",
@@ -381,7 +388,9 @@
     "pointsProgression": "Points Progression",
     "racePointsNote": "Race points only (sprints excluded)",
     "afterRound": "After round {round}",
-    "fullCalendar": "Full calendar"
+    "fullCalendar": "Full calendar",
+    "market": "Market",
+    "edge": "Edge"
   },
   "palette": {
     "placeholder": "Search drivers, teams, races…",

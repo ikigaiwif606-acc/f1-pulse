@@ -132,7 +132,16 @@ const FALLBACK_CHAMPIONSHIP_ODDS: ChampionshipOddsItem[] = [
   { name: "Max Verstappen", code: "VER", odds: 0.03, volume: "$31M", change: -0.03, color: "#3671C6" },
 ];
 
-export async function getMarkets(category?: string): Promise<MarketsData> {
+// Markets + provenance — staleness is first-class data (Pit Wall rule R-01):
+// consumers must be able to tell live Polymarket data from the static fallback.
+export interface MarketsMeta {
+  data: MarketsData;
+  stale: boolean;
+  timestamp: string;
+}
+
+export async function getMarketsMeta(category?: string): Promise<MarketsMeta> {
+  const timestamp = new Date().toISOString();
   try {
     const events = await getF1Events(40);
     const markets = transformPolymarketEvents(events);
@@ -145,16 +154,25 @@ export async function getMarkets(category?: string): Promise<MarketsData> {
     ) {
       if (category && category in markets) {
         return {
-          ...FALLBACK_MARKETS,
-          [category]: markets[category as keyof MarketsData],
+          data: {
+            ...FALLBACK_MARKETS,
+            [category]: markets[category as keyof MarketsData],
+          },
+          stale: false,
+          timestamp,
         };
       }
-      return markets;
+      return { data: markets, stale: false, timestamp };
     }
-    return FALLBACK_MARKETS;
+    return { data: FALLBACK_MARKETS, stale: true, timestamp };
   } catch {
-    return FALLBACK_MARKETS;
+    return { data: FALLBACK_MARKETS, stale: true, timestamp };
   }
+}
+
+export async function getMarkets(category?: string): Promise<MarketsData> {
+  const { data } = await getMarketsMeta(category);
+  return data;
 }
 
 export async function getChampionshipOdds(): Promise<ChampionshipOddsItem[]> {

@@ -21,7 +21,7 @@ export function NewsSection({ news }: NewsSectionProps) {
   return (
     <section className="section-animate">
       <div className="flex items-baseline justify-between" style={{ marginBottom: "20px" }}>
-        <div style={{ fontFamily: "var(--font-oswald), sans-serif", fontSize: "22px", fontWeight: 700, letterSpacing: "0.5px", color: "var(--text-primary, #eeeef0)" }}>
+        <div style={{ fontFamily: "var(--font-barlow), sans-serif", fontSize: "22px", fontWeight: 700, letterSpacing: "0.5px", color: "var(--text-primary, #eeeef0)" }}>
           {t("latestHeadlines")}
         </div>
         <Link href="/news" style={{ fontSize: "13px", color: "var(--text-secondary, #8b8b9e)", textDecoration: "none", fontWeight: 500 }}>

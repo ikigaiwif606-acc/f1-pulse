@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { useMarkets } from "@/lib/hooks/use-markets";
+import type { MarketsMeta } from "@/lib/data/markets";
 import type { MarketOutcomeItem } from "@/types";
 
 // Driver code → team mapping (2026 grid)
@@ -56,10 +57,10 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
 
 type TabKey = "championship" | "nextRace" | "constructors";
 
-export function MarketOverview() {
+export function MarketOverview({ initial }: { initial?: MarketsMeta }) {
   const t = useTranslations("markets");
   const tHome = useTranslations("home");
-  const { markets, isLoading } = useMarkets();
+  const { markets, isLoading } = useMarkets(initial);
   const [activeTab, setActiveTab] = useState<TabKey>("championship");
   const [expanded, setExpanded] = useState(false);
 

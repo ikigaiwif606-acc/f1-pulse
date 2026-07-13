@@ -103,11 +103,11 @@ const FALLBACK: HomepageData = {
   liveSession: null,
   seasonProgress: { completed: 2, total: 22 },
   standings: [
-    { pos: 1, id: "russell", name: "George Russell", code: "RUS", pts: 51, color: "#27F4D2" },
-    { pos: 2, id: "antonelli", name: "Andrea Kimi Antonelli", code: "ANT", pts: 47, color: "#27F4D2" },
-    { pos: 3, id: "leclerc", name: "Charles Leclerc", code: "LEC", pts: 34, color: "#E80020" },
-    { pos: 4, id: "hamilton", name: "Lewis Hamilton", code: "HAM", pts: 33, color: "#E80020" },
-    { pos: 5, id: "bearman", name: "Oliver Bearman", code: "BEA", pts: 17, color: "#B6BABD" },
+    { pos: 1, id: "russell", name: "George Russell", code: "RUS", pts: 51, wins: 1, color: "#27F4D2" },
+    { pos: 2, id: "antonelli", name: "Andrea Kimi Antonelli", code: "ANT", pts: 47, wins: 1, color: "#27F4D2" },
+    { pos: 3, id: "leclerc", name: "Charles Leclerc", code: "LEC", pts: 34, wins: 0, color: "#E80020" },
+    { pos: 4, id: "hamilton", name: "Lewis Hamilton", code: "HAM", pts: 33, wins: 0, color: "#E80020" },
+    { pos: 5, id: "bearman", name: "Oliver Bearman", code: "BEA", pts: 17, wins: 0, color: "#B6BABD" },
   ],
   recent: [
     { round: 2, slug: "chinese-gp", name: "Chinese GP", winner: "Antonelli", code: "ANT", color: "#27F4D2" },
@@ -158,6 +158,7 @@ export async function getHomepageData(): Promise<HomepageData> {
               name: d.name,
               code: d.code,
               pts: d.pts,
+              wins: d.wins,
               color: d.color,
             }))
           : FALLBACK.standings,

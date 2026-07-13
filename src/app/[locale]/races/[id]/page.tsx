@@ -127,7 +127,7 @@ function RaceDetailInner({ race, prevRace, nextRace }: { race: RaceData; prevRac
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <span className="f1-label rounded bg-[#E10600] px-2 py-0.5 !text-white">
-                  {t("round")} {race.round}
+                  {t("round", { round: race.round })}
                 </span>
                 <span className="f1-label rounded border border-[#1c1c1c] bg-[#0f0f0f] px-2 py-0.5">
                   {race.season} {t("season")}

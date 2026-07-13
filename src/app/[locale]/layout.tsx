@@ -9,6 +9,7 @@ import { CommandPalette, type PaletteItem } from "@/components/layout/command-pa
 import { getSeasonContext } from "@/lib/data/season";
 import { getDriversList } from "@/lib/data/drivers";
 import { getTeamsList } from "@/lib/data/teams";
+import { getMarketsMeta } from "@/lib/data/markets";
 
 const PALETTE_PAGES = ["races", "markets", "standings", "analytics", "news", "drivers", "teams", "replay"] as const;
 
@@ -25,10 +26,11 @@ export default async function LocaleLayout({
   }
 
   const messages = (await import(`../../../messages/${locale}.json`)).default;
-  const [ctx, drivers, teams] = await Promise.all([
+  const [ctx, drivers, teams, championshipMeta] = await Promise.all([
     getSeasonContext().catch(() => null),
     getDriversList().catch(() => []),
     getTeamsList().catch(() => []),
+    getMarketsMeta("championship").catch(() => null),
   ]);
 
   const season: SeasonBadge | undefined = ctx
@@ -73,7 +75,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-screen flex-col has-tabbar-padding">
         <Header season={season} />
-        <OddsTicker />
+        <OddsTicker initial={championshipMeta ?? undefined} />
         <main className="flex-1">{children}</main>
         <Footer />
         <MobileTabbar />
